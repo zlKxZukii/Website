@@ -1,0 +1,61 @@
+html {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    padding: 40px;
+    width: 720px;
+    height: 520px;
+    background-color: transparent;
+    margin: 0;
+}
+
+.fade-animation{
+    animation: fadeInOut 10s linear;
+}
+
+.alert-box {
+    opacity: 0;
+    width: 800px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-img img {
+    max-height: 300px;
+    max-width: 400px;
+}
+
+.alert-text {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.alert-text p {
+    margin: 0;
+    font-size: 40px;
+    color: black;
+}
+
+.middle-middle {
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0; 
+  }
+  40% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1; 
+  }
+  100% {
+    opacity: 0; 
+  }
+}

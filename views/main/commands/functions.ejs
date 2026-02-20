@@ -1,0 +1,54 @@
+<%- include("../../layouts/functionsBar") %>
+
+    <div class="main">
+        <div class="functions">
+            <p>Trigger</p>
+            <p>Name</p>
+            <p>Beschreibung</p>
+            <p>Status</p>
+        </div>
+        <div class="functions">
+            <p></p>
+            <p>Spambot Protection</p>
+            <p>Filtert <b>Spam</b> Bots aus deinem <b>Chat</b>, bannt diese umgehend und löscht deren Nachrichten.</p>
+            <label>
+                <input id="spamBot" type="checkbox">
+                <div class="toggle"><span></span></div>
+            </label>
+        </div>
+        <div class="functions">
+            <p></p>
+            <p>Follow Bot Protection</p>
+            <p>Filtert <b>Follow</b> Bots aus deinem <b>Chat</b>, bannt diese umgehend, löscht deren Nachrichten und
+                bannt diese umgehend.</p>
+            <label>
+                <input id="followBot" type="checkbox">
+                <div class="toggle"><span></span></div>
+            </label>
+        </div>
+        <div class="functions">
+            <p>!clip</p>
+            <p>Clip erstellen</p>
+            <p><b style="color: red;">Für alle im Chat nutzbar.</b><br>
+                Clipt <b>automatisch</b> die letzten 30 Sekunden.</p>
+            <label>
+                <input id="clip" type="checkbox">
+                <div class="toggle"><span></span></div>
+            </label>
+        </div>
+        <div class="functions">
+            <div class="end-buttons">
+                <button onclick="safeState()">Speichern</button>
+            </div>
+        </div>
+    </div>
+    <script id="loader"> const value = <%- JSON.stringify(values) %></script>
+    <script>
+        const tagArray = ["clip", "spamBot", "followBot"];
+
+        for (let index = 0; index < tagArray.length; index++) {
+            if (value[tagArray[index]] === "true") {
+                document.getElementById(tagArray[index]).checked = true;
+            }
+        };</script>
+    <script src="../js/commands/functions.js"></script>

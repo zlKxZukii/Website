@@ -1,0 +1,21 @@
+<div class="headline">
+    <button onclick="window.location.href='https://www.twitch.tv/<%- locals.streamer%>'">👉 Hier kommst du zurück zu <%- locals.streamer%> 👈</button>
+</div>
+
+<div class="render-box" id="commandBox">
+
+</div>
+
+<script>const data =<%- JSON.stringify(list) %></script>
+
+<script>window.addEventListener("load", () => {
+                console.log(data)
+                const keys = Object.keys(data)
+                for (let index = 0; index < keys.length; index++) {
+                    document.getElementById("commandBox").innerHTML += `    
+                    <div class="command-list-element">
+                        <p>${data[keys[index]].trigger}</p>
+                        <p>${data[keys[index]].title}</p>
+                    </div>`
+                }
+            })</script>

@@ -1,0 +1,32 @@
+<div class="alert-box middle-middle" id="alert-box">
+    <div class="alert-img" id="alertImg">
+
+    </div>
+    <div class="alert-text">
+        <p id="beforeText"> </p>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const username = "<%= targetUser %>";
+    console.log("Client-seitig: Ich bin " + username);
+
+    socket.on("connect", () => {
+        console.log("Erfolgreich mit Server verbunden!");
+        socket.emit("join-room", username)
+    });
+
+    socket.on("new-alert", (data) => {
+        console.log(data)
+        document.getElementById("alertImg").innerHTML = data.alertImg;
+        document.getElementById("beforeText").innerText = data.beforeText;
+        const alertBox = document.getElementById("alert-box")
+        alertBox.classList.add("fade-animation")
+        setTimeout(() => {
+            alertBox.classList.remove("fade-animation")
+        }, 10000);
+    })
+</script>

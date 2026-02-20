@@ -1,0 +1,60 @@
+<header>
+
+    <nav>
+        <div class="hamburger" id="burgerIcon" onclick="burgerMenuSlide()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+    <div id="userWindow" aria-label="follow to dashboard" onclick="window.location.href='/dashboard'" class="user">
+        <img id="logo" src="<%= locals.img %>" alt="../img/logo.png">
+        <p id="username">
+            <%= locals.username %>
+        </p>
+    </div>
+    <% if(locals.indexText === undefined) { %>
+        <a href="/" aria-label="follow to startpage" class="logo">
+
+            <img src="../img/header/logo_with_name.png" alt=""></a>
+        <% } else{ %>
+            <p class="not-signed"><%-locals.indexText%> ➜</p>
+            <% } %>
+                <button id="loginButton" type="button" onclick="toggleLogin()">
+                    Anmelden
+                </button>
+
+</header>
+
+<div class="login-window-handler" id="login-window" style="display: none;">
+    <div class="login-window">
+        <div class="closing-button">
+            <button onclick="toggleLogin()"><b>x</b></button>
+        </div>
+        <div class="connection-buttons">
+            <button class="twitch" aria-label="connect with twitch" onclick="window.location.href='/auth'"><img
+                    src="../img/header/twitch_logo.png" alt="">
+                <p>Twitch</p>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="hamburger-menu" id="burgerMenu">
+    <div class="hamburger" onclick="burgerMenuSlide()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <ul>
+        <li> <a href="/">Start</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/commands">Commands</a></li>
+        <li><a href="/functions">Funktionen</a></li>
+        <!-- <li><a href="/alertbox">Alertbox</a></li> -->
+        <li><a id="signout" href="/data?sign=signout">Abmelden</a></li>
+    </ul>
+</div>
+
+<script src="../js/burgerMenu.js" defer></script>
+<script src="../js/connection-window.js"></script>

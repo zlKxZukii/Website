@@ -1,0 +1,140 @@
+.head {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 50px;
+}
+
+.video-div {
+    width: 45%;
+}
+
+.video-div h2 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.video-div video {
+    width: 100%;
+}
+
+.video-socials {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.video-socials img {
+    padding-right: 5px;
+}
+
+.video-socials a {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    transition: color 0.5s ease;
+}
+
+.video-socials a:hover {
+    color: #2addfc;
+}
+
+.head h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 70px;
+    width: 45%;
+    padding-left: 40px;
+    color: #2addfc;
+}
+
+.hero-align {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.hero-section {
+    padding-left: 40px;
+    width: 45%;
+    align-items: center;
+}
+
+.hero-section h2 {
+    margin: 40px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 48px;
+    color: #2addfc;
+}
+
+
+#example {
+    max-height: 160px;
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    padding: 20px 40px;
+    width: 40%;
+    background-color: rgba(34, 34, 34, 0.7);
+    margin: 40px;
+    border-radius: 10px;
+    justify-content: end;
+}
+
+.command-align {
+    padding: 4px 0px;
+    display: flex;
+    flex-direction: row;
+}
+
+.command-align p:first-child {
+    min-width: 15%;
+    animation: rainbow 10s infinite;
+}
+
+@keyframes rainbow {
+    0% {
+        color: red;
+    }
+
+    14% {
+        color: orange;
+    }
+
+    28% {
+        color: yellow;
+    }
+
+    42% {
+        color: green;
+    }
+
+    57% {
+        color: #2bdffe;
+    }
+
+    71% {
+        color: rgb(101, 2, 172);
+    }
+
+    85% {
+        color: violet;
+    }
+
+    100% {
+        color: red;
+    }
+}
+
+.not-signed{
+    font-size: 32px;
+    animation: rainbow 4s infinite
+}

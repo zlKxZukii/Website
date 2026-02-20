@@ -1,0 +1,15 @@
+<%- include("../../layouts/commandBar") %>
+
+    <div class="box" id="headline">
+        <div class="box-line">
+            <p>Bearbeiten</p>
+            <p>Name</p>
+            <p style="width: 60%;">Text</p>
+            <p>Intervall <br>
+                in Sekunden</p>
+            <p>Status</p>
+        </div>
+
+    </div>
+    <script>const data =<%- locals.data %> </script>
+    <script src="./js/commands/intervall.js"></script>

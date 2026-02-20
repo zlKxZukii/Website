@@ -1,0 +1,33 @@
+#renderJokes {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: 60px;
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.joke p:nth-child(odd) {
+    width: 30px;
+}
+
+.joke {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+}
+
+.joke:first-child {
+    border-radius: 10px 10px 0px 0px;
+}
+
+.joke:nth-child(odd) {
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+.joke:last-child {
+    border-radius: 0px 0px 10px 10px;
+}

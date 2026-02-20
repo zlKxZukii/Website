@@ -1,0 +1,31 @@
+.impressum-box {
+    margin: 40px 60px;
+    padding: 40px 40px;
+    background-color: rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.impressum-box h1 {
+    display: flex;
+    justify-content: center;
+}
+
+.dev-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.dev-box h2 {
+    margin-top: 20px
+}
+
+.dev-box a {
+    text-decoration: none;
+    transition: color 0.5s ease;
+}
+
+.dev-box a:hover {
+    color: #2BD6F1;
+}

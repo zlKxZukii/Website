@@ -1,0 +1,64 @@
+.link-box {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 60px;
+    margin-top: 60px;
+    background-color: rgba(34, 34, 34, 1);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.link-box h3 {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-size: 26px;
+}
+
+.input-field {
+    background-color: rgba(34, 34, 34, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px 10px 10px 10px;
+}
+
+.inner {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    border-style: solid ;border-radius: 10px 10px 10px 10px;
+    border-color: #2bdffe;
+}
+
+.input-field input {
+border: none;
+    background-color: rgba(34, 34, 34, 1);
+    height: 34px;
+    width: 90%;
+    border-radius:10px 0px 0px 10px
+}
+
+.blur{
+    filter:blur(5px);
+}
+
+.input-field button {
+    cursor: pointer;
+    border-radius: 10px 10px 10px 10px;
+    border: none;
+    background-color: rgba(34, 34, 34, 1);
+    height: 36px;
+    width: 5%;
+}
+
+.input-field img {
+    height: 25px;
+}

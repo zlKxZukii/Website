@@ -1,0 +1,176 @@
+.box {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: 0px 60px;
+    margin-top: 60px;
+    background-color: rgba(0, 0, 0, 0);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.new-edit {
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.new-edit input {
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 30px;
+    width: 10%;
+}
+
+.new-edit input::placeholder {
+    font-size: 18px;
+}
+
+
+.box-line {
+    padding: 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.box-line:nth-child(odd) {
+    background-color: rgba(34, 34, 34, 1);
+}
+
+.box-line:first-child {
+    border-radius: 10px 10px 0 0;
+}
+
+.box-line:last-child {
+    border-radius: 0 0 10px 10px;
+}
+
+.img-tag {
+    cursor: pointer;
+    width: 10%;
+}
+
+.img-tag img {
+    height: 36px;
+}
+
+.img-tag button {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    height: 30px;
+    width: 30px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 16px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+
+}
+
+.box-line div {
+    display: flex;
+    justify-content: center;
+}
+
+.box-line input {
+    width: 10%;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 30px;
+}
+
+.box-line p {
+    text-align: center;
+    width: 10%;
+}
+
+.box-line label {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+
+}
+
+.creation-buttons button {
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 24px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+    width: 40%;
+}
+
+.creation-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.toggle {
+    position: relative;
+    width: 60px;
+    /* neue Breite */
+    height: 20px;
+    /* Höhe 20px */
+    background: red;
+    border-radius: 10px;
+    /* Hälfte der Höhe */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Der kleine Kreis */
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    /* Padding für 16px Kreis */
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Checkbox ausblenden */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* Wenn aktiviert: Hintergrund grün + Kreis nach rechts */
+input[type="checkbox"]:checked+.toggle {
+    background: #4caf50;
+}
+
+input[type="checkbox"]:checked+.toggle::after {
+    transform: translateX(42px);
+    /* 60 - 16 - 2*2 = 42px */
+}
+
+/* Optional: Beschriftung AN/AUS */
+.toggle span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}

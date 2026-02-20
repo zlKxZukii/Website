@@ -1,0 +1,9 @@
+<%- include("../../layouts/commandBar") %>
+    <div class="commands-box" id="renderContent">
+    </div>
+
+    <script>const data = <%- JSON.stringify(defaultCommand) %></script>
+
+    <script src="./js/commands/defaultCommands/render.js"></script>
+    <script src="./js/commands/logicCmds.js"></script>
+    <script src="./js/commands/defaultCommands/saveCommands.js"></script>

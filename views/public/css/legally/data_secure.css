@@ -1,0 +1,31 @@
+.data-secure-box {
+    margin: 40px 60px;
+    padding: 40px 40px;
+    background-color: rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.data-secure-box h1 {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 40px;
+}
+
+.data-secure-box h2 {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0px;
+}
+
+.data-secure-box h3 {
+    padding-top: 20px;
+}
+
+.data-secure-box a {
+    text-decoration: none;
+    transition: color 0.5s ease;
+}
+
+.data-secure-box a:hover {
+    color: #2BD6F1;
+}

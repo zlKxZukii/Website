@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="../css/boxes/alert-box-link.css">
+
+
+<h3>
+    🔐 <b>Sicherheitshinweis</b><br>
+    Dein persönlicher Alert-Link ist vertraulich.<br>
+    Bitte gib ihn nicht weiter, um Missbrauch zu vermeiden.
+</h3>
+<div class="input-field">
+    <div class="inner">
+        <input class="blur" type="text" name="alertBoxLink" id="alertBoxLink" onclick="deleteBlur('alertBoxLink')"
+            value="<%- locals.alertLink%>" readonly>
+        <button id="saveBtn" onclick="copyBtn()" style="border-radius:0px 0px 0px 0px ; border-right: solid #2bdffe; border-left: solid #2bdffe;"><img src="./img/alert-box/save-button.png" alt=""></button>
+        <button id="reloadKeyBtn" onclick="reloadKey('<%- locals.back%>')"><img src="./img/alert-box/generate-new-key.png" alt=""></button>
+    </div>
+</div>
+
+<script src="./js/boxes/alertBox.js"></script>

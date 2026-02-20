@@ -1,0 +1,22 @@
+h2 {
+    display: flex;
+    justify-content: center;
+    margin: 0 60px;
+    margin-top: 60px;
+    font-size: 40px;
+}
+
+.explanation {
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.explanation video {
+    height: 300px;
+}
+
+.explanation li {
+    font-size: 20px;
+    padding: 10px;
+}

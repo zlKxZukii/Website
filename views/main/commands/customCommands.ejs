@@ -1,0 +1,25 @@
+<%- include("../../layouts/commandBar") %>
+    <div class="commands-box">
+        <div class="headline">
+            <p>Commands</p>
+            <p>Beschreibung</p>
+            <p>Berechtigung</p>
+            <p>Status</p>
+        </div>
+        <div id="customWindow">
+            <div id="error-div"></div>
+        </div>
+        <div class="creation-buttons">
+            <button onclick="deleteValues()" id="deleteButton">Löschen</button>
+            <button onclick="createCommand()">Hinzufügen</button>
+            <button onclick="initSave()" id="safeButton">Speichern</button>
+        </div>
+    </div>
+
+    <!-- das formatieren nicht vergessen über das textpad -->
+    <script>
+        let customCommands = <%- JSON.stringify(customCommandData) %>
+    </script>
+    <script src="../js/commands/customCommands.js"></script>
+    <script src="../js/template.js"></script>
+    <script src="../js/commands/logicCmds.js"></script>

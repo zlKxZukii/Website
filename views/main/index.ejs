@@ -1,0 +1,72 @@
+<div>
+    <div class="head">
+        <h1>Mehr Witz. <br>
+            Mehr Interaktion.<br>
+            Weniger Stress. <br>
+            Für dich.
+        </h1>
+        <div class="video-div">
+            <h2>Partner von Scaletta</h2>
+            <video autoplay muted loop playsinline>
+                <source src="../VID/index/clip.mp4" type="video/mp4">
+            </video>
+            <div class="video-socials">
+                <div>
+                    <a href="https://www.twitch.tv/ozanityreal"><img style="height: 25px;"
+                            src="../img/index/twitch_logo.png" alt="">OzanityReal</a>
+                </div>
+
+                <div>
+                    <a href="https://www.tiktok.com/@ozanityreeal?_r=1&_t=ZN-92GiJ4FgeEo"> <img style="height: 25px;"
+                            src="../img/index/tiktok_logo.png" alt="">OzanityReal</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="hero-align">
+        <div class="hero-section">
+            <h2>Ein Twitch-Bot für Streamer,
+                die ihren Chat mit einfachen Commands<br>
+                und kleinen Witzen lebendig halten wollen
+                ohne Aufwand, ohne Ablenkung.</h2>
+        </div>
+
+        <div id="example">
+            <div class="command-align">
+                <p>
+                    Timinator
+                </p>
+                <p>
+                    : <%= locals.jokeTrigger %>
+                </p>
+            </div>
+            <div class="command-align">
+                <p>
+                    <%= locals.username || "Scaletta" %>
+                </p>
+                <p>
+                    : <%= locals.jokePrompt %>
+                </p>
+            </div>
+            <div class="command-align">
+                <p>
+                    Timinator
+                </p>
+                <p>
+                    : <%= locals.socialMediaTrigger %>
+                </p>
+            </div>
+            <div class="command-align">
+                <p>
+                    <%= locals.username || "Scaletta" %>
+                </p>
+                <p>
+                    : Kontaktiere mich über Social Media: <a href="<%= locals.socialMediaPrompt %>">
+                        <%= locals.socialMediaPrompt %>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

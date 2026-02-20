@@ -1,0 +1,42 @@
+body {
+    height: 100vh;
+}
+
+.align {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 50%; */
+    width: 100%;
+    flex-direction: column;
+}
+
+.align h1 {
+    font-size: 36px;
+    padding-top: 30px;
+    margin: 0;
+    text-align: center;
+}
+
+.align img {
+    height: 300px;
+    width: 300px;
+    padding: 10px 0px;
+}
+
+.align a {
+    transition: color 0.5s ease;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.align a:hover {
+    color: #2BD6F1;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

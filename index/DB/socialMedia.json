@@ -1,0 +1,10 @@
+{
+    "trigger": [
+        "!whatsapp",
+        "!wa",
+        "!dc",
+        "!discord"
+    ],
+    "whatsapp": "https://wa.me/4915259649322",
+    "discord": "https://discord.gg/jNVSkGE7zs"
+}

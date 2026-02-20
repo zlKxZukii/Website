@@ -1,0 +1,44 @@
+<%- include("../../layouts/commandBar") %>
+
+    <div class="joke-box">
+        <div class="joke-section">
+            <p>Trigger</p>
+            <p>Beschreibung</p>
+            <p>Ganze Liste</p>
+            <p>Status</p>
+        </div>
+        <div class="joke-section">
+            <p><%- locals.animals %></p>
+            <p>Tier Witze</p>
+            <p><a href="/jokes?list=<%- locals.titleanimals %>">Entdecke die Liste</a></p>
+            <input id="<%- locals.titleanimals %>" type="checkbox" <%-locals.animalsinp%>>
+        </div>
+        <div class="joke-section">
+            <p><%- locals.chuckNorris %></p>
+            <p>Chuck Norris Witze</p>
+            <p><a href="/jokes?list=<%- locals.titlechuckNorris %>">Entdecke die Liste</a></p>
+            <input id="<%- locals.titlechuckNorris %>" type="checkbox" <%-locals.chucknorrisinp%>>
+        </div>
+        <div class="joke-section">
+            <p><%- locals.deineMudda %></p>
+            <p>Deine Mudda Witze</p>
+            <p><a href="/jokes?list=<%- locals.titledeineMudda %>">Entdecke die Liste</a></p>
+            <input id="<%- locals.titledeineMudda %>" type="checkbox" <%-locals.deinemuddainp%>>
+        </div>
+        <div class="joke-section">
+            <p><%- locals.flachWitze %></p>
+            <p>Flach Witze</p>
+            <p><a href="/jokes?list=<%- locals.titleflachWitze %>">Entdecke die Liste</a></p>
+            <input id="<%- locals.titleflachWitze %>" type="checkbox" <%-locals.flachwitzeinp%>>
+        </div>
+        <div class="joke-buttons">
+            <button onclick="window.location.href='/data?jokes=true'">Alle Deaktivieren</button>
+            <button
+                onclick="window.location.href='/data?jokes=true&animals=true&deinemudda=true&chucknorris=true&flachwitze=true'">Alle
+                aktivieren</button>
+            <button onclick="safeJokes()">Speichern</button>
+        </div>
+    </div>
+
+    <script src="../js/commands/jokes.js"></script>
+    <script src="../js/commands/logicCmds.js"></script>

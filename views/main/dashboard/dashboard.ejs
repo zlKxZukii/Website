@@ -1,0 +1,29 @@
+<div class="dashboard-container">
+    <div class="box">
+        <div style="display: flex; align-items: center; flex-direction: column;">
+            <h2 style="margin-bottom: 40px;">Einer Deiner Momente</h2>
+            <iframe
+                src="https://clips.twitch.tv/embed?clip=<%-locals.clipID%>&parent=<%-locals.parent%>&autoplay=true&muted=true"
+                frameborder="0" allowfullscreen="false" scrolling="no"></iframe>
+        </div>
+        <div class="overview">
+            <img src="./img/dashboard/follow-ico.png" alt="">
+            <p><%- locals.follower %></p>
+        </div>
+        <div class="overview">
+            <img src="./img/dashboard/sub-ico.png" alt="">
+            <p><%- locals.subscriber %></p>
+        </div>
+        <div class="overview">
+            <img src="./img/dashboard/bits-ico.png" alt="">
+            <p><%- locals.bits %></p>
+        </div>
+        <div class="bot-btn">
+            <button id="activate">Aktiviere den Bot</button>
+            <button id="deactivate">Deaktiviere den Bot</button>
+        </div>
+    </div>
+
+</div>
+<div id="state"><%- locals.botState %></div>
+<script src="./js/dashboard/botButtons.js"></script>

@@ -1,0 +1,54 @@
+.headline{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: 40px
+}
+
+.headline button{
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 24px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+}
+
+.render-box {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin: 0px 60px;
+    margin-top: 60px;
+    background-color: rgba(0, 0, 0, 0);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px
+}
+
+.command-list-element{
+    padding: 20px 20px;
+    width: calc(100% - 40px);
+    display: flex;
+    justify-content: space-between;
+}
+
+.command-list-element:first-child{
+        border-radius: 10px 10px 0px 0px
+}
+
+.command-list-element:last-child{
+        border-radius: 0px 0px 10px 10px
+}
+
+.command-list-element:nth-child(odd){
+    background-color: rgba(34, 34, 34, 1);
+}
+
+.command-list-element p:last-child{
+    width: 80%;
+}
