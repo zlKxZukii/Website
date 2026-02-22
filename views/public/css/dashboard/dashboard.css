@@ -41,10 +41,20 @@ iframe {
 
 
 .bot-btn {
+    flex-direction: column-reverse;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 150px;
+    max-height: 380px;
+}
+
+.help {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 40px;
 }
 
 #activate {

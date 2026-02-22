@@ -1,28 +1,21 @@
-import animals from "./animals.json" with{type: "json"};
-import chuckNorris from "./chuckNorris.json" with{type: "json"};
-import deineMudda from "./deineMudda.json" with{type: "json"};
-import flachWitze from "./flachWitze.json" with{type: "json"}
-import { getRandomInt } from "../../randomizer/randomNumber.js"
+import { getJokesWithTrigger } from "../../sql/getData.js";
+import { getRandomInt } from "../../randomizer/randomNumber.js";
 
+export async function randomJoke() {
 
-
-const randomArray = [chuckNorris, deineMudda, animals, flachWitze]
-
-export function randomJoke() {
-    const DBIndex = getRandomInt(randomArray.length)
-    let DB = randomArray[DBIndex]
-
-    let lengthTrigger = Object.keys(DB.trigger).length
-    let intTrigger = getRandomInt(lengthTrigger)
-
-    let lengthJoke = Object.keys(DB.jokes).length
-    let intJoke = getRandomInt(lengthJoke)
-    if (intJoke <= 0) {
-        intJoke = 1
-    }
-
-    return {
-        trigger: DB.trigger[intTrigger],
-        prompt: DB.jokes[intJoke]
-    }
-}
+    const randomArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
+    const randomSection = randomArray[getRandomInt(randomArray.length)];
+    try {
+        const DB = await getJokesWithTrigger(randomSection);
+        const DBIndex = getRandomInt(DB.length);
+        return {
+            jokeTrigger: DB[DBIndex].triggers[0],
+            jokePrompt: DB[DBIndex].response_text
+        };
+    } catch (error) {
+        return {
+            jokeTrigger: "keine Trigger gefunden",
+            jokePrompt: error.message
+        };
+    };
+};

@@ -1,113 +1,114 @@
 import express from "express"
 export let jokesRoute = express.Router()
 
-import animals from "./jokeDB/animals.json" with{type: "json"};
-import chuckNorris from "./jokeDB/chuckNorris.json" with{type: "json"};
-import deineMudda from "./jokeDB/deineMudda.json" with{type: "json"};
-import flachWitz from "./jokeDB/flachWitze.json" with{type: "json"};
-import { getData } from "../src/firebase.js";
+import client from "../src/redisClient.js";
+import { getJokeDataForUser, getAllJokes } from "../sql/getData.js";
+import { jokeState } from "../sql/insertFunctions.js";
 
-jokesRoute.get((""), async (req, res) => {
-    const userID = req.signedCookies.userID || "";
-    const username = req.signedCookies.username || "";
-    const img = req.signedCookies.profilePic || "";
-    if (!userID) {
-        res.redirect("/?index=true")
+// Standard Route
+jokesRoute.get("", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+
+    if (!key) {
+        return res.redirect("/?index=true")
     }
-    else if (req.query.list == "flachWitze") {
+    try {
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const jokeDB = await getJokeDataForUser(sessionData.userId)
+        const randomArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
+
         const obj = {
-            title: `Witze: ${req.query.list}`,
-            css: "css/commands/joke-list.css",
-            username: username,
-            img: img,
-            jokes: {},
-            showBody: true
-        }
-        const keys = Object.keys(animals.jokes)
-        for (let index = 0; index < keys.length; index++) {
-            let value = animals.jokes[keys[index]]
-            Object.assign(obj.jokes, { [keys[index]]: value })
-        }
-        res.render("main/commands/joke-list", obj)
-    }
-    else if (req.query.list == "animals") {
-        let obj = {
-            title: `Witze: ${req.query.list}`,
-            css: "css/commands/joke-list.css",
-            username: username,
-            img: img,
-            jokes: {},
-            showBody: true
-        }
-        const keys = Object.keys(animals.jokes)
-        for (let index = 0; index < keys.length; index++) {
-            let value = animals.jokes[keys[index]]
-            Object.assign(obj.jokes, { [keys[index]]: value })
-        }
-        res.render("main/commands/joke-list", obj)
-    }
-    else if (req.query.list == "chuckNorris") {
-        let obj = {
-            title: `Witze: ${req.query.list}`,
-            css: "css/commands/joke-list.css",
-            username: username,
-            img: img,
-            jokes: {},
-            showBody: true
-        }
-        const keys = Object.keys(chuckNorris.jokes)
-        for (let index = 0; index < keys.length; index++) {
-            let value = chuckNorris.jokes[keys[index]]
-
-            Object.assign(obj.jokes, { [keys[index]]: value })
-
-        }
-        res.render("main/commands/joke-list", obj)
-    }
-    else if (req.query.list == "deineMudda") {
-        let obj = {
-            title: `Witze: ${req.query.list}`,
-            css: "css/commands/joke-list.css",
-            username: username,
-            img: img,
-            jokes: {},
-            showBody: true
-        }
-        const keys = Object.keys(deineMudda.jokes)
-        for (let index = 0; index < keys.length; index++) {
-            let value = deineMudda.jokes[keys[index]]
-
-            Object.assign(obj.jokes, { [keys[index]]: value })
-
-        }
-        res.render("main/commands/joke-list", obj)
-    }
-    else {
-        let obj = {
             title: "Witze",
             css: "css/commands/jokes.css",
-            username: username,
-            img: img,
-            showBody: true
+            username: sessionData.username,
+            img: sessionData.profilePicture,
+            showBody: true,
+            jokeData: {}
         }
-        const jokeDB = await getData("jokes", username, userID)
-        const jokeKeys = Object.keys(jokeDB)
-        for (let i = 0; i < jokeKeys.length; i++) {
-            if (jokeDB[jokeKeys[i]].state === "true") {
-                Object.assign(obj, { [jokeKeys[i].toLowerCase() + "inp"]: "checked" })
-            }   
+        if (!jokeDB) {
+            for (const element of randomArray) {
+
+                await jokeState(sessionData.userId, element)
+            };
+            return res.redirect("/jokes")
         }
-        const jokeArray = [animals, chuckNorris, deineMudda, flachWitz]
-        let workArray = []
-        for (let jokeMasterIndex = 0; jokeMasterIndex < jokeArray.length; jokeMasterIndex++) {
-            let jokeMasterKeys = Object.keys(jokeArray[jokeMasterIndex].trigger)
-            for (let jokePromptIndex = 0; jokePromptIndex < jokeMasterKeys.length; jokePromptIndex++) {
-                workArray.push(jokeArray[jokeMasterIndex].trigger[jokePromptIndex])
-                jokeArray[jokeMasterIndex][jokePromptIndex]
-            }
-            Object.assign(obj, { [jokeArray[jokeMasterIndex].title]: workArray, ["title" + jokeArray[jokeMasterIndex].title]: jokeArray[jokeMasterIndex].title })
-            workArray = []
+        for (let index = 0; index < randomArray.length; index++) {
+            const key = randomArray[index].split(" ").join("")
+            Object.assign(obj.jokeData, {
+                [key]: {
+                    trigger: jokeDB[index].triggers,
+                    category: randomArray[index],
+                    id: randomArray[index].toLowerCase(),
+                    state: jokeDB[index].state
+                }
+            })
         }
         res.render("main/commands/jokes", obj)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+// Route für Speichern der States
+
+jokesRoute.get("/save", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+    if (!key) {
+        return res.redirect("/?index=true")
+    }
+    try {
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const cookieKey = Object.keys(req.cookies)
+        // insert Statements
+        for (const element of cookieKey) {
+            if (element != "cookie") {
+                await jokeState(sessionData.userId, element.split("_").join(" "), req.cookies[element])
+                res.cookie(element, "", { maxAge: 0 })
+            }
+        }
+        res.redirect("/jokes")
+
+    } catch (error) {
+        console.log(error)
+        res.redirect("/")
+    }
+})
+
+// Route für eine Liste
+jokesRoute.get("/:category", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+    try {
+        const category = req.params.category
+        const DB = await getAllJokes(category)
+        if (DB.length < 1) {
+            return res.redirect("/nono")
+        }
+        console.log(DB.length)
+        const obj = {
+            title: `Witze: ${category}`,
+            css: "/css/commands/joke-list.css",
+            jokes: {},
+            showBody: true
+        }
+
+        for (let index = 0; index < DB.length; index++) {
+            Object.assign(obj.jokes, {
+                [index + 1]: {
+                    prompt: DB[index].response_text
+                }
+            })
+
+        }
+
+        if (key) {
+            const sessionData = JSON.parse(await client.get(`sess:${key}`));
+            Object.assign(obj, {
+                username: sessionData.username,
+                img: sessionData.profilePicture,
+            })
+        }
+        res.render("main/commands/joke-list", obj)
+    } catch (error) {
+        console.log(error)
     }
 })

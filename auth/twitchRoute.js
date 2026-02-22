@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' });
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 
 import requestIP from "request-ip"
 

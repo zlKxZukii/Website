@@ -40,31 +40,33 @@ export async function saveTwitchTokens(twitchId, tokens, scopes) {
     }
 }
 
-export async function loginUser(twitchId, username, ip_address, login_key) {
-    console.log(twitchId)
+export async function loginUser(twitchId, username, ip_address, login_key, picture_url) {
     const sql = `
         INSERT INTO users (
             twitch_id, 
             username, 
             ip_address,
-            login_key
+            login_key,
+            picture_url
         )
-        VALUES ($1, $2, $3, $4)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (twitch_id) 
         DO UPDATE SET 
             twitch_id = EXCLUDED.twitch_id,
             username = EXCLUDED.username,
             ip_address = EXCLUDED.ip_address,
             login_key = EXCLUDED.login_key,
+            picture_url = EXCLUDED.picture_url,
             updated_at = NOW()
-        RETURNING *;
+        RETURNING (SELECT login_key FROM users WHERE twitch_id = $1) AS old_key;
     `;
 
     const values = [
         twitchId,
         username,
         ip_address,
-        login_key
+        login_key,
+        picture_url
     ];
 
     try {

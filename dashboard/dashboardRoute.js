@@ -1,51 +1,42 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' });
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 
-import express from "express"
-import { getData } from "../src/firebase.js";
-export let dashboardRoute = express.Router()
+import express from "express";
+export let dashboardRoute = express.Router();
 
 import { createApiClient } from '../twitch_bot/createAPIclient.js';
 import { getAuthProvider } from '../auth/createRefreshToken.js';
 import { getRandomInt } from "../randomizer/randomNumber.js";
-import { getUsers } from "../sql/getData.js";
+import { getUsers, getToken } from "../sql/getData.js";
+import client from "../src/redisClient.js";
 
 dashboardRoute.get((""), async (req, res) => {
-    const key = req.signedCookies.access_validator
-    console.log(await getUsers(2))
-    if (await getUsers(2) != []) {
-        
-        const username = req.signedCookies.username || "";
-        const img = req.signedCookies.profilePic || "";
-        const parent = process.env.PARENT
+    const key = req.signedCookies.access_validator;
+    if (key) {
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const userId = sessionData.userId
+        const user = await getUsers(key)
+        const tokenData = await getToken(sessionData.userId);
+        const authProviderComp = await getAuthProvider(tokenData);
+        const apiClient = await createApiClient(authProviderComp);
 
-        const tokenData = await getData("tokens", username, userID)
-        const authProviderComp = await getAuthProvider(tokenData)
-        const apiClient = await createApiClient(authProviderComp)
-
-        const get = await getData("botState", username, userID)
         const obj = {
             title: "Dashboard",
             css: "../css/dashboard/dashboard.css",
-            username: username,
-            img: img,
-            parent: parent,
-            showBody: true
-        }
+            username: sessionData.username,
+            img: sessionData.profilePicture,
+            parent: process.env.PARENT,
+            showBody: true,
+            botState: user.bot_state
+        };
 
-        if (get.state) {
-            Object.assign(obj, { botState: "true" })
-        }
-        else {
-            Object.assign(obj, { botState: "false" })
-        }
-
-        Object.assign(obj, await getBroadcasterInfo(userID, apiClient))
+        Object.assign(obj, await getBroadcasterInfo(userId, apiClient))
         res.render("main/dashboard/dashboard", obj)
     } else {
         res.redirect("/?index=true")
     }
-
 })
 
 async function getBroadcasterInfo(userID, apiClient) {

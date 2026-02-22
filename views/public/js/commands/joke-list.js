@@ -5,7 +5,7 @@ function renderJokes() {
     for (let index = 0; index < jokeKey.length; index++) {
         jokeDiv.innerHTML += `<div class="joke">
                                 <p>${jokeKey[index]}</p>
-                                <p>${jokeList[index + 1]}</p>
+                                <p>${jokeList[jokeKey[index]].prompt}</p>
                             </div>`
 
     }

@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' });
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { io } from "../src/server.js";
 import { followProtection } from "./functions/spamProtection.js";

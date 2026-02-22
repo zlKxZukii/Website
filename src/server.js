@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' })
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 
 import express from "express";
 import { createServer } from "http";
@@ -27,7 +29,7 @@ io.on("connection", (socket) => {
         console.error("Socket Fehler: ", err);
     });
 });
-console.log("--- DER BOT STARTET JETZT ---");
+
 import pkg from 'pg';
 const { Pool } = pkg;
 import 'dotenv/config';

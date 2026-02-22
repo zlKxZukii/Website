@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' })
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 
 import { initializeApp } from "firebase/app";
 import { collection, getDocs, getFirestore, doc, setDoc, getDoc, updateDoc, deleteField } from "firebase/firestore"

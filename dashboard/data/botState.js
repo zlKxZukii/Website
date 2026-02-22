@@ -1,12 +1,15 @@
 import express from "express"
 
 import { botManager } from "../../twitch_bot/connectBot.js"
+import client from "../../src/redisClient.js"
 export const getBotState = express.Router()
 
 
 getBotState.get((""), async (req, res) => {
-    const userID = req.signedCookies.userID || "";
-    const username = req.signedCookies.username || "";
+    const key = req.signedCookies.access_validator;
+    const sessionData = await JSON.parse(await client.get(`sess:${key}`));
+    const userID = sessionData.userId
+    const username = sessionData.username
 
     const { activate, deactivate } = req.query
 

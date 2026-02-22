@@ -5,14 +5,14 @@ export function randomSocialMedia() {
     const socialIndex = getRandomInt(socialMedia.trigger.length)
     if (socialIndex <= 1) {
         return {
-            trigger: [socialMedia.trigger[socialIndex]],
-            prompt: [socialMedia.whatsapp]
+            socialMediaTrigger: [socialMedia.trigger[socialIndex]],
+            socialMediaPrompt: [socialMedia.whatsapp]
         }
     }
     else {
         return {
-            trigger: [socialMedia.trigger[socialIndex]],
-            prompt: [socialMedia.discord]
+            socialMediaTrigger: [socialMedia.trigger[socialIndex]],
+            socialMediaPrompt: [socialMedia.discord]
         }
     }
 }

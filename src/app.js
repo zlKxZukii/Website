@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config({ path: './src/.env' });
+dotenv.config({
+    path: './src/.env', quiet: true
+});
 
+import client from "./redisClient.js"
 import express from "express";
 import MainLayouts from "express-ejs-layouts"
 import cookieParser from "cookie-parser";
@@ -22,7 +25,7 @@ import { getBotState } from "../dashboard/data/botState.js";
 import { dataSecureRoute, impressumRoute } from "../legally/legallyRoute.js";
 import { auth, twitch } from "../auth/twitchRoute.js";
 import { botManager } from "../twitch_bot/connectBot.js";
-import {listRoute} from "../list/listRoute.js"
+import { listRoute } from "../list/listRoute.js"
 
 InitializeFirebaseApp()
 app.use(express.json());
@@ -37,7 +40,7 @@ app.set('trust proxy', 1)
 app.use("/", indexRoute)
 app.use("/dashboard", dashboardRoute)
 app.use("/alertbox", alertBoxRoute)
-app.use("/alertbox",alertBox)
+app.use("/alertbox", alertBox)
 app.use("/followbox", followBoxRoute)
 // commands
 app.use("/functions", functionsRoute)
@@ -66,7 +69,7 @@ app.use((req, res) => {
 })
 
 httpServer.listen(PORT, async () => {
-    console.log("Server gestartet und ist auf Port " + PORT + " erreichbar")
+    console.log("Server gestartet auf Port " + PORT)
 
     const userData = await getDataForServerStart("botState")
 

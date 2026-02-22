@@ -15,9 +15,9 @@ export async function createApiClient(authProvider) {
     return apiClient
 }
 
-export async function createHelixClient(authProvider, info) {
+export async function createHelixClient(authProvider, userID) {
     const apiClient = new ApiClient({ authProvider });
 
-    const user = await apiClient.users.getUserById(info.userId); 
+    const user = await apiClient.users.getUserById(userID); 
     return user
 }

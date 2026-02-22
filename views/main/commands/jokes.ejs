@@ -7,30 +7,8 @@
             <p>Ganze Liste</p>
             <p>Status</p>
         </div>
-        <div class="joke-section">
-            <p><%- locals.animals %></p>
-            <p>Tier Witze</p>
-            <p><a href="/jokes?list=<%- locals.titleanimals %>">Entdecke die Liste</a></p>
-            <input id="<%- locals.titleanimals %>" type="checkbox" <%-locals.animalsinp%>>
-        </div>
-        <div class="joke-section">
-            <p><%- locals.chuckNorris %></p>
-            <p>Chuck Norris Witze</p>
-            <p><a href="/jokes?list=<%- locals.titlechuckNorris %>">Entdecke die Liste</a></p>
-            <input id="<%- locals.titlechuckNorris %>" type="checkbox" <%-locals.chucknorrisinp%>>
-        </div>
-        <div class="joke-section">
-            <p><%- locals.deineMudda %></p>
-            <p>Deine Mudda Witze</p>
-            <p><a href="/jokes?list=<%- locals.titledeineMudda %>">Entdecke die Liste</a></p>
-            <input id="<%- locals.titledeineMudda %>" type="checkbox" <%-locals.deinemuddainp%>>
-        </div>
-        <div class="joke-section">
-            <p><%- locals.flachWitze %></p>
-            <p>Flach Witze</p>
-            <p><a href="/jokes?list=<%- locals.titleflachWitze %>">Entdecke die Liste</a></p>
-            <input id="<%- locals.titleflachWitze %>" type="checkbox" <%-locals.flachwitzeinp%>>
-        </div>
+        <div id="renderJokes"></div>
+
         <div class="joke-buttons">
             <button onclick="window.location.href='/data?jokes=true'">Alle Deaktivieren</button>
             <button
@@ -39,6 +17,29 @@
             <button onclick="safeJokes()">Speichern</button>
         </div>
     </div>
+
+    <script>
+        const data = <%- JSON.stringify(locals.jokeData) %>;
+        const keys = Object.keys(data)
+        window.onload = function () { render() }
+        function render() {
+            for (let index = 0; index < keys.length; index++) {
+                const renderJokes = document.getElementById("renderJokes")
+                renderJokes.innerHTML += `<div class="joke-section">
+                                    <p>${data[keys[index]].trigger}</p>
+                                    <p>${data[keys[index]].category}</p>
+                                    <p><a href="/jokes/${data[keys[index]].id}">Entdecke die Liste</a></p>
+                                    <input id="${data[keys[index]].id.split(" ").join("")}" type="checkbox" ${checkState(index)}>
+                                </div>`
+            }
+        }
+        function checkState(index) {
+            if (data[keys[index]].state) {
+                return "checked"
+            }
+            else { return "false" }
+        }
+    </script>
 
     <script src="../js/commands/jokes.js"></script>
     <script src="../js/commands/logicCmds.js"></script>
