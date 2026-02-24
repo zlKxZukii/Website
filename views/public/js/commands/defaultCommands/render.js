@@ -25,7 +25,7 @@ function renderDefaultCommands(renderDiv) {
 function defaultCommandsTemplate(title, socialMedia) {
     return `<div class="default-commands-checkbox">
                 <div class="default-commands" onclick="fadeIt('${title}')">
-                    <p>${socialMedia.trigger}</p>
+                    <p>${socialMedia.triggers}</p>
                     <p>${title}</p>
                     <p></p>
                 </div>
@@ -37,12 +37,12 @@ function defaultCommandsTemplate(title, socialMedia) {
             <div class="closed" id="${title}Slide">
                 <div class="fade-box">
                     <div class="link">
-                        <a href="${socialMedia.value}" id="${title}Safe" target="_blank">${socialMedia.value}</a>
+                        <a href="${socialMedia.response_text}" id="${title}Safe" target="_blank">${socialMedia.response_text}</a>
                     </div>
                     <input id="${title}Link" type="text" name="linkSender"
                         placeholder="Hier ${title} Link und/oder Text einfügen" autocomplete="off">
                     <ul class="allow-level">
-                        <li><input type="checkbox" name="" id="${title}Anybody" ${getState(socialMedia.stateTitle.anybody)} onclick=highlightAll('${title}')>Jeder</li>
+                        <li><input type="checkbox" name="" id="${title}Anybody"  onclick="highlightAll('${title}')" ${getState(socialMedia.stateTitle.anybody)}>Jeder</li>
                         <li><input type="checkbox" name="" id="${title}Subscriber" ${getState(socialMedia.stateTitle.subscriber)}>Subscriber
                         </li>
                         <li><input type="checkbox" name="" id="${title}Vip" ${getState(socialMedia.stateTitle.vip)}>VIP</li>
@@ -63,10 +63,10 @@ function defaultCommandsTemplate(title, socialMedia) {
 }
 
 function getState(state){
-    if (state === true || state === "true"){
+    if (state === true){
         return "checked"
     }
-    else{return ""}
+    else{return false}
 }
 
 function renderButtons() {

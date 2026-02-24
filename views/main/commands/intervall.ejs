@@ -1,6 +1,6 @@
 <%- include("../../layouts/commandBar") %>
 
-    <div class="box" id="headline">
+    <div class="box" >
         <div class="box-line">
             <p>Bearbeiten</p>
             <p>Name</p>
@@ -9,7 +9,14 @@
                 in Sekunden</p>
             <p>Status</p>
         </div>
-
+        <div id="headline"></div>
+        <div class="box-line">
+            <div class="creation-buttons">
+                <button onclick="createIntervall()">Hinzufügen</button>
+                <button onclick="saveIntervall()" id="safeButton">Speichern</button>
+            </div>
+        </div>
     </div>
-    <script>const data =<%- locals.data %> </script>
+
+    <script> const data = <%- JSON.stringify(locals.data) %> </script>
     <script src="./js/commands/intervall.js"></script>

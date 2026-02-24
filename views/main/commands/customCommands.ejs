@@ -19,6 +19,13 @@
     <!-- das formatieren nicht vergessen über das textpad -->
     <script>
         let customCommands = <%- JSON.stringify(customCommandData) %>
+            window.addEventListener("load", () => {
+                const cKey = Object.keys(customCommands)
+                cKey.sort()
+                for (let i = 0; i < cKey.length; i++) {
+                    document.getElementById("customWindow").innerHTML += getTemplate(cKey[i])
+                }
+            })
     </script>
     <script src="../js/commands/customCommands.js"></script>
     <script src="../js/template.js"></script>

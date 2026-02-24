@@ -3,5 +3,5 @@ function safeState() {
         let val = document.getElementById(tagArray[index])
         document.cookie = `${tagArray[index]}=${val.checked} ;max-age= ${1000}`
     }
-    window.location.href = "/data?functions=true"
+    window.location.href = "/functions/save"
 }

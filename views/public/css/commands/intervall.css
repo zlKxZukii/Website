@@ -40,7 +40,7 @@
     align-items: center;
 }
 
-.box-line:nth-child(odd) {
+.box-line:nth-child(even) {
     background-color: rgba(34, 34, 34, 1);
 }
 

@@ -7,10 +7,10 @@ import { RefreshingAuthProvider, exchangeCode } from '@twurple/auth';
 import { getTokenInfo } from "@twurple/auth";
 
 import crypto from "crypto";
-import { loginUser, saveTwitchTokens } from "../sql/authUser.js";
+import { Auth, Select } from "../sql/sqlHandler.js";
 import { scopes } from "./scopes.js";
 import { createCookie } from "./createCookies.js";
-import { createHelixClient, createApiClient } from "../twitch_bot/createAPIclient.js";
+import { createHelixClient } from "../twitch_bot/createAPIclient.js";
 import client from "../src/redisClient.js";
 
 const clientId = process.env.CLIENT_ID;
@@ -32,8 +32,15 @@ export async function authTwitch(code, ipAddress, res) {
             profilePicture: user.profilePictureUrl,
         }), { EX: 1209600 })
 
-        await saveTwitchTokens(info.userId, tokenData, scopes);
-        const loginRes = await loginUser(info.userId, info.userName, ipAddress, loginKey, user.profilePictureUrl)
+        const DB = await Select.AccessShield([info.userId])
+        if (!DB) {
+            const category = ["Follow Schutz", "Nachrichten Schutz", "Automatisches Clipen"]
+            for (let index = 0; index < category.length; index++) {
+                Insert.AccessShield([info.userId], category[index], false)
+            }
+        }
+        await Auth.saveTwitchTokens(info.userId, tokenData, scopes);
+        const loginRes = await Auth.loginUser(info.userId, info.userName, ipAddress, loginKey, user.profilePictureUrl)
         const oldKey = loginRes.rows[0]?.old_key;
         if (oldKey) {
             await client.del(`sess:${oldKey}`);
@@ -51,7 +58,7 @@ export async function getAuthProvider(tokenData) {
         clientId,
         clientSecret,
         onRefresh: async (userId, newTokenData) =>
-            await saveTwitchTokens(userId, newTokenData, scopes)
+            await Auth.saveTwitchTokens(userId, newTokenData, scopes)
     });
     await authProvider.addUserForToken(tokenData, ['chat', 'api']);
     return authProvider;

@@ -9,7 +9,7 @@ export let dashboardRoute = express.Router();
 import { createApiClient } from '../twitch_bot/createAPIclient.js';
 import { getAuthProvider } from '../auth/createRefreshToken.js';
 import { getRandomInt } from "../randomizer/randomNumber.js";
-import { getUsers, getToken } from "../sql/getData.js";
+import { Select } from "../sql/sqlHandler.js";
 import client from "../src/redisClient.js";
 
 dashboardRoute.get((""), async (req, res) => {
@@ -17,10 +17,8 @@ dashboardRoute.get((""), async (req, res) => {
     if (key) {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const userId = sessionData.userId
-        const user = await getUsers(key)
-        const tokenData = await getToken(sessionData.userId);
-        const authProviderComp = await getAuthProvider(tokenData);
-        const apiClient = await createApiClient(authProviderComp);
+        const user = await Select.Users(['bot_state'], [key])
+        const tokenData = await Select.Token([sessionData.userId]);
 
         const obj = {
             title: "Dashboard",
@@ -32,14 +30,16 @@ dashboardRoute.get((""), async (req, res) => {
             botState: user.bot_state
         };
 
-        Object.assign(obj, await getBroadcasterInfo(userId, apiClient))
+        Object.assign(obj, await getBroadcasterInfo(userId, tokenData))
         res.render("main/dashboard/dashboard", obj)
     } else {
         res.redirect("/?index=true")
     }
 })
 
-async function getBroadcasterInfo(userID, apiClient) {
+async function getBroadcasterInfo(userID, tokenData) {
+    const authProviderComp = await getAuthProvider(tokenData);
+    const apiClient = await createApiClient(authProviderComp);
     const workObj = {}
     Object.assign(workObj, await getClips(userID, apiClient))
     Object.assign(workObj, await getProminenceInformation(userID, apiClient))

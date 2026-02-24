@@ -24,10 +24,11 @@ function readValues() {
         if (obj.delay < 0) {
             obj.delay = 0
         }
+
         document.cookie = `${DBKeys[index]}=${decodeURIComponent(JSON.stringify(obj))};max-age=10000000`
     }
     
-window.location.href="/data?defaultdata=true"
+window.location.href='/commands/save'
 }
 
 

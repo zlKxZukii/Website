@@ -1,28 +1,44 @@
+import { Select, Insert } from "../sql/sqlHandler.js";
+import client from "../src/redisClient.js";
+
 import express from "express"
-import { getData } from "../src/firebase.js";
 export const functionsRoute = express.Router()
 
-functionsRoute.get((""), async (req, res) => {
-    const userID = req.signedCookies.userID || "";
-    const username = req.signedCookies.username || "";
-    const img = req.signedCookies.profilePic || "";
-    if (!userID) {
-        res.redirect("/?index=true")
+functionsRoute.get("", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+    if (!key) {
+        return res.redirect("/?index=true")
     }
-    else {
-        const DB = await getData("streamFunctions", username, userID)
-        const obj = {
-            title: `Funktionen`,
-            css: "css/commands/functions.css",
-            username: username,
-            img: img,
-            showBody: true,
-            values: {
-                followBot:DB.followBot,
-                spamBot: DB.spamBot,
-                clip: DB.clip
-            }
+    const sessionData = JSON.parse(await client.get(`sess:${key}`));
+    const DB = await Select.AccessShield([sessionData.userId])
+    const obj = {
+        title: `Funktionen`,
+        css: "css/commands/functions.css",
+        username: sessionData.username,
+        img: sessionData.profilePicture,
+        showBody: true,
+        values: {}
+    }
+    for (let index = 0; index < DB.length; index++) {
+        Object.assign(obj.values, { [DB[index].category]: DB[index].state })
+    }
+        console.log(obj)
+    res.render("main/commands/functions", obj)
+})
+
+functionsRoute.get("/save", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+    if (!key) {
+        return res.redirect("/?index=true")
+    }
+    const sessionData = JSON.parse(await client.get(`sess:${key}`));
+    const accessKey = Object.keys(req.cookies)
+    for (let index = 0; index < accessKey.length; index++) {
+        if (accessKey[index] !== "cookie") {
+            await Insert.AccessShield([sessionData.userId, accessKey[index], req.cookies[accessKey[index]]])
+            res.cookie(accessKey[index], "", { maxAge: 0 })
         }
-        res.render("main/commands/functions", obj)
+
     }
+    res.redirect("/functions")
 })

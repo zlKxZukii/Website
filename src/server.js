@@ -31,8 +31,8 @@ io.on("connection", (socket) => {
 });
 
 import pkg from 'pg';
+import chalk from "chalk";
 const { Pool } = pkg;
-import 'dotenv/config';
 
 const pool = new Pool({
     user: process.env.PG_USER,
@@ -40,12 +40,13 @@ const pool = new Pool({
     database: process.env.PG_NAME,
     password: process.env.PG_PASSWORD,
     port: process.env.PG_PORT || 5432,
+    client_encoding: 'UTF8'
 });
 
 // Kurzer Verbindungstest beim Start
 try {
     pool.on('connect', () => {
-        console.log('✅ Datenbank-Pool verbunden');
+        console.log(chalk.green('Datenbank-Pool verbunden'));
     });
 } catch (error) {
     console.log(error)

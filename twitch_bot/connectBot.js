@@ -9,32 +9,34 @@ import { createApiClient } from "./createAPIclient.js";
 import { getData, saveData } from "../src/firebase.js";
 import crypto from "crypto";
 import { answers } from "./controller.js"
-import { alertBoxKey } from "../sql/insertFunctions.js";
 
 import { registerUserEvents } from "../twitch_bot/eventListener.js"
-import { getAlertBox, getToken } from "../sql/getData.js";
+import { Select, Insert } from "../sql/sqlHandler.js";
+import chalk from "chalk";
 
 async function createBot(username, userId) {
-    let alertKey = await getAlertBox(userId)
+    let alertKey = await Select.AlertBox([userId])
 
     if (!alertKey) {
         const alertKeyNew = crypto.randomBytes(12).toString("hex");
-        await alertBoxKey(userId, alertKeyNew)
+        await Insert.alertBoxKey(userId, alertKeyNew)
         alertKey = alertKeyNew
     }
-    alertKey.alert_key
-    const tokenData = await getToken(userId)
+    const tokenData = await Select.Token([userId])
     const authProviderComp = await getAuthProvider(tokenData)
     const apiClient = await createApiClient(authProviderComp)
 
     const client = new ChatClient({
         authProvider: authProviderComp,
         channels: [username],
-        requestMembershipEvents: true
+        requestMembershipEvents: true,
+        connectionOptions: {
+            connectionRetries: 15
+        }
     });
 
     client.onConnect(async () => {
-        console.log(username + " connected")
+        console.log(chalk.blue(username + " connected"))
     });
 
     client.onMessage(async (channel, user, message, msg) => {

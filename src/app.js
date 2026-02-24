@@ -26,6 +26,7 @@ import { dataSecureRoute, impressumRoute } from "../legally/legallyRoute.js";
 import { auth, twitch } from "../auth/twitchRoute.js";
 import { botManager } from "../twitch_bot/connectBot.js";
 import { listRoute } from "../list/listRoute.js"
+import chalk from "chalk";
 
 InitializeFirebaseApp()
 app.use(express.json());
@@ -79,9 +80,8 @@ httpServer.listen(PORT, async () => {
                 await botManager.start(userData[index].username, userData[index].userID)
             }
         } catch (error) {
-            console.log("Error from Bot START: " + userData[index].username + "" + error)
+            console.log(chalk.red("Error from Bot START: " + userData[index].username + "" + error))
         }
 
     }
-    console.log("All Bots are online.")
 })

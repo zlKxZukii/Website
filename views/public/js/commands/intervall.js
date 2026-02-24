@@ -13,42 +13,34 @@ function renderIntervall() {
     for (let index = 0; index < keys.length; index++) {
         headline.innerHTML += renderTemplate(data[keys[index]].intervallName, data[keys[index]].text, data[keys[index]].intervall, data[keys[index]].state)
     }
-    headline.innerHTML += ` <div class="box-line">
-                                <div class="creation-buttons">
-                                    <button onclick="createIntervall()">Hinzufügen</button>
-                                    <button onclick="saveIntervall()" id="safeButton">Speichern</button>
-                                </div>
-                            </div>`
 }
-
-function renderTemplate(intervallName, text, intervall, state) {
-    return `<div class="box-line" id="${intervallName}">
+function renderTemplate(category, respone_text, intervall, state) {
+    return `<div style="border-radius: 0;" class="box-line" id="${category}">
                 <div class="img-tag">
-                    <button onclick="deleteIntervall('${intervallName}')">x</button>
-                    <img src="./img/intervall/pencil.png" alt="" onclick="editIntervall('${intervallName}')">
+                    <button onclick="deleteIntervall('${category}')">x</button>
+                    <img src="./img/intervall/pencil.png" alt="" onclick="editIntervall('${category}')">
                 </div>
                 <div style="width: 10%;">
-                    ${intervallName}
+                    ${category}
                 </div>
-                <div style="width: 60%;" id="${intervallName}Text">
-                    <p style="width: 80%;" id="${intervallName}ShowText">${text}</p>
+                <div style="width: 60%;" id="${category}Text">
+                    <p style="width: 80%;" id="${category}ShowText">${respone_text}</p>
                 </div>
-                <div style="width: 10%;" id="${intervallName}Intervall">
-                    <p style="width: 100%;" id="${intervallName}ShowIntervall">${intervall}</p>
+                <div style="width: 10%;" id="${category}Intervall">
+                    <p style="width: 100%;" id="${category}ShowIntervall">${intervall}</p>
                 </div>
                 <label>
-                    <input id="${intervallName}IntervallState" onclick="stateCheck('${intervallName}')" type="checkbox" ${getState(state)} >
+                    <input id="${category}IntervallState" onclick="stateCheck('${category}')" type="checkbox" ${renderGetState(state)} >
                     <div class="toggle"><span></span></div>
                 </label>
             </div>`
 }
-
-function getState(state) {
+function renderGetState(state) {
     if (state) {
         return "checked"
     }
 }
-
+// abreigen des namens für speichern des intervalls
 function stateCheck(intervallName) {
     saveIntervallNames.push(intervallName)
 }
@@ -63,7 +55,7 @@ function saveIntervall() {
                 state: document.getElementById(`${saveIntervallNames[index]}IntervallState`).checked,
                 intervallName: saveIntervallNames[index]
             }
-            document.cookie = `${saveIntervallNames[index]}=${JSON.stringify(obj)};max-age=1000`
+            document.cookie = `${saveIntervallNames[index].split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
         }
         else {
             const obj = {
@@ -72,7 +64,7 @@ function saveIntervall() {
                 state: document.getElementById(`${saveIntervallNames[index]}IntervallState`).checked,
                 intervallName: saveIntervallNames[index]
             }
-            document.cookie = `${saveIntervallNames[index]}=${JSON.stringify(obj)};max-age=1000`
+            document.cookie = `${saveIntervallNames[index].split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
         }
     }
     for (let index = 0; index < counter; index++) {
@@ -89,10 +81,10 @@ function saveIntervall() {
             state: true,
             intervallName: intervallName
         }
-        document.cookie = `${intervallName}=${JSON.stringify(obj)};max-age=1000`
+        document.cookie = `${intervallName.split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
     }
 
-    window.location.href = "/data?intervall=true"
+    window.location.href = "/intervall/save"
 }
 
 function editIntervall(intervallName) {
@@ -108,7 +100,7 @@ function editIntervall(intervallName) {
 
 function deleteIntervall(intervallName) {
     document.getElementById(intervallName).remove()
-    window.location.href = `/data?intervall=true&delete=${intervallName}`
+    window.location.href = `/intervall/delete/${intervallName}`
 }
 
 function createIntervall() {

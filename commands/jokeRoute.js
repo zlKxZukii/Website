@@ -2,8 +2,7 @@ import express from "express"
 export let jokesRoute = express.Router()
 
 import client from "../src/redisClient.js";
-import { getJokeDataForUser, getAllJokes } from "../sql/getData.js";
-import { jokeState } from "../sql/insertFunctions.js";
+import { Select, Insert } from "../sql/sqlHandler.js";
 
 // Standard Route
 jokesRoute.get("", async (req, res) => {
@@ -14,9 +13,8 @@ jokesRoute.get("", async (req, res) => {
     }
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const jokeDB = await getJokeDataForUser(sessionData.userId)
-        const randomArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
-
+        const jokeDB = await Select.JokeDataForUser([sessionData.userId])
+        
         const obj = {
             title: "Witze",
             css: "css/commands/jokes.css",
@@ -25,32 +23,34 @@ jokesRoute.get("", async (req, res) => {
             showBody: true,
             jokeData: {}
         }
-        if (!jokeDB) {
-            for (const element of randomArray) {
 
-                await jokeState(sessionData.userId, element)
+        if (!jokeDB) {
+            const jokeArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
+            for (const element of jokeArray) {
+
+                await Insert.jokeState(sessionData.userId, element)
             };
             return res.redirect("/jokes")
         }
-        for (let index = 0; index < randomArray.length; index++) {
-            const key = randomArray[index].split(" ").join("")
+        for (let index = 0; index < jokeDB.length; index++) {
             Object.assign(obj.jokeData, {
-                [key]: {
+                [jokeDB[index].category.split(" ").join("")]: {
                     trigger: jokeDB[index].triggers,
-                    category: randomArray[index],
-                    id: randomArray[index].toLowerCase(),
+                    category: jokeDB[index].category,
+                    id: jokeDB[index].category.split(" ").join("").toLowerCase(),
                     state: jokeDB[index].state
                 }
             })
         }
+
         res.render("main/commands/jokes", obj)
     }
     catch (error) {
         console.log(error)
     }
 })
-// Route für Speichern der States
 
+// Route für Speichern der States
 jokesRoute.get("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
@@ -62,7 +62,7 @@ jokesRoute.get("/save", async (req, res) => {
         // insert Statements
         for (const element of cookieKey) {
             if (element != "cookie") {
-                await jokeState(sessionData.userId, element.split("_").join(" "), req.cookies[element])
+                await Insert.jokeState(sessionData.userId, element.split("_").join(" "), req.cookies[element])
                 res.cookie(element, "", { maxAge: 0 })
             }
         }
@@ -78,12 +78,12 @@ jokesRoute.get("/save", async (req, res) => {
 jokesRoute.get("/:category", async (req, res) => {
     const key = req.signedCookies.access_validator;
     try {
-        const category = req.params.category
-        const DB = await getAllJokes(category)
+        const DB = await Select.AllJokes([category])
         if (DB.length < 1) {
             return res.redirect("/nono")
         }
-        console.log(DB.length)
+        const category = req.params.category
+
         const obj = {
             title: `Witze: ${category}`,
             css: "/css/commands/joke-list.css",
@@ -97,7 +97,6 @@ jokesRoute.get("/:category", async (req, res) => {
                     prompt: DB[index].response_text
                 }
             })
-
         }
 
         if (key) {
