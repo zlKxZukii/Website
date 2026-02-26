@@ -8,7 +8,10 @@ function getTemplate(key) {
                         <p></p>
                     </div>
                     <div class="checkbox">
-                        <input type="checkbox" name="${key}LinkState" id="${key}LinkState" ${checkLinkState(elementTitle)} >
+                                                                                    <label>
+                <input type="checkbox" name="${key}LinkState" id="${key}LinkState" ${checkLinkState(elementTitle)} >
+                        <div class="toggle"><span></span></div>
+            </label>
                         <button onclick="deleteCommand('${key}')">x</button>
                     </div>
                 </div>
@@ -59,11 +62,36 @@ function creationWindow(counter) {
 
 
 function allowList(title) {
-    return `<li><input type="checkbox" name="" id="${title}Anybody" ${checkState(title, "anybody")} onclick="highlightAll('${title}')">Jeder</li>
-            <li><input type="checkbox" name="" id="${title}Subscriber" ${checkState(title, "subscriber")}>Subscriber</li>
-            <li><input type="checkbox" name="" id="${title}Vip" ${checkState(title, "vip")}>VIP</li>
-            <li><input type="checkbox" name="" id="${title}Moderator" ${checkState(title, "moderator")}>Moderatoren</li>
-            <li><input type="checkbox" name="" id="${title}Broadcaster" ${checkState(title, "broadcaster")}>Streamer</li>`
+    return `<li>
+                <label>
+                <input type="checkbox" name="" id="${title}Anybody" ${checkState(title, "anybody")} onclick="highlightAll('${title}')">
+                    <div class="toggle"><span></span></div>
+                </label>Jeder
+            </li>
+            <li>
+                <label>
+                <input type="checkbox" name="" id="${title}Subscriber" ${checkState(title, "subscriber")}>
+                    <div class="toggle"><span></span></div>
+                </label>Abonnenten
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" name="" id="${title}Vip" ${checkState(title, "vip")}>
+                    <div class="toggle"><span></span></div>
+                </label>VIP
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" name="" id="${title}Moderator" ${checkState(title, "moderator")}>
+                    <div class="toggle"><span></span></div>
+                </label>Moderatoren
+            </li>
+            <li>
+                <label>
+                <input type="checkbox" name="" id="${title}Broadcaster" ${checkState(title, "broadcaster")}>
+                    <div class="toggle"><span></span></div>
+                </label>Streamer
+            </li>`
 }
 
 function checkState(key, chatBage) {

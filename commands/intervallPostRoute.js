@@ -2,6 +2,7 @@ import client from "../src/redisClient.js";
 import { Select, Insert, Delete } from "../sql/sqlHandler.js"
 
 import express from "express"
+import { ClientManager } from "../twitch_bot/connectBot.js";
 export const intervallRoute = express.Router()
 
 intervallRoute.get((""), async (req, res) => {
@@ -49,6 +50,7 @@ intervallRoute.get("/save", async (req, res) => {
             res.cookie(cookieKeys[index], "", { maxAge: 0 });
         };
     };
+    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     res.redirect("/intervall");
 })
 
@@ -59,5 +61,7 @@ intervallRoute.get("/delete/:category", async (req, res) => {
     };
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
     await Delete.Intervall([sessionData.userId, req.params.category])
+    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     res.redirect("/intervall")
 })
+

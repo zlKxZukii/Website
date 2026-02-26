@@ -1,25 +1,20 @@
 
+function pushButton(state) {
+    const button = document.getElementById(`${state}`)
+    button.disabled = true
+    location.href = `/dashboard/bot/${state}`
+}
+
+
 const activateButton = document.querySelector("#activate")
-
-activateButton.addEventListener("click", () => {
-    activateButton.disabled = true
-    location.href = '/bot?activate=true'
-})
-
-const deactivateButton = document.querySelector("#deactivate")
-
-deactivateButton.addEventListener("click", () => {
-    deactivateButton.disabled = true
-    location.href = '/bot?deactivate=true'
-})
 
 const state = document.getElementById("state")
 
 if (state.innerText == "true") {
-    activateButton.remove()
+    document.getElementById("activate").remove()
 }
 else {
-    deactivateButton.remove()
+    document.getElementById("deactivate").remove()
 }
 
 state.remove()

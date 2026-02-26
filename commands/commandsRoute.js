@@ -2,6 +2,7 @@ import express from "express";
 export let commandsRoute = express.Router();
 import client from "../src/redisClient.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
+import { ClientManager } from "../twitch_bot/connectBot.js";
 
 commandsRoute.get("", async (req, res) => {
     const key = req.signedCookies.access_validator;
@@ -22,7 +23,6 @@ commandsRoute.get("", async (req, res) => {
         };
 
         let DB = await Select.Commands([sessionData.userId]);
-
         // Create Commands firt time
         if (!DB || DB.length === 0) {
             const socialArray = [
@@ -102,7 +102,7 @@ commandsRoute.get("/save", async (req, res) => {
             ]);
             res.cookie(cookieKeys[index], "", { maxAge: 0 })
         }
-
+        ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     }
     res.redirect("/commands");
 })

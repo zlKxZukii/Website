@@ -10,9 +10,9 @@
         <div id="renderJokes"></div>
 
         <div class="joke-buttons">
-            <button onclick="window.location.href='/data?jokes=true'">Alle Deaktivieren</button>
+            <button onclick="acDeButton(false)">Alle Deaktivieren</button>
             <button
-                onclick="window.location.href='/data?jokes=true&animals=true&deinemudda=true&chucknorris=true&flachwitze=true'">Alle
+                onclick="acDeButton(true)">Alle
                 aktivieren</button>
             <button onclick="safeJokes()">Speichern</button>
         </div>
@@ -28,8 +28,12 @@
                 renderJokes.innerHTML += `<div class="joke-section">
                                     <p>${data[keys[index]].trigger}</p>
                                     <p>${data[keys[index]].category}</p>
-                                    <p><a href="/jokes/${data[keys[index]].id}">Entdecke die Liste</a></p>
-                                    <input id="${data[keys[index]].id.split(" ").join("")}" type="checkbox" ${checkState(index)}>
+                                    <p><a href="/jokes/${data[keys[index]].id.split(" ").join("%20")}">Entdecke die Liste</a></p>
+                                                <label>
+                <input class="toggle" id="${data[keys[index]].id.split(" ").join("")}" type="checkbox" ${checkState(index)}>
+                <div class="toggle"><span></span></div>
+            </label>
+                                    
                                 </div>`
             }
         }

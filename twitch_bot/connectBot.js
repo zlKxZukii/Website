@@ -1,100 +1,116 @@
 import dotenv from "dotenv";
 dotenv.config({
-    path: './src/.env', quiet: true
+    path: './src/.env',
+    quiet: true
 });
-
 import { ChatClient } from '@twurple/chat';
 import { getAuthProvider } from '../auth/createRefreshToken.js';
 import { createApiClient } from "./createAPIclient.js";
-import { getData, saveData } from "../src/firebase.js";
-import crypto from "crypto";
-import { answers } from "./controller.js"
-
-import { registerUserEvents } from "../twitch_bot/eventListener.js"
+import { registerUserEvents } from "../twitch_bot/eventListener.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
+import { answers } from "./controller.js";
 import chalk from "chalk";
-
-async function createBot(username, userId) {
-    let alertKey = await Select.AlertBox([userId])
-
-    if (!alertKey) {
-        const alertKeyNew = crypto.randomBytes(12).toString("hex");
-        await Insert.alertBoxKey(userId, alertKeyNew)
-        alertKey = alertKeyNew
-    }
-    const tokenData = await Select.Token([userId])
-    const authProviderComp = await getAuthProvider(tokenData)
-    const apiClient = await createApiClient(authProviderComp)
-
-    const client = new ChatClient({
-        authProvider: authProviderComp,
-        channels: [username],
-        requestMembershipEvents: true,
-        connectionOptions: {
-            connectionRetries: 15
-        }
-    });
-
-    client.onConnect(async () => {
-        console.log(chalk.blue(username + " connected"))
-    });
-
-    client.onMessage(async (channel, user, message, msg) => {
-        await answers(channel, user, message, msg, userId)
-    })
-
-    client.onDisconnect(((manually, reason) =>
-        console.log(username, 'Disconnected:', manually)))
-    return {
-        client: client,
-        key: alertKey.key,
-        apiClient: apiClient
-    }
-}
+import crypto from "crypto";
 
 class BotManager {
     constructor() {
         this.client = new Map();
-    }
+    };
 
     async start(username, userId) {
+
         if (this.client.has(userId)) return;
+
         try {
-            const { client, key, apiClient } = await createBot(username, userId);
-            // ------------------------------------------------------- hier geht es weiter beim nächsten mal
-            const wsListener = await registerUserEvents(username, userId, key, apiClient);
+            const { client, key, apiClient } = await this.createBot(username, userId);
 
-            const jokeState = await getData("jokes", username, userId) || {}
-            const defaultCommands = await getDefaultCommands(username, userId) || {}
-            const streamFunctionState = await streamFunctions(username, userId) || {}
-            const customCommands = await getData("customCommands", username, userId) || {}
+            // alert box nach integration fertigstellen
+            // const wsListener = await registerUserEvents(userId, key, apiClient);
 
-            const spamBotProtection = {}
-            const intervallList = {}
-            const DB = await getData("intervalls", username, userId)
-            const DBKeys = Object.keys(DB)
-            for (let index = 0; index < DBKeys.length; index++) {
-                if (DB[DBKeys[index]].state) {
-                    Object.assign(intervallList, {
-                        [DBKeys[index]]: setInterval(() => {
-                            client.say(username, DB[DBKeys[index]].text)
-                        }, Number(DB[DBKeys[index]].intervall) * 1000)
-                    })
-                }
+            const jokeState = await Select.JokeDataForUser([userId]) || {};
+            const defaultCommands = await Select.Commands([userId]) || {};
+            const accessShieldState = await Select.AccessShield([userId]) || {};
+            const customCommands = await Select.CustomCommand([userId]) || {};
+            const spamBotProtection = {};
+            const intervallList = await this.initTimer(client, username, userId);
+
+            // wsListener, einfach reinpasten 
+            this.client.set(userId, { userId, client, username, key, apiClient, jokeState, defaultCommands, accessShieldState, customCommands, spamBotProtection, intervallList });
+            // send true to Database
+            await Insert.BotState([userId, true, username]);
+            try {
+                await client.connect();
+            } catch (error) {
+                console.log(chalk.red("der bot konnte nicht gestartet werden " + error.message))
             }
-
-
-            this.client.set(userId, { userId, client, username, key, apiClient, wsListener, jokeState, defaultCommands, streamFunctionState, customCommands, spamBotProtection, intervallList });
-            await saveData("botState", username, userId, {
-                state: true
-            });
-
-            await client.connect();
 
         } catch (error) {
             console.log("Error Bot Start ", error)
         }
     }
+
+    async createBot(username, userId) {
+        // wenn kein alertkey existiert wird einer neuer erstellt
+        let alertKey = await Select.AlertBox([userId])
+        if (!alertKey) {
+            const alertKeyNew = crypto.randomBytes(32).toString("hex");
+            await Insert.AlertBoxKey([userId, alertKeyNew])
+            alertKey = alertKeyNew
+        }
+
+        const tokenData = await Select.Token([userId])
+        const authProviderComp = await getAuthProvider(tokenData)
+        const apiClient = await createApiClient(authProviderComp)
+
+        const chatClient = new ChatClient({
+            authProvider: authProviderComp,
+            authUserId: userId,
+            channels: [username],
+            requestMembershipEvents: true,
+            connectionOptions: {
+                connectionRetries: 15
+            }
+        });
+
+        chatClient.onConnect(async () => {
+            console.log(chalk.blue(username + " connected"))
+        });
+
+        chatClient.onConnectionFailed
+
+        chatClient.onMessage(async (channel, user, message, msg) => {
+            await answers(channel, user, message, msg, userId)
+        })
+
+        chatClient.onDisconnect(((manually, reason) => {
+            if (manually) {
+                console.log("der bot wurde erfolgreich per hand getrennt")
+            }
+            else {
+                console.log(chalk.red("der bot ist abgeschmiert" + reason.message))
+            }
+        }))
+        return {
+            client: chatClient,
+            key: alertKey.alert_key,
+            apiClient: apiClient
+        }
+    }
+
+    async initTimer(client, username, userId) {
+        const intervallList = {};
+        const DB = await Select.Intervall([userId]);
+        for (let index = 0; index < DB.length; index++) {
+            if (DB[index].state) {
+                Object.assign(intervallList, {
+                    [DB[index].category]: setInterval(() => {
+                        client.say(username, DB[index].response_text)
+                    }, Number(DB[index].intervall) * 1000)
+                });
+            };
+        };
+        return intervallList
+    };
 
     async disconnect(userID) {
         const data = this.client.get(userID);
@@ -103,13 +119,8 @@ class BotManager {
         if (wsListener) {
             wsListener.stop();
         }
-
         Object.values(intervallList).forEach(clearInterval)
-
-        await saveData("botState", username, userID, {
-            state: false
-        });
-
+        await Insert.BotState([userID, false, username]);
         if (!client) return;
 
         client.quit();
@@ -120,66 +131,14 @@ class BotManager {
     getClient(userID) {
         return this.client.get(userID);
     }
-}
 
-export const botManager = new BotManager()
-
-export async function restartBot(username, userID) {
-    const botState = await getData("botState", username, userID)
-    if (botState.state) {
-        await botManager.disconnect(userID)
-        await botManager.start(username, userID)
+    async restartBot(username, userID, loginKey) {
+        const botState = await Select.Users(['bot_state'], [loginKey])
+        if (botState.bot_state) {
+            await this.disconnect(userID)
+            await this.start(username, userID)
+        }
     }
 }
 
-async function streamFunctions(username, userID) {
-    let DB = await getData("streamFunctions", username, userID)
-    if (!DB) {
-        DB = {
-            spamBot: "true",
-            clip: "true",
-            followBot: "true"
-        }
-        await saveData("streamFunctions", username, userID, DB)
-    }
-    return DB
-}
-
-async function getDefaultCommands(username, userID) {
-    let DB = await getData("commands", username, userID)
-
-    if (!DB) {
-        const tagArr = ["discord", "facebook", "tiktok", "instagram", "youtube"]
-        const triggerArr = {
-            discord: ["!dc", "!discord"],
-            facebook: ["!fb", "!facebook",],
-            tiktok: ["!tt", "!tiktok"],
-            instagram: ["!insta", "!instagram"],
-            youtube: ["!yt", "!youtube"]
-
-        }
-        const obj = {}
-        for (let index = 0; index < tagArr.length; index++) {
-            Object.assign(obj, {
-                [tagArr[index]]: {
-                    state: false,
-                    value: "",
-                    stateTitle: {
-                        anybody: false,
-                        subscriber: false,
-                        vip: false,
-                        moderator: false,
-                        broadcaster: false
-                    },
-                    cooldown: 0,
-                    delay: 0,
-                    trigger: triggerArr[tagArr[index]]
-                }
-            })
-        }
-        DB = obj
-        await saveData("commands", username, userID, obj)
-    }
-
-    return DB
-}
+export const ClientManager = new BotManager()

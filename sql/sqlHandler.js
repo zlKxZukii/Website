@@ -2,19 +2,53 @@ import chalk from "chalk";
 import { query } from "../src/server.js"
 
 class InsertSQL {
+    static whitelist = [
+        'username',
+        'twitch_id',
+        'category',
+        'response_text',
+        'cooldown',
+        'delay',
+        'state',
+        'triggers'
+    ];
 
-    constructor() {
-        this.whitelist = [
-            'username',
-            'twitch_id',
-            'category',
-            'response_text',
-            'cooldown',
-            'delay',
-            'state',
-            'triggers'
-        ];
-    };
+    async BotState(valuesArray) {
+        try {
+            const sql = `INSERT INTO users AS u(
+                            twitch_id,
+                            bot_state,
+                            username)
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id)
+                        DO UPDATE SET
+                        bot_state = EXCLUDED.bot_state,
+                        updated_at = NOW()
+                        RETURNING u.*;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Bot State nicht gespeichert" + error.message))
+        }
+    }
+
+    async AlertBoxKey(valuesArray){
+                try {
+            const sql = `INSERT INTO alert_box AS ab(
+                            twitch_id,
+                            alert_key)
+                        VALUES($1, $2)
+                        ON CONFLICT (twitch_id)
+                        DO UPDATE SET
+                        alert_key = EXCLUDED.alert_key,
+                        updated_at = NOW()
+                        RETURNING ab.*;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Alert Key nicht gespeichert " + error.message))
+        }
+    }
 
     // defaultCommands
     async CreateDefCommands(valuesArray) {
@@ -84,7 +118,8 @@ class InsertSQL {
                             updated_at = NOW()
                         FROM update_def_commands AS udc
                         WHERE dp.twitch_id = udc.twitch_id
-                        AND dp.category = udc.category;`;
+                        AND dp.category = udc.category
+                        RETURNING dp.*;`;
             const res = await query(sql, valuesArray);
             return res;
         } catch (error) {
@@ -199,7 +234,7 @@ class InsertSQL {
     // jokes
     async jokeState(twitch_id, category, state = false) {
         try {
-            const sql = `INSERT INTO commands.jokes (
+            const sql = `INSERT INTO joke_states (
                             twitch_id,
                             category,
                             state
@@ -222,7 +257,7 @@ class InsertSQL {
         };
     };
 
-    async AccessShield(valuesArray){
+    async AccessShield(valuesArray) {
         try {
             const sql = `INSERT INTO access_shield (
                             twitch_id,
@@ -250,6 +285,17 @@ class SelectSQL {
         this.whitelist = ['username', 'twitch_id', 'bot_state', 'picture_url'];
     };
 
+    async UsersForStart(){
+         try {
+            const sql = `SELECT username, twitch_id, bot_state FROM users;`;
+            const res = await query(sql,[]);
+            
+            return res.rows;
+        } catch (error) {
+            console.log(chalk.red("Fehler im Starten aller User" + error.message));
+        };
+    }
+
     async Users(whitelistArray, valuesArray) {
         let injectString = ""
         for (const element of whitelistArray) {
@@ -259,7 +305,9 @@ class SelectSQL {
         }
         try {
             const sql = `SELECT ${injectString.slice(0, -2) + " "}FROM users WHERE login_key=$1;`;
+            
             const res = await query(sql, valuesArray);
+            
             return res.rows[0];
         } catch (error) {
             console.log(chalk.red("Fehler im Select Statement" + error.message));
@@ -305,12 +353,12 @@ class SelectSQL {
     };
     async JokeDataForUser(valuesArray) {
         try {
-            const sql = `SELECT DISTINCT ON (cj.category) 
-                            cj.category, cj.state, j.triggers 
+            const sql = `SELECT DISTINCT ON (js.category) 
+                            js.category, js.state, j.triggers 
                         FROM 
-                            commands.jokes cj 
+                            joke_states js
                         INNER JOIN
-                            public.jokes j ON cj.category=j.category
+                            public.jokes j ON js.category= j.category
                         WHERE
                             twitch_id = $1;`;
             const res = await query(sql, valuesArray);
@@ -351,21 +399,9 @@ class SelectSQL {
                         FROM
                             def_commands AS dc
                         JOIN 
-                            def_permissions AS dp ON dc.twitch_id = dp.twitch_id
+                            def_permissions AS dp ON dc.twitch_id = dp.twitch_id AND dc.category = dp.category
                         WHERE
-                            dc.twitch_id ILIKE ($1) 
-                        GROUP BY 
-                            dc.category,
-                            dc.response_text,
-                            dc.cooldown,
-                            dc.delay,
-                            dc.state,
-                            dc.triggers,
-                            dp.anybody,
-                            dp.broadcaster,
-                            dp.vip,
-                            dp.subscriber,
-                            dp.moderator;`;
+                            dc.twitch_id ILIKE ($1);`;
 
             const res = await query(sql, valuesArray);
             return res.rows;
@@ -376,7 +412,7 @@ class SelectSQL {
 
     async CustomCommand(valuesArray) {
         try {
-            const sql = `SELECT 
+            const sql = `SELECT  DISTINCT ON (cc.category)
                             cc.category,
                             cc.response_text,
                             cc.cooldown,
@@ -391,7 +427,7 @@ class SelectSQL {
                         FROM
                             custom_commands AS cc
                         JOIN 
-                            custom_permissions AS cp ON cc.twitch_id = cp.twitch_id
+                            custom_permissions AS cp ON cc.twitch_id = cp.twitch_id AND cc.category = cp.category
                         WHERE
                             cc.twitch_id ILIKE ($1) 
                         GROUP BY 

@@ -11,6 +11,9 @@ import { getAuthProvider } from '../auth/createRefreshToken.js';
 import { getRandomInt } from "../randomizer/randomNumber.js";
 import { Select } from "../sql/sqlHandler.js";
 import client from "../src/redisClient.js";
+import { ClientManager } from "../twitch_bot/connectBot.js";
+
+
 
 dashboardRoute.get((""), async (req, res) => {
     const key = req.signedCookies.access_validator;
@@ -71,3 +74,19 @@ async function getProminenceInformation(userID, apiClient) {
         bits: bits.totalCount
     }
 }
+
+dashboardRoute.get("/bot/:state", async (req, res) => {
+    const key = req.signedCookies.access_validator;
+    const sessionData = await JSON.parse(await client.get(`sess:${key}`));
+    const userID = sessionData.userId
+    const username = sessionData.username
+
+    const params = req.params
+    if (params.state === 'activate') {
+        await ClientManager.start(username, userID)
+    }
+    if (params.state === 'deactivate') {
+        await ClientManager.disconnect(userID)
+    }
+    res.redirect("/dashboard")
+})

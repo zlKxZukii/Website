@@ -7,3 +7,10 @@ function safeJokes() {
     }
     window.location.href = "/jokes/save"
 }
+
+function acDeButton(state) {
+    for (let index = 0; index < keyArr.length; index++) {
+        document.cookie = `${data[keyArr[index]].category.split(" ").join("_")} = ${state} ;max-age=1000`
+    }
+    window.location.href = "/jokes/save"
+}

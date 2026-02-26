@@ -30,7 +30,10 @@ function defaultCommandsTemplate(title, socialMedia) {
                     <p></p>
                 </div>
                 <div class="checkbox">
-                    <input type="checkbox" name="${title}LinkState" id="${title}State" ${getState(socialMedia.state)}>
+                                                                <label>
+                <input type="checkbox" name="${title}LinkState" id="${title}State" ${getState(socialMedia.state)}>
+                <div class="toggle"><span></span></div>
+            </label>
                 </div>
             </div>
 
@@ -42,13 +45,36 @@ function defaultCommandsTemplate(title, socialMedia) {
                     <input id="${title}Link" type="text" name="linkSender"
                         placeholder="Hier ${title} Link und/oder Text einfügen" autocomplete="off">
                     <ul class="allow-level">
-                        <li><input type="checkbox" name="" id="${title}Anybody"  onclick="highlightAll('${title}')" ${getState(socialMedia.stateTitle.anybody)}>Jeder</li>
-                        <li><input type="checkbox" name="" id="${title}Subscriber" ${getState(socialMedia.stateTitle.subscriber)}>Subscriber
-                        </li>
-                        <li><input type="checkbox" name="" id="${title}Vip" ${getState(socialMedia.stateTitle.vip)}>VIP</li>
-                        <li><input type="checkbox" name="" id="${title}Moderator" ${getState(socialMedia.stateTitle.moderator)}>Moderatoren
-                        </li>
-                        <li><input type="checkbox" name="" id="${title}Broadcaster" ${getState(socialMedia.stateTitle.broadcaster)}>Streamer</li>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="" id="${title}Anybody"  onclick="highlightAll('${title}')" ${getState(socialMedia.stateTitle.anybody)}>
+                            <div class="toggle"><span></span></div>
+                         </label>Jeder
+                     </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="" id="${title}Subscriber" ${getState(socialMedia.stateTitle.subscriber)}>
+                            <div class="toggle"><span></span></div>
+                         </label>Abonnenten
+                     </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="" id="${title}Vip" ${getState(socialMedia.stateTitle.vip)}>
+                            <div class="toggle"><span></span></div>
+                         </label>VIP
+                     </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="" id="${title}Moderator" ${getState(socialMedia.stateTitle.moderator)}>
+                            <div class="toggle"><span></span></div>
+                         </label>Moderatoren
+                     </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" name="" id="${title}Broadcaster" ${getState(socialMedia.stateTitle.broadcaster)}>
+                            <div class="toggle"><span></span></div>
+                         </label>Streamer
+                     </li>
                     </ul>
                     <div class="cooldown">
                         <p>Cooldown</p>

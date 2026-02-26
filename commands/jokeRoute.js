@@ -3,6 +3,7 @@ export let jokesRoute = express.Router()
 
 import client from "../src/redisClient.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
+import { ClientManager } from "../twitch_bot/connectBot.js";
 
 // Standard Route
 jokesRoute.get("", async (req, res) => {
@@ -14,7 +15,6 @@ jokesRoute.get("", async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const jokeDB = await Select.JokeDataForUser([sessionData.userId])
-        
         const obj = {
             title: "Witze",
             css: "css/commands/jokes.css",
@@ -24,7 +24,7 @@ jokesRoute.get("", async (req, res) => {
             jokeData: {}
         }
 
-        if (!jokeDB) {
+        if (!jokeDB || jokeDB.length < 1) {
             const jokeArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
             for (const element of jokeArray) {
 
@@ -37,7 +37,7 @@ jokesRoute.get("", async (req, res) => {
                 [jokeDB[index].category.split(" ").join("")]: {
                     trigger: jokeDB[index].triggers,
                     category: jokeDB[index].category,
-                    id: jokeDB[index].category.split(" ").join("").toLowerCase(),
+                    id: jokeDB[index].category,
                     state: jokeDB[index].state
                 }
             })
@@ -66,8 +66,9 @@ jokesRoute.get("/save", async (req, res) => {
                 res.cookie(element, "", { maxAge: 0 })
             }
         }
-        res.redirect("/jokes")
 
+        ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+        res.redirect("/jokes")
     } catch (error) {
         console.log(error)
         res.redirect("/")
@@ -78,11 +79,11 @@ jokesRoute.get("/save", async (req, res) => {
 jokesRoute.get("/:category", async (req, res) => {
     const key = req.signedCookies.access_validator;
     try {
+        const category = req.params.category
         const DB = await Select.AllJokes([category])
         if (DB.length < 1) {
             return res.redirect("/nono")
         }
-        const category = req.params.category
 
         const obj = {
             title: `Witze: ${category}`,

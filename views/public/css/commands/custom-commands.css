@@ -152,6 +152,7 @@
 .allow-level li {
     display: flex;
     align-items: center;
+    margin: 10px;
 }
 
 .allow-level input {
@@ -256,4 +257,82 @@
     100% {
         color: red;
     }
+}
+
+label {
+    display: flex;
+    align-items: center;
+}
+
+.toggle {
+    position: relative;
+    margin: 0 10px;
+    width: 40px;
+    /* neue Breite */
+    height: 20px;
+    /* Höhe 20px */
+    background: red;
+    border-radius: 10px;
+    /* Hälfte der Höhe */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Der kleine Kreis */
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    /* Padding für 16px Kreis */
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Checkbox ausblenden */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* Wenn aktiviert: Hintergrund grün + Kreis nach rechts */
+input[type="checkbox"]:checked+.toggle {
+    background: #4caf50;
+}
+
+input[type="checkbox"]:checked+.toggle::after {
+    transform: translateX(20px);
+    
+}
+
+/* Optional: Beschriftung AN/AUS */
+.toggle span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}
+
+.end-buttons{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.end-buttons button{
+        margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 24px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+    width: 80%;
 }

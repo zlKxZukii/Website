@@ -37,15 +37,12 @@ function openCookieBanner() {
             <button>X</button>
         </div>
         <div class="cookie-text">
-            <h2>Diese Website nutzt Cookies</h2>
+            <h2>Disclaimer</h2>
             <p>Weitere Details zur Funktion unserer Cookies findest du im <a href="/dataSecure">Datenschutz</a>.</p>
             <p>Speicherung erfolgt für 14 Tage oder endet automatisch, sobald du dich abmeldest.</p>
-            <p>Falls du die Cookies nicht akzeptierst, werden diese vollständig gelöscht. Danach wirst du zu einer
-                alternativen Seite weitergeleitet.</p>
         </div>
         <div class="cookie-button">
-            <button id="accept" onclick="acceptButton()">Annehmen</button>
-            <button id="decline" onclick="acceptButton()">Ablehnen</button>
+            <button style="border: #2BD6F1 solid; margin-bottom:20px;" id="accept" onclick="acceptButton()">Ich habe verstanden</button>
         </div>
     </div>
 </div>`

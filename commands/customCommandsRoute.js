@@ -2,6 +2,7 @@ import express from "express"
 export let customCommandsRoute = express.Router()
 import client from "../src/redisClient.js";
 import { Select, Insert, Delete } from "../sql/sqlHandler.js";
+import { ClientManager } from "../twitch_bot/connectBot.js";
 
 customCommandsRoute.get((""), async (req, res) => {
     const key = req.signedCookies.access_validator;
@@ -81,6 +82,7 @@ customCommandsRoute.get("/save", async (req, res) => {
             res.cookie(cookieKeys[index], "", { maxAge: 0 })
         }
     }
+    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     res.redirect("/customcommands")
 
 })
@@ -93,5 +95,7 @@ customCommandsRoute.get("/delete/:category", async (req, res) => {
     const category = req.params.category
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
     await Delete.CustomCommands([sessionData.userId, category])
+    
+    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     res.redirect("/customcommands")
 })

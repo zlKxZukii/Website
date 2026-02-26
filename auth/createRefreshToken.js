@@ -36,7 +36,7 @@ export async function authTwitch(code, ipAddress, res) {
         if (!DB) {
             const category = ["Follow Schutz", "Nachrichten Schutz", "Automatisches Clipen"]
             for (let index = 0; index < category.length; index++) {
-                Insert.AccessShield([info.userId], category[index], false)
+                await Insert.AccessShield([info.userId], category[index], false)
             }
         }
         await Auth.saveTwitchTokens(info.userId, tokenData, scopes);

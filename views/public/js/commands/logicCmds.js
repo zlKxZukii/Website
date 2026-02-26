@@ -8,8 +8,11 @@ function deleteCmd(titleC, title) {
 }
 
 function highlightAll(title) {
+    if (!document.getElementById(`${title + 'Anybody'}`).checked) {
+        return;
+    };
     document.getElementById(`${title + 'Subscriber'}`).checked = true;
-    document.getElementById(title+"Vip").checked = true;
-    document.getElementById(title+"Moderator").checked = true;
-    document.getElementById(title+"Broadcaster").checked = true;
+    document.getElementById(title + "Vip").checked = true;
+    document.getElementById(title + "Moderator").checked = true;
+    document.getElementById(title + "Broadcaster").checked = true;
 }

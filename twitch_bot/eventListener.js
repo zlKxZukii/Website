@@ -5,9 +5,9 @@ dotenv.config({
 import { EventSubWsListener } from '@twurple/eventsub-ws';
 import { io } from "../src/server.js";
 import { followProtection } from "./functions/spamProtection.js";
-import { botManager } from "./connectBot.js";
+import { ClientManager } from "./connectBot.js";
 
-export async function registerUserEvents(username, userID, key, apiClient) {
+export async function registerUserEvents(userID, key, apiClient) {
 
     const wsListener = new EventSubWsListener({
         apiClient
@@ -18,7 +18,7 @@ export async function registerUserEvents(username, userID, key, apiClient) {
     // Follow
     wsListener.onChannelFollow(userID, userID, async event => {
         try {
-            const client = botManager.client.get(userID)
+            const client = ClientManager.client.get(userID)
             let check = await followProtection(client, event, userID)
             if (check == "true") {
                 io.to(key).emit("new-alert", {
