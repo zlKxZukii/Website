@@ -30,6 +30,46 @@
     border-radius: 0px 0px 10px 10px;
 }
 
+.closed {
+    padding: 0;
+    height: 0px;
+    overflow: hidden;
+    transition: height 2s ease, padding 2s ease;
+}
+
+.fade-open {
+    padding: 30px 40px;
+    height: 100px;
+}
+
+.fade-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.fade-box input {
+    width: 30%;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 30px;
+}
+
+.align-slide {
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    height: 80px;
+}
+
+.align-slide p {
+    padding-bottom: 20px;
+}
+
+/* das ist der slider */
 label {
     display: flex;
     align-items: center;
@@ -89,14 +129,14 @@ input[type="checkbox"]:checked+.toggle::after {
     user-select: none;
 }
 
-.end-buttons{
+.end-buttons {
     display: flex;
     justify-content: center;
     width: 100%;
 }
 
-.end-buttons button{
-        margin: 5px;
+.end-buttons button {
+    margin: 5px;
     padding: 5px;
     cursor: pointer;
     border-radius: 10px;

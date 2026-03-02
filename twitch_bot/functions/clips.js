@@ -1,14 +1,15 @@
-export async function clip(channel, userID, apiClient, chatClient) {
+export async function clip(channel, userID, apiClient, chatClient, duration) {
     let message = "";
-    
+
     try {
         const clip = await apiClient.clips.createClip({
             channel: userID,
-            createAfterDelay: true
+            createAfterDelay: true,
+            duration: Number(duration)
         })
 
         async function waitForClip() {
-        
+
             while (true) {
                 const clipT = await apiClient.clips.getClipById(clip)
                 if (clipT === null) {
@@ -22,6 +23,7 @@ export async function clip(channel, userID, apiClient, chatClient) {
         } await waitForClip()
 
     } catch (error) {
+        console.log(JSON.parse(error.body).message)
         message = JSON.parse(error.body).message
     }
     chatClient.say(channel, message)

@@ -29,8 +29,12 @@
     width: 10%;
 }
 
-.default-commands-checkbox:nth-of-type(2n):not(.closed) {
+.default-commands-checkbox:nth-child(odd of .default-commands-checkbox) {
     background-color: black;
+}
+
+.default-commands-checkbox:nth-child(odd of .default-commands-checkbox):hover {
+    background-color: rgba(54, 54, 54, 0.7);
 }
 
 .default-commands-checkbox {
@@ -123,9 +127,10 @@
 }
 
 .cooldown {
-    align-items: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .cooldown input {
@@ -188,6 +193,16 @@
         color: red;
     }
 }
+
+.align-slide{
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    padding-right: 40px ;
+}
+
 
 label {
     display: flex;

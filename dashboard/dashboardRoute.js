@@ -17,63 +17,66 @@ import { ClientManager } from "../twitch_bot/connectBot.js";
 
 dashboardRoute.get((""), async (req, res) => {
     const key = req.signedCookies.access_validator;
-    if (key) {
-        const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const userId = sessionData.userId
-        const user = await Select.Users(['bot_state'], [key])
-        const tokenData = await Select.Token([sessionData.userId]);
-
-        const obj = {
-            title: "Dashboard",
-            css: "../css/dashboard/dashboard.css",
-            username: sessionData.username,
-            img: sessionData.profilePicture,
-            parent: process.env.PARENT,
-            showBody: true,
-            botState: user.bot_state
-        };
-
-        Object.assign(obj, await getBroadcasterInfo(userId, tokenData))
-        res.render("main/dashboard/dashboard", obj)
-    } else {
+    if (!key) {
         res.redirect("/?index=true")
     }
-})
 
-async function getBroadcasterInfo(userID, tokenData) {
-    const authProviderComp = await getAuthProvider(tokenData);
-    const apiClient = await createApiClient(authProviderComp);
-    const workObj = {}
-    Object.assign(workObj, await getClips(userID, apiClient))
-    Object.assign(workObj, await getProminenceInformation(userID, apiClient))
-    return workObj
-}
+    const sessionData = JSON.parse(await client.get(`sess:${key}`));
+    const userId = sessionData.userId
+    const user = await Select.Users(['bot_state'], [key])
+    const tokenData = await Select.Token([sessionData.userId]);
 
-async function getClips(userID, apiClient) {
-    let clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 100 })
+    const obj = {
+        title: "Dashboard",
+        css: "../css/dashboard/dashboard.css",
+        username: sessionData.username,
+        img: sessionData.profilePicture,
+        parent: process.env.PARENT,
+        showBody: true,
+        botState: user.bot_state
+    };
 
-    if (clips.data.length != 0) {
-        let randInt = getRandomInt(clips.data.length)
-        if (randInt == clips.data.length) {
-            randInt -= 1
+    Object.assign(obj, await getBroadcasterInfo(userId, tokenData))
+
+
+    async function getBroadcasterInfo(userID, tokenData) {
+        const authProviderComp = await getAuthProvider(tokenData);
+        const apiClient = await createApiClient(authProviderComp);
+        const workObj = {}
+        Object.assign(workObj, await getClips(userID, apiClient))
+        Object.assign(workObj, await getProminenceInformation(userID, apiClient))
+        return workObj
+    }
+
+    async function getClips(userID, apiClient) {
+        const clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 100 })
+
+        if (clips.data.length != 0) {
+            let randInt = getRandomInt(clips.data.length)
+            if (randInt == clips.data.length) {
+                randInt -= 1
+            }
+            return { clipID: clips.data[randInt].id }
         }
-        return { clipID: clips.data[randInt].id }
+        else {
+            return { clipID: "CloudySarcasticSashimiTwitchRPG" }
+        }
     }
-    else {
-        return { clipID: "CloudySarcasticSashimiTwitchRPG" }
-    }
-}
 
-async function getProminenceInformation(userID, apiClient) {
-    const follower = await apiClient.channels.getChannelFollowers(userID)
-    const subs = await apiClient.subscriptions.getSubscriptions(userID)
-    const bits = await apiClient.bits.getLeaderboard(userID)
-    return {
-        follower: follower.total,
-        subscriber: subs.total,
-        bits: bits.totalCount
+    async function getProminenceInformation(userID, apiClient) {
+        const follower = await apiClient.channels.getChannelFollowers(userID)
+        const subs = await apiClient.subscriptions.getSubscriptions(userID)
+        const bits = await apiClient.bits.getLeaderboard(userID)
+        return {
+            follower: follower.total,
+            subscriber: subs.total,
+            bits: bits.totalCount
+        }
     }
-}
+
+    res.render("main/dashboard/dashboard", obj)
+
+})
 
 dashboardRoute.get("/bot/:state", async (req, res) => {
     const key = req.signedCookies.access_validator;

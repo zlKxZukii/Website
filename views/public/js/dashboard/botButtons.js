@@ -1,4 +1,3 @@
-
 function pushButton(state) {
     const button = document.getElementById(`${state}`)
     button.disabled = true

@@ -8,14 +8,13 @@ import { Select } from "../sql/sqlHandler.js";
 const tagArray = ["broadcaster", "subscriber", "vip", "moderator", "anybody"];
 
 export async function answers(channel, user, message, msg, userID) {
-
     const client = ClientManager.getClient(userID)
     const permission = readTags(msg)
     await chatFunctions(client, msg.userInfo, client.apiClient, message)
-    defaultCommandsOutput(client, message, permission)
-    customCommandsOutput(client, message, permission)
+    await defaultCommandsOutput(client, message, permission, user)
+    customCommandsOutput(client, message, permission, msg)
     await jokeOutput(client, message)
-
+    // await shoutOuts(client, msg, channel)
     // funktioniert aber soll erst später eingebunden werden 
     // commandListOutput(client, userID, message, channel)
 }
@@ -25,23 +24,24 @@ async function chatFunctions(client, user, apiClient, message) {
         if (client.accessShieldState[index].category === "spamBot" && client.accessShieldState[index].state === true) {
             await messageProtection(client, user, apiClient, message)
         }
-        if (client.accessShieldState[index].category === "clip" && client.accessShieldState[index].state === true && message === "!clip") {
-            await clip(client.username, client.userId, client.apiClient, client.client)
+    }
+}
+
+async function defaultCommandsOutput(client, message, permission, user) {
+    const dbKeys = Object.keys(client.defaultCommands)
+    for (let index = 0; index < dbKeys.length; index++) {
+        if (checkTrigger(message, client.defaultCommands[[index]])) permissionCheck(client, client.defaultCommands[[index]], permission, user)
+        if (message === "!clip" && client.defaultCommands[[index]].category === "Clip") {
+            console.log(client.defaultCommands[index].settings.clipLength)
+            await clip(client.username, client.userId, client.apiClient, client.client, client.defaultCommands[index].settings.clipLength)
         }
     }
 }
 
-function defaultCommandsOutput(client, message, permission) {
-    const dbKeys = Object.keys(client.defaultCommands)
-    for (let index = 0; index < dbKeys.length; index++) {
-        if (checkTrigger(message, client.defaultCommands[[index]])) permissionCheck(client, client.defaultCommands[[index]], permission)
-    }
-}
-
-function customCommandsOutput(client, message, permission) {
+function customCommandsOutput(client, message, permission, user) {
     const dbKeys = Object.keys(client.customCommands)
     for (let index = 0; index < dbKeys.length; index++) {
-        if (checkTrigger(message, client.customCommands[[index]])) permissionCheck(client, client.customCommands[[index]], permission)
+        if (checkTrigger(message, client.customCommands[[index]])) permissionCheck(client, client.customCommands[[index]], permission, user)
     }
 }
 
@@ -69,11 +69,11 @@ function checkTrigger(message, DB) {
     }
 }
 
-function permissionCheck(client, DB, permission) {
+function permissionCheck(client, DB, permission, user) {
     for (let index = 0; index < tagArray.length; index++) {
         if (DB[tagArray[index]] === true) {
             if (permission[tagArray[index]] === true) {
-                client.client.say(client.username, DB.response_text)
+                client.client.say(client.username, DB.response_text.split("${user}").join(user))
                 return
             }
         }
@@ -101,4 +101,8 @@ function commandListOutput(client, userID, message, channel) {
             client.client.say(channel, `https://scaletta.live/list?broadcaster=${client.username}&id=${userID}`)
         }
     }
+}
+
+async function shoutOuts(client, msg, streamer) {
+
 }

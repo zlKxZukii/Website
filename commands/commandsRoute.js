@@ -11,6 +11,15 @@ commandsRoute.get("", async (req, res) => {
         return res.redirect("/?index=true");
     };
 
+    const defaultCommandsObj = [
+        { category: 'Discord', triggers: ['!dc', '!discord'], settings: { cooldown: 0, delay: 0 } },
+        { category: 'Facebook', triggers: ['!fb', '!facebook'], settings: { cooldown: 0, delay: 0 } },
+        { category: 'YouTube', triggers: ['!yt', '!youtube'], settings: { cooldown: 0, delay: 0 } },
+        { category: 'TikTok', triggers: ['!tt', '!tiktok'], settings: { cooldown: 0, delay: 0 } },
+        { category: 'Instagram', triggers: ['!insta', '!instagram'], settings: { cooldown: 0, delay: 0 } },
+        { category: 'Clip', triggers: ['!clip'], settings: { clipLength: 30 } }
+    ]
+
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const obj = {
@@ -19,37 +28,30 @@ commandsRoute.get("", async (req, res) => {
             username: sessionData.username,
             img: sessionData.profilePicture,
             showBody: true,
-            defaultCommand: {}
+            defaultCommand: {},
+            clip: {}
         };
 
         let DB = await Select.Commands([sessionData.userId]);
-        // Create Commands firt time
-        if (!DB || DB.length === 0) {
-            const socialArray = [
-                'Discord',
-                'Facebook',
-                'YouTube',
-                'TikTok',
-                'Instagram']
-            const triggersArray = [
-                ['!dc', '!discord'],
-                ['!fb', '!facebook'],
-                ['!yt', '!youtube'],
-                ['!tt', '!tiktok'],
-                ['!insta', '!instagram']];
-            for (let index = 0; index < socialArray.length; index++) {
-                await Insert.CreateDefCommands([sessionData.userId, socialArray[index], triggersArray[index]]);
-            };
-            return res.redirect("/commands");
-        };
+
+        const DBTester = DB.map(c => c.category)
+
+        for (const entry of defaultCommandsObj) {
+            if (!DBTester.includes(entry.category)) {
+                await Insert.CreateDefCommands([sessionData.userId, entry.category, entry.triggers, entry.settings]);
+            }
+
+        }
 
         // Send to Frontend
+        if (DB.length < defaultCommandsObj.length) {
+            DB = await Select.Commands([sessionData.userId])
+        }
         for (let index = 0; index < DB.length; index++) {
             Object.assign(obj.defaultCommand, {
                 [DB[index].category]: {
                     response_text: DB[index].response_text,
-                    cooldown: DB[index].cooldown,
-                    delay: DB[index].delay,
+                    settings: DB[index].settings,
                     state: DB[index].state,
                     triggers: DB[index].triggers,
                     stateTitle: {
@@ -81,18 +83,17 @@ commandsRoute.get("/save", async (req, res) => {
     for (let index = 0; index < cookieKeys.length; index++) {
         if (cookieKeys[index] != "cookie") {
             const params = JSON.parse(req.cookies[cookieKeys[index]])
-            if (params.cooldown < 0) {
-                params.cooldown = 0
-            }
-            if (params.delay < 0) {
-                params.delay = 0
-            }
+            const settings = {}
+            const fields = ['cooldown', 'delay', 'clipLength'];
+            fields.forEach(field => {
+                if (field in params) settings[field] = params[field];
+            });
+
             await Insert.updateDefCommand([
                 sessionData.userId,
                 cookieKeys[index],
                 params.value,
-                params.cooldown,
-                params.delay,
+                settings,
                 params.state,
                 params.stateTitle.anybody,
                 params.stateTitle.broadcaster,

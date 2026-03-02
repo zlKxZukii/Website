@@ -57,12 +57,14 @@ class InsertSQL {
             INSERT INTO def_commands AS dc (
                 twitch_id,
                 category,
-                triggers
+                triggers,
+                settings
                 )
-            VALUES($1, $2, $3)
+            VALUES($1, $2, $3, $4)
             ON CONFLICT (twitch_id, category)
             DO UPDATE SET
                 triggers = EXCLUDED.triggers,
+                settings = EXCLUDED.settings,
                 updated_at = NOW()
             RETURNING dc.*;`;
             const res = await query(sql, valuesArray);
@@ -100,9 +102,8 @@ class InsertSQL {
                         UPDATE def_commands
                         SET
                             response_text = $3,
-                            cooldown = $4,
-                            delay = $5,
-                            state = $6,
+                            settings =$4::jsonb,
+                            state = $5,
                             updated_at = NOW()
                         WHERE twitch_id = $1
                         AND category = $2
@@ -110,11 +111,11 @@ class InsertSQL {
                         )
                         UPDATE def_permissions AS dp
                         SET
-                            anybody = $7,
-                            broadcaster = $8,
-                            moderator = $9,
-                            subscriber = $10,
-                            vip = $11,
+                            anybody = $6,
+                            broadcaster = $7,
+                            moderator = $8,
+                            subscriber = $9,
+                            vip = $10,
                             updated_at = NOW()
                         FROM update_def_commands AS udc
                         WHERE dp.twitch_id = udc.twitch_id
@@ -387,10 +388,9 @@ class SelectSQL {
             const sql = `SELECT 
                             dc.category,
                             dc.response_text,
-                            dc.cooldown,
-                            dc.delay,
                             dc.state,
                             dc.triggers,
+                            dc.settings,
                             dp.anybody,
                             dp.broadcaster,
                             dp.vip,
@@ -409,6 +409,7 @@ class SelectSQL {
             console.log(chalk.red("Fehler beim Laden der Commands" + error.message));
         };
     };
+
 
     async CustomCommand(valuesArray) {
         try {

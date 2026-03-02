@@ -1,0 +1,28 @@
+<div class="ad-field">
+    <h2> WERBUNG </h2>
+    <div>
+        <p>Jetzt:</p>
+        <p id="adNow">0 Sekunden</p>
+    </div>
+
+    <div>
+        <p>Nächste in:</p>
+        <p id="adThen">0 Sekunden</p>
+    </div>
+</div>
+
+<div class="cover"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const username = "<%= targetUser %>";
+    socket.on("connect", () => {
+        socket.emit("join-room", username)
+    });
+    socket.on("new-add", (data) => {
+        console.log(data)
+        document.getElementById("adNow").innerText = data.adNow + "Sekunden";
+        document.getElementById("adThen").innerText = data.nextAd + " Sekunden";
+    })
+</script>

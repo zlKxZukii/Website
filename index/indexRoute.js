@@ -14,7 +14,7 @@ indexRoute.get("", async (req, res) => {
         css: "../css/index.css",
         showBody: true
     };
-
+    
     Object.assign(indexObj, randomSocialMedia(), await randomJoke());
 
     if (key) {

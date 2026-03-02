@@ -24,6 +24,8 @@ import { ClientManager } from "../twitch_bot/connectBot.js";
 // import { listRoute } from "../list/listRoute.js"
 import chalk from "chalk";
 import { Select } from "../sql/sqlHandler.js";
+import { obsDocks } from "../obs_docks/obsDocksRoute.js";
+import { adsRoute } from "../obs_docks/ads/adsRoute.js";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,6 +51,8 @@ app.use("/impressum", impressumRoute)
 app.use("/Intervall", intervallRoute)
 app.use("/auth", auth);
 app.use("/auth/twitch", twitch);
+app.use("/obs%20docks", obsDocks)
+app.use("/ads", adsRoute)
 // app.use("/alertbox", alertBoxRoute)
 // app.use("/list", listRoute)
 

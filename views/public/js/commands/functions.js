@@ -5,3 +5,7 @@ function safeState() {
     }
     window.location.href = "/functions/save"
 }
+
+function fadeIt(title) {
+    document.getElementById(`${title}Slide`).classList.toggle("fade-open")
+}

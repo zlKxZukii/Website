@@ -24,8 +24,7 @@ class BotManager {
         try {
             const { client, key, apiClient } = await this.createBot(username, userId);
 
-            // alert box nach integration fertigstellen
-            // const wsListener = await registerUserEvents(userId, key, apiClient);
+            const wsListener = await registerUserEvents(userId, key, apiClient);
 
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
@@ -34,9 +33,12 @@ class BotManager {
             const spamBotProtection = {};
             const intervallList = await this.initTimer(client, username, userId);
 
-            // wsListener, einfach reinpasten 
-            this.client.set(userId, { userId, client, username, key, apiClient, jokeState, defaultCommands, accessShieldState, customCommands, spamBotProtection, intervallList });
+            this.client.set(userId, { userId, client, username, wsListener, key, apiClient, jokeState, defaultCommands, accessShieldState, customCommands, spamBotProtection, intervallList });
             // send true to Database
+
+            // zeigt die komplette User Lise
+            // console.log(this.getClient(userId))
+            
             await Insert.BotState([userId, true, username]);
             try {
                 await client.connect();
@@ -115,13 +117,12 @@ class BotManager {
     async disconnect(userID) {
         const data = this.client.get(userID);
         const { client, username, wsListener, intervallList } = data
-
+        if (!client) return;
         if (wsListener) {
             wsListener.stop();
         }
         Object.values(intervallList).forEach(clearInterval)
         await Insert.BotState([userID, false, username]);
-        if (!client) return;
 
         client.quit();
         this.client.delete(userID);

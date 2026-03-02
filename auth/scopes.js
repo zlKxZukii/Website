@@ -15,6 +15,7 @@ export const scopes = [
     "channel:manage:broadcast",
     "channel:edit:commercial",
     "channel:read:stream_key",
+    "channel:read:ads",
     "channel:manage:polls",
     "channel:read:polls",
     "channel:manage:raids",

@@ -1,9 +1,23 @@
 <%- include("../../layouts/commandBar") %>
     <div class="commands-box" id="renderContent">
+        <div class="headline">
+            <p>Commands</p>
+            <p>Beschreibung</p>
+            <p>Berechtigung</p>
+            <p>Status</p>
+        </div>
+        <section id="socialMedia" name="socialMedia">
+
+        </section>
+        <section id="functions" style="margin-top: 30px;">
+        </section>
+        <div class="buttons">
+            <button onclick="deleteValues()" id="deleteButton">Löschen</button>
+            <button onclick="readValues()" id="safeButton">Speichern</button>
+        </div>
     </div>
 
     <script>const data = <%- JSON.stringify(defaultCommand) %></script>
-
     <script src="./js/commands/defaultCommands/render.js"></script>
     <script src="./js/commands/logicCmds.js"></script>
     <script src="./js/commands/defaultCommands/saveCommands.js"></script>
