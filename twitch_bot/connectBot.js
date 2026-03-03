@@ -22,26 +22,37 @@ class BotManager {
         if (this.client.has(userId)) return;
 
         try {
-            const { client, key, apiClient } = await this.createBot(username, userId);
+            const { chatClient, wsKeys, apiClient } = await this.createBot(username, userId);
 
-            const wsListener = await registerUserEvents(userId, key, apiClient);
+            await registerUserEvents(userId, wsKeys, apiClient);
 
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
             const customCommands = await Select.CustomCommand([userId]) || {};
             const spamBotProtection = {};
-            const intervallList = await this.initTimer(client, username, userId);
+            const intervallList = await this.initTimer(chatClient, username, userId);
 
-            this.client.set(userId, { userId, client, username, wsListener, key, apiClient, jokeState, defaultCommands, accessShieldState, customCommands, spamBotProtection, intervallList });
-            // send true to Database
+            this.client.set(userId, {
+                userId,
+                chatClient,
+                username,
+                wsKeys,
+                apiClient,
+                jokeState,
+                defaultCommands,
+                accessShieldState,
+                customCommands,
+                spamBotProtection,
+                intervallList
+            });
+            await Insert.BotState([userId, true, username]);
 
             // zeigt die komplette User Lise
             // console.log(this.getClient(userId))
-            
-            await Insert.BotState([userId, true, username]);
+
             try {
-                await client.connect();
+                await chatClient.connect();
             } catch (error) {
                 console.log(chalk.red("der bot konnte nicht gestartet werden " + error.message))
             }
@@ -52,14 +63,8 @@ class BotManager {
     }
 
     async createBot(username, userId) {
-        // wenn kein alertkey existiert wird einer neuer erstellt
-        let alertKey = await Select.AlertBox([userId])
-        if (!alertKey) {
-            const alertKeyNew = crypto.randomBytes(32).toString("hex");
-            await Insert.AlertBoxKey([userId, alertKeyNew])
-            alertKey = alertKeyNew
-        }
-
+        // wenn kein key  existiert wird einer neuer erstellt  
+        const wsKeys = await this.getWsKeys(userId)
         const tokenData = await Select.Token([userId])
         const authProviderComp = await getAuthProvider(tokenData)
         const apiClient = await createApiClient(authProviderComp)
@@ -89,12 +94,12 @@ class BotManager {
                 console.log("der bot wurde erfolgreich per hand getrennt")
             }
             else {
-                console.log(chalk.red("der bot ist abgeschmiert" + reason.message))
+                console.log(chalk.red("der bot ist abgeschmiert" + reason))
             }
         }))
         return {
-            client: chatClient,
-            key: alertKey.alert_key,
+            chatClient: chatClient,
+            wsKeys: wsKeys,
             apiClient: apiClient
         }
     }
@@ -139,6 +144,38 @@ class BotManager {
             await this.disconnect(userID)
             await this.start(username, userID)
         }
+    }
+
+    async getWsKeys(userId) {
+        const obj = { obsDocksKeys: {} }
+
+        // OBS docks
+        const obsKeysArray = ["ads"]
+        let obsDockKeys = await Select.obsDocks([userId])
+
+        if (!obsDockKeys || obsDockKeys.length < obsKeysArray.length) {
+            for (let index = 0; index < obsKeysArray.length; index++) {
+                const newKey = crypto.randomBytes(32).toString("hex");
+                await Insert.obsDocks([userId, obsKeysArray[index], newKey,])
+            }
+            obsDockKeys = await Select.obsDocks([userId])
+        }
+        for (const element of obsDockKeys) {
+            if (obsKeysArray.includes(element.category)) {
+                Object.assign(obj.obsDocksKeys, { [element.category]: element.keys })
+            }
+        }
+
+        // alertBox
+        let alertKey = await Select.AlertBox([userId])
+        if (!alertKey) {
+            const alertKeyNew = crypto.randomBytes(32).toString("hex");
+            await Insert.AlertBoxKey([userId, alertKeyNew])
+            alertKey = await Select.AlertBox([userId])
+        }
+        Object.assign(obj, { alertBoxKey: alertKey.alert_key })
+
+        return obj
     }
 }
 

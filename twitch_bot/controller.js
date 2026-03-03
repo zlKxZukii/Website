@@ -33,7 +33,7 @@ async function defaultCommandsOutput(client, message, permission, user) {
         if (checkTrigger(message, client.defaultCommands[[index]])) permissionCheck(client, client.defaultCommands[[index]], permission, user)
         if (message === "!clip" && client.defaultCommands[[index]].category === "Clip") {
             console.log(client.defaultCommands[index].settings.clipLength)
-            await clip(client.username, client.userId, client.apiClient, client.client, client.defaultCommands[index].settings.clipLength)
+            await clip(client.username, client.userId, client.apiClient, client.chatClient, client.defaultCommands[index].settings.clipLength)
         }
     }
 }
@@ -73,7 +73,7 @@ function permissionCheck(client, DB, permission, user) {
     for (let index = 0; index < tagArray.length; index++) {
         if (DB[tagArray[index]] === true) {
             if (permission[tagArray[index]] === true) {
-                client.client.say(client.username, DB.response_text.split("${user}").join(user))
+                client.chatClient.say(client.username, DB.response_text.split("${user}").join(user))
                 return
             }
         }
@@ -91,14 +91,14 @@ async function sendJoke(client, DB) {
 
     const randInt = getRandomInt(jokes.length)
     if (randInt <= 0) randInt = 1
-    client.client.say(client.username, jokes[randInt].response_text)
+    client.chatClient.say(client.username, jokes[randInt].response_text)
 }
 
 function commandListOutput(client, userID, message, channel) {
     const commandListTrigger = ["!cmd", "!commands", "!befehle"]
     for (let index = 0; index < commandListTrigger.length; index++) {
         if (message == commandListTrigger[index]) {
-            client.client.say(channel, `https://scaletta.live/list?broadcaster=${client.username}&id=${userID}`)
+            client.chatClient.say(channel, `https://scaletta.live/list?broadcaster=${client.username}&id=${userID}`)
         }
     }
 }

@@ -1,0 +1,35 @@
+.box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+    margin: 0 60px;
+    margin-top: 60px;
+    background-color: rgba(34, 34, 34, 1);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+.box h2{
+    font-size: 40px;
+    margin: 20px;
+    margin-bottom: 60px;
+}
+
+.explanation {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.explanation video {
+    height: 300px;
+}
+
+.explanation li {
+    font-size: 20px;
+    padding: 5px;
+}

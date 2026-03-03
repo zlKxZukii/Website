@@ -8,16 +8,17 @@ obsDocks.get("/", async (req, res) => {
     if (!key) {
         return res.redirect("/?index=true");
     };
-    client
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-
+    
     const obj = {
-        title: "Commands",
-        css: "../css/commands/commands.css",
+        title: "Werkzeuge",
+        css: "../css/obs_docks/docks.css",
         username: sessionData.username,
         img: sessionData.profilePicture,
+        link:"hure",
+        back: "obsdocks",
         showBody: true
     };
-    res.redirect(`/ads/${key}`)
-    // res.render("main/obs_docks/obsDocks.ejs", obj)
+    // res.redirect(`ads/${key}`)
+    res.render("main/obs_docks/obsDocks.ejs", obj)
 })

@@ -1,36 +1,64 @@
-body{
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #18181b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.ad-field{
+.link-box {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    font-size: 20px;
+    padding: 10px;
+    margin: 60px;
+    margin-top: 60px;
+    background-color: rgba(34, 34, 34, 1);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
 }
 
-.ad-field div{
+.link-box h3 {
+    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    margin: 10px;
+    padding: 20px;
+    font-size: 26px;
 }
 
-.cover{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    z-index: 100;
-    height: 100vh;
+.input-field {
+    background-color: rgba(34, 34, 34, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px 10px 10px 10px;
+}
+
+.inner {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    border-style: solid ;border-radius: 10px 10px 10px 10px;
+    border-color: #2bdffe;
+}
+
+.input-field input {
+border: none;
+    background-color: rgba(34, 34, 34, 1);
+    height: 34px;
+    width: 90%;
+    border-radius:10px 0px 0px 10px
+}
+
+.blur{
+    filter:blur(5px);
+}
+
+.input-field button {
+    cursor: pointer;
+    border-radius: 10px 10px 10px 10px;
+    border: none;
+    background-color: rgba(34, 34, 34, 1);
+    height: 36px;
+    width: 5%;
+}
+
+.input-field img {
+    height: 25px;
 }

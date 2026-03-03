@@ -13,7 +13,7 @@ import { app, PORT, httpServer } from "./server.js";
 import { indexRoute } from "../index/indexRoute.js";
 import { dashboardRoute } from "../dashboard/dashboardRoute.js";
 // import { alertBoxRoute, alertBox, followBoxRoute } from "../boxes/alertBoxRoute.js";
-import { functionsRoute } from "../commands/functionsRoute.js";
+import { securityRoute } from "../commands/securityRoute.js";
 import { jokesRoute } from "../commands/jokeRoute.js";
 import { commandsRoute } from "../commands/commandsRoute.js";
 import { customCommandsRoute } from "../commands/customCommandsRoute.js";
@@ -42,7 +42,7 @@ app.use("/dashboard", dashboardRoute)
 // app.use("/alertbox", alertBox)
 // app.use("/followbox", followBoxRoute)
 // commands
-app.use("/functions", functionsRoute)
+app.use("/security", securityRoute)
 app.use("/jokes", jokesRoute)
 app.use("/commands", commandsRoute)
 app.use("/customCommands", customCommandsRoute)
@@ -51,7 +51,7 @@ app.use("/impressum", impressumRoute)
 app.use("/Intervall", intervallRoute)
 app.use("/auth", auth);
 app.use("/auth/twitch", twitch);
-app.use("/obs%20docks", obsDocks)
+app.use("/obsdocks", obsDocks)
 app.use("/ads", adsRoute)
 // app.use("/alertbox", alertBoxRoute)
 // app.use("/list", listRoute)

@@ -3,9 +3,9 @@ import client from "../src/redisClient.js";
 
 import express from "express"
 import { ClientManager } from "../twitch_bot/connectBot.js";
-export const functionsRoute = express.Router()
+export const securityRoute = express.Router()
 
-functionsRoute.get("", async (req, res) => {
+securityRoute.get("", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true")
@@ -13,8 +13,8 @@ functionsRoute.get("", async (req, res) => {
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
     const DB = await Select.AccessShield([sessionData.userId])
     const obj = {
-        title: `Funktionen`,
-        css: "css/commands/functions.css",
+        title: `Sicherheit`,
+        css: "css/commands/security.css",
         username: sessionData.username,
         img: sessionData.profilePicture,
         showBody: true,
@@ -23,10 +23,10 @@ functionsRoute.get("", async (req, res) => {
     for (let index = 0; index < DB.length; index++) {
         Object.assign(obj.values, { [DB[index].category]: DB[index].state })
     }
-    res.render("main/commands/functions", obj)
+    res.render("main/commands/security", obj)
 })
 
-functionsRoute.get("/save", async (req, res) => {
+securityRoute.get("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
@@ -41,5 +41,5 @@ functionsRoute.get("/save", async (req, res) => {
     };
     
     ClientManager.restartBot(sessionData.username, sessionData.userId, key)
-    res.redirect("/functions");
+    res.redirect("/security");
 });

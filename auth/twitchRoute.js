@@ -39,7 +39,7 @@ twitch.get("", requestIP.mw(), async (req, res) => {
     try {
         const ipAddress = req.clientIp
         await authTwitch(code, ipAddress, res);
-        return res.redirect("/");
+        return res.redirect("/dashboard");
     } catch (err) {
         console.log(err)
         return res.redirect("/auth");

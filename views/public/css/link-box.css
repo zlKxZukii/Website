@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     width: 100%;
     border-radius: 10px 10px 10px 10px;
 }
@@ -61,4 +62,21 @@ border: none;
 
 .input-field img {
     height: 25px;
+}
+
+.help{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 20px;
+}
+
+.help button{
+    padding: 20px 40px;
+    font-size: 26px;
+    font-weight: bold;
+    border: solid #2bdffe;
+    width: auto;
+    height: auto;
 }

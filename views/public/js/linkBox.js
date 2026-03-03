@@ -1,5 +1,5 @@
 function copyBtn() {
-    const input = document.getElementById('alertBoxLink');
+    const input = document.getElementById('linkBox');
     const button = document.getElementById("saveBtn")
     button.textContent = 'Kopiert ✔';
     input.select();

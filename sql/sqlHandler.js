@@ -50,6 +50,25 @@ class InsertSQL {
         }
     }
 
+    async obsDocks(valuesArray){
+        try {
+            const sql = `INSERT INTO obs_docks AS od(
+                            twitch_id,
+                            category,
+                            keys)
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id, category)
+                        DO UPDATE SET
+                        keys = EXCLUDED.keys,
+                        updated_at = NOW()
+                        RETURNING od.*;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("OBS Dock Key nicht gespeichert " + error.message))
+        }
+    }
+
     // defaultCommands
     async CreateDefCommands(valuesArray) {
         try {
@@ -342,6 +361,17 @@ class SelectSQL {
             console.log(chalk.red("AlertBox konnte nicht geladen werden " + error.message));
         };
     };
+
+    async obsDocks(valuesArray){
+                try {
+            const sql = `SELECT * FROM obs_docks WHERE twitch_id=$1`;
+            const res = await query(sql, valuesArray);
+            return res.rows;
+
+        } catch (error) {
+            console.log(chalk.red("AlertBox konnte nicht geladen werden " + error.message));
+        };
+    }
 
     async JokesWithTrigger(valuesArray) {
         try {
