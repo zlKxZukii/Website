@@ -1,6 +1,6 @@
 <div class="alert-box middle-middle" id="alert-box">
     <div class="alert-img" id="alertImg">
-
+        
     </div>
     <div class="alert-text">
         <p id="beforeText"> </p>
@@ -19,7 +19,7 @@
         socket.emit("join-room", username)
     });
 
-    socket.on("new-alert", (data) => {
+    socket.on("new-follower", (data) => {
         console.log(data)
         document.getElementById("alertImg").innerHTML = data.alertImg;
         document.getElementById("beforeText").innerText = data.beforeText;

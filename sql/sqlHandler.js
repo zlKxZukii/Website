@@ -36,13 +36,16 @@ class InsertSQL {
                 try {
             const sql = `INSERT INTO alert_box AS ab(
                             twitch_id,
-                            alert_key)
-                        VALUES($1, $2)
-                        ON CONFLICT (twitch_id)
+                            alert_key,
+                            type,
+                            settings)
+                        VALUES($1, $2, $3, $4)
+                        ON CONFLICT (twitch_id, type)
                         DO UPDATE SET
                         alert_key = EXCLUDED.alert_key,
+                        settings = EXCLUDED.settings,
                         updated_at = NOW()
-                        RETURNING ab.*;`;
+                        RETURNING *;`;
             const res = await query(sql, valuesArray);
             return res;
         } catch (error) {
@@ -355,7 +358,7 @@ class SelectSQL {
         try {
             const sql = `SELECT * FROM alert_box WHERE twitch_id=$1;`;
             const res = await query(sql, valuesArray);
-            return res.rows[0];
+            return res.rows;
 
         } catch (error) {
             console.log(chalk.red("AlertBox konnte nicht geladen werden " + error.message));

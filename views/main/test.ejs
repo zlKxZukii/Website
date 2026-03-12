@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>OBS Overlay</title>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+</head>
+<body>
+    <form action="/uploadFollow" method="POST" enctype="multipart/form-data">
+        <input type="file" name="File">
+        <button type="submit">Hochladen</button>
+    </form>
+    <!-- <script>
+        const socket = io(); // Verbindet automatisch zum selben Host
+
+        // Sound-Datei (hier ein Beispiel-Pfad)
+        const audio = new Audio('https://www.myinstants.com/media/sounds/ding.mp3');
+
+        socket.on('play-sound', () => {
+            console.log("Signal erhalten, spiele Ton!");
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("Autoplay-Fehler:", e));
+        });
+    </script> -->
+</body>
+</html>

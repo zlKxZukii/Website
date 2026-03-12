@@ -17,7 +17,8 @@ commandsRoute.get("", async (req, res) => {
         { category: 'YouTube', triggers: ['!yt', '!youtube'], settings: { cooldown: 0, delay: 0 } },
         { category: 'TikTok', triggers: ['!tt', '!tiktok'], settings: { cooldown: 0, delay: 0 } },
         { category: 'Instagram', triggers: ['!insta', '!instagram'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'Clip', triggers: ['!clip'], settings: { clipLength: 30 } }
+        { category: 'Clip', triggers: ['!clip'], settings: { clipLength: 30 } },
+        // { category: 'Shoutout', triggers: ['!so', '!sh', '!shoutout'], setting: {} }
     ]
 
     try {
@@ -29,7 +30,8 @@ commandsRoute.get("", async (req, res) => {
             img: sessionData.profilePicture,
             showBody: true,
             defaultCommand: {},
-            clip: {}
+            clip: {},
+            // shoutOut: {}
         };
 
         let DB = await Select.Commands([sessionData.userId]);

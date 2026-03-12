@@ -1,4 +1,4 @@
-<%- include("../../layouts/functionsBar") %>
+<!-- <%- include("../../layouts/functionsBar") %> -->
 
     <div class="main">
         <div class="functions">
@@ -33,14 +33,14 @@
         </div>
     </div>
     </div>
-    <script id="loader"> const value = <%- JSON.stringify(values) %></script>
+    <script id="loader"> const value = <%- JSON.stringify(locals.values) %></script>
     <script src="../js/commands/functions.js"></script>
     <script>
-
         const tagArray = ["spamBot", "followBot"];
 
         for (let index = 0; index < tagArray.length; index++) {
             if (value[tagArray[index]] === true) {
                 document.getElementById(tagArray[index]).checked = true;
             }
-        };</script>
+        };
+    </script>

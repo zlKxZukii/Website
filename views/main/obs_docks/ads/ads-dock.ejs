@@ -2,7 +2,7 @@
     <h2> WERBUNG </h2>
     <div>
         <p>Jetzt:</p>
-        <p id="adNow">0 Sekunden</p>
+        <p id="adNow">Keine Werbung</p>
     </div>
 
     <!-- <div>
@@ -15,14 +15,29 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+
     const socket = io();
     const username = "<%= targetUser %>";
     socket.on("connect", () => {
         socket.emit("join-room", username)
     });
-    socket.on("new-add", (data) => {
-        console.log(data)
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    
+    socket.on("new-add", async (data) => {
+
+        let time = Number(data.adNow)
         document.getElementById("adNow").innerText = data.adNow + "Sekunden";
-        // document.getElementById("adThen").innerText = data.nextAd + " Sekunden";
+        console.log("werbung gestartet")
+        while (true) {
+            if (time === 0) {
+                document.getElementById("adNow").innerText = "Keine Werbung";
+                break
+            }
+            await sleep(1000)
+            time--
+            document.getElementById("adNow").innerText = time + " Sekunden";
+        }
     })
+
 </script>

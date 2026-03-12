@@ -11,14 +11,17 @@
 .video-div h2 {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    font-size: 36px;
+    margin-bottom: 30px;
 }
 
 .video-div video {
+    box-shadow: -5px 10px 10px #2addfc, -5px -10px 10px #2addfc, 10px 10px 10px #2addfc;
     width: 100%;
 }
 
 .video-socials {
+    margin-top: 20px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -87,6 +90,10 @@
     margin: 40px;
     border-radius: 10px;
     justify-content: end;
+        box-shadow: -5px -5px 10px rgba(34, 34, 34, 0.7),
+        5px -10px 10px rgba(34, 34, 34, 0.7),
+        -5px 10px 10px rgba(34, 34, 34, 0.7),
+        5px 10px 10px rgba(34, 34, 34, 0.7);
 }
 
 .command-align {

@@ -18,7 +18,7 @@ import { ClientManager } from "../twitch_bot/connectBot.js";
 dashboardRoute.get((""), async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
-        res.redirect("/?index=true")
+        return res.redirect("/?index=true")
     }
 
     const sessionData = JSON.parse(await client.get(`sess:${key}`));

@@ -21,5 +21,5 @@ function deleteBlur(inputID) {
 }
 
 function reloadKey(back) {
-    window.location.href=`/data?alertkey=true&back=${back}`
+    window.location.href=`${back}`
 }

@@ -6,11 +6,12 @@ dotenv.config({
 import { ChatClient } from '@twurple/chat';
 import { getAuthProvider } from '../auth/createRefreshToken.js';
 import { createApiClient } from "./createAPIclient.js";
-import { registerUserEvents } from "../twitch_bot/eventListener.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
 import { answers } from "./controller.js";
 import chalk from "chalk";
 import crypto from "crypto";
+import { eventSubListener, io } from "../src/server.js";
+import { subscribeUser } from "./eventListener.js";
 
 class BotManager {
     constructor() {
@@ -24,15 +25,12 @@ class BotManager {
         try {
             const { chatClient, wsKeys, apiClient } = await this.createBot(username, userId);
 
-            await registerUserEvents(userId, wsKeys, apiClient);
-
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
             const customCommands = await Select.CustomCommand([userId]) || {};
             const spamBotProtection = {};
             const intervallList = await this.initTimer(chatClient, username, userId);
-
             this.client.set(userId, {
                 userId,
                 chatClient,
@@ -46,12 +44,14 @@ class BotManager {
                 spamBotProtection,
                 intervallList
             });
+
             await Insert.BotState([userId, true, username]);
 
             // zeigt die komplette User Lise
             // console.log(this.getClient(userId))
 
             try {
+                await subscribeUser(eventSubListener, userId, io, this.client);
                 await chatClient.connect();
             } catch (error) {
                 console.log(chalk.red("der bot konnte nicht gestartet werden " + error.message))
@@ -80,10 +80,8 @@ class BotManager {
         });
 
         chatClient.onConnect(async () => {
-            console.log(chalk.blue(username + " connected"))
-        });
 
-        chatClient.onConnectionFailed
+        });
 
         chatClient.onMessage(async (channel, user, message, msg) => {
             await answers(channel, user, message, msg, userId)
@@ -97,6 +95,7 @@ class BotManager {
                 console.log(chalk.red("der bot ist abgeschmiert" + reason))
             }
         }))
+
         return {
             chatClient: chatClient,
             wsKeys: wsKeys,
@@ -121,15 +120,15 @@ class BotManager {
 
     async disconnect(userID) {
         const data = this.client.get(userID);
-        const { client, username, wsListener, intervallList } = data
-        if (!client) return;
+        const { chatClient, username, wsListener, intervallList } = data
+        if (!chatClient) return;
         if (wsListener) {
             wsListener.stop();
         }
         Object.values(intervallList).forEach(clearInterval)
         await Insert.BotState([userID, false, username]);
 
-        client.quit();
+        chatClient.quit();
         this.client.delete(userID);
 
     }
@@ -148,18 +147,18 @@ class BotManager {
 
     async getWsKeys(userId) {
         const obj = { obsDocksKeys: {} }
-
         // OBS docks
         const obsKeysArray = ["ads"]
         let obsDockKeys = await Select.obsDocks([userId])
 
         if (!obsDockKeys || obsDockKeys.length < obsKeysArray.length) {
             for (let index = 0; index < obsKeysArray.length; index++) {
-                const newKey = crypto.randomBytes(32).toString("hex");
+                const newKey = crypto.randomBytes(64).toString("hex");
                 await Insert.obsDocks([userId, obsKeysArray[index], newKey,])
             }
             obsDockKeys = await Select.obsDocks([userId])
         }
+
         for (const element of obsDockKeys) {
             if (obsKeysArray.includes(element.category)) {
                 Object.assign(obj.obsDocksKeys, { [element.category]: element.keys })
@@ -168,14 +167,25 @@ class BotManager {
 
         // alertBox
         let alertKey = await Select.AlertBox([userId])
-        if (!alertKey) {
-            const alertKeyNew = crypto.randomBytes(32).toString("hex");
-            await Insert.AlertBoxKey([userId, alertKeyNew])
-            alertKey = await Select.AlertBox([userId])
+        if (!alertKey[0]) {
+            alertKey = await this.CreateAlertBox(userId)
         }
         Object.assign(obj, { alertBoxKey: alertKey.alert_key })
-
         return obj
+    }
+
+    async CreateAlertBox(userId) {
+        const alertKeyNew = crypto.randomBytes(64).toString("hex");
+        const createAlertBoxArr = [
+            { type: 'Follow', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } },
+            { type: 'Sub', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif',  soundPath: '../../uploads/default/sound.mp3' } },
+            { type: 'Raid', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif',  soundPath: '../../uploads/default/sound.mp3' } }
+        ];
+        for (const element in createAlertBoxArr) {
+            await Insert.AlertBoxKey([userId, alertKeyNew, createAlertBoxArr[element].type, createAlertBoxArr[element].settings])
+        }
+        const alertKey = await Select.AlertBox([userId])
+        return alertKey[0]
     }
 }
 

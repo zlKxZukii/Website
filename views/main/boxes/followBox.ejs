@@ -1,0 +1,102 @@
+<%- include("../../layouts/alertBoxBar") %>
+
+    <div class="link-box">
+        <%- include("../../layouts/linkBox") %>
+            <div class="user-input">
+                <div class="upload-section">
+                    <div class="upload-group">
+                        <h2>Grafisches Objekt</h2>
+                        <form class="upload-form" action="/follows/upload/follow" method="POST"
+                            enctype="multipart/form-data"
+                            onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
+                            <label for="image-upload" class="custom-file-button">Datei auswählen</label>
+                            <input id="image-upload" type="file" name="image" accept="image/*,video/*"
+                                class="hidden-input">
+
+                            <button type="submit" class="submit-btn">Hochladen</button>
+                            <p id="image-name" class="file-status">Keine Datei gewählt</p>
+                        </form>
+                    </div>
+                    <div class="upload-group">
+                        <h2>Sound</h2>
+                        <form class="upload-form" action="/follows/upload/follow" method="POST"
+                            enctype="multipart/form-data"
+                            onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
+                            <label for="sound-upload" class="custom-file-button">Sound auswählen</label>
+                            <input id="sound-upload" name="sound" type="file" accept="audio/*" class="hidden-input">
+
+                            <button type="submit" class="submit-btn" o>Hochladen</button>
+                            <p id="sound-name" class="file-status">Kein Sound gewählt</p>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- <div class="test-window">
+                    <iframe src="<%= locals.link %>" frameborder="0"></iframe>
+                    <button>Teste Mich.</button>
+                </div> -->
+
+            </div>
+            <h2
+                style="display: flex; justify-content: center; margin-top: 10px; padding-top: 10px; background-color: black;">
+                Feintuning</h2>
+            <div class="options">
+                <div class="text-options">
+                    <div class="option">
+                        <label for="responseText">Dein Text der bei einem Follower<br> ausgegeben werden soll.</label>
+                        <textarea style="color:<%= locals.color %>" name="responseText" id="responseText" rows="8" cols="50" 
+                            placeholder="Hier den Follower Text hinzufügen." spellCheck="false" ><%= locals.responseText %></textarea>
+                    </div>
+                    <div style="align-items: center; display: flex;">
+                        <label style="color:<%= locals.color %>" for="colorPicker"> Die Farbe der Schrift</label>
+                        <input type="color" name="colorPicker" id="colorPicker" value="<%- locals.color || '#000000' %>">
+                    </div>
+                </div>
+                <div class="var-list">
+                    <h2>Eine Liste mit <br> Platzhaltern</h2>
+                    <ul id="varList" name="varList">
+                        <li>Zuschauer</li>
+                        <li>[viewer]</li>
+                        <li>-</li>
+                        <li>Streamer</li>
+                        <li>[streamer]</li>
+                    </ul>
+                </div>
+                <div class="sounds">
+                    <h2>Soundeinstellungen <br>
+                        des Alerts.</h2>
+                    <label for="volume">Lautstärke</label>
+                    <input id="volume" type="range" min="0" max="100" value="<%= locals.volume || '50' %>" step="10">
+                </div>
+            </div>
+            <div class="save-button">
+                <button id="followBtn" onclick="readVal()">Speichern</button>
+            </div>
+    </div>
+
+    <script>
+        const handleFileChange = (inputId, statusId) => {
+            document.getElementById(inputId).addEventListener('change', function () {
+                const fileName = this.files[0] ? this.files[0].name : "Keine Datei gewählt";
+                document.getElementById(statusId).textContent = fileName;
+            });
+        };
+
+        handleFileChange('image-upload', 'image-name');
+        handleFileChange('sound-upload', 'sound-name');
+    </script>
+
+    <script>
+        const colorPicker = document.getElementById('colorPicker');
+        const text = document.getElementById('responseText');
+        const label = document.querySelector('label[for="colorPicker"]');
+
+        // Funktion zur Farbanpassung
+        colorPicker.addEventListener('input', (event) => {
+            const selectedColor = event.target.value;
+            label.style.color = selectedColor;
+            text.style.color = selectedColor;
+        });
+    </script>
+
+    <script src="../js/boxes/follower.js"></script>

@@ -6,19 +6,64 @@ dotenv.config({
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { ApiClient } from '@twurple/api';
+import { AppTokenAuthProvider } from '@twurple/auth';
+import { EventSubMiddleware } from '@twurple/eventsub-http';
+import pkg from 'pg';
+import chalk from "chalk";
+const { Pool } = pkg;
 
 export const app = express();
 export const PORT = 3000;
 export const httpServer = createServer(app);
+
 export const io = new Server(httpServer, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    } // Wichtig für OBS Browser-Quellen
+    }
+});
+
+export let apiClient;
+export let eventSubListener;
+
+export async function initializeTwurple() {
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    const authProvider = new AppTokenAuthProvider(clientId, clientSecret);
+    await authProvider.getAppAccessToken()
+    apiClient = new ApiClient({ authProvider });
+
+    try {
+        eventSubListener = new EventSubMiddleware({
+            apiClient,
+            hostName: 'scaletta.live',
+            pathPrefix: '/eventsub',
+            secret: process.env.EVENTSUB_SECRET
+        });
+
+        console.log(chalk.magenta("EventSubListener wurde fehlerfrei erstellt."));
+    } catch (e) {
+        console.error(chalk.red("Fehler direkt im Listener-Constructor:"), e.message);
+    }
+}
+
+io.on('connection', (socket) => {
+    console.log('Ein Client ist verbunden:', socket.id);
+
+    // Wenn der Server eine Nachricht "trigger-alert" empfängt...
+    socket.on('trigger-alert', () => {
+        console.log('Sound-Befehl empfangen, sende an alle...');
+        // ...sendet er "play-sound" an ALLE (inkl. OBS)
+        io.emit('play-sound');
+    });
 });
 
 io.on("connection", (socket) => {
+    io.emit('play-sound');
     socket.on("join-room", (room) => {
+
         socket.join(room);
         console.log(`AlertBox von ${room} beigetreten.`);
     });
@@ -29,10 +74,6 @@ io.on("connection", (socket) => {
         console.error("Socket Fehler: ", err);
     });
 });
-
-import pkg from 'pg';
-import chalk from "chalk";
-const { Pool } = pkg;
 
 const pool = new Pool({
     user: process.env.PG_USER,

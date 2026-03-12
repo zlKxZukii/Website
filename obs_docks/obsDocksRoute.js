@@ -16,7 +16,7 @@ obsDocks.get("/", async (req, res) => {
         username: sessionData.username,
         img: sessionData.profilePicture,
         link:"hure",
-        back: "obsdocks",
+        change: "obsdocks",
         showBody: true
     };
     // res.redirect(`ads/${key}`)

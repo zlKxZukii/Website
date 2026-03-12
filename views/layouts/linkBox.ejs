@@ -9,14 +9,16 @@
 <div class="input-field">
     <div class="inner">
         <input class="blur" type="text" name="linkBox" id="linkBox" onclick="deleteBlur('linkBox')"
-            value="<%- locals.link%>" readonly>
-        <button id="saveBtn" onclick="copyBtn()" style="border-radius:0px 0px 0px 0px ; border-right: solid #2bdffe; border-left: solid #2bdffe;"><img src="./img/alert-box/save-button.png" alt=""></button>
-        <button id="reloadKeyBtn" onclick="reloadKey('<%- locals.back%>')"><img src="./img/alert-box/generate-new-key.png" alt=""></button>
+            value="<%- locals.link %>" readonly>
+        <button title="Kopiere den Link." id="saveBtn" onclick="copyBtn()" style="border-radius:0px 0px 0px 0px ; border-right: solid #2bdffe; border-left: solid #2bdffe;"><img src="./img/alert-box/save-button.png" alt=""></button>
+        <button title="Ändere den Link." id="reloadKeyBtn" onclick="reloadKey('<%- locals.change %>')"><img src="./img/alert-box/generate-new-key.png" alt=""></button>
     </div>
+    <% if (locals.helpLink){ %>
     <div class="help">
         <h3>Du benötigst Hilfe beim Hinzufügen? Kein Problem!</h3>
-        <button onclick="window.location.href='<%= locals.helpLink %>'">Drück Mich</button>
+        <button title="Hier bekommst du Hilfe." onclick="window.location.href='<%= locals.helpLink %>'">Drück Mich</button>
     </div>
+    <% } %>
 </div>
 
 <script src="./js/linkBox.js"></script>

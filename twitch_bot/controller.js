@@ -31,9 +31,16 @@ async function defaultCommandsOutput(client, message, permission, user) {
     const dbKeys = Object.keys(client.defaultCommands)
     for (let index = 0; index < dbKeys.length; index++) {
         if (checkTrigger(message, client.defaultCommands[[index]])) permissionCheck(client, client.defaultCommands[[index]], permission, user)
-        if (message === "!clip" && client.defaultCommands[[index]].category === "Clip") {
-            console.log(client.defaultCommands[index].settings.clipLength)
+        if (message === "!clip" && client.defaultCommands[[index]].category === "Clip" && client.defaultCommands[[index]].state === true) {
+
+            // cooldown init
+            
+            client.defaultCommands[index].state = false
+            console.log(client.defaultCommands[[index]])
             await clip(client.username, client.userId, client.apiClient, client.chatClient, client.defaultCommands[index].settings.clipLength)
+            setTimeout(() => {
+                client.defaultCommands[index].state = true
+            }, 120000);
         }
     }
 }
@@ -101,8 +108,4 @@ function commandListOutput(client, userID, message, channel) {
             client.chatClient.say(channel, `https://scaletta.live/list?broadcaster=${client.username}&id=${userID}`)
         }
     }
-}
-
-async function shoutOuts(client, msg, streamer) {
-
 }

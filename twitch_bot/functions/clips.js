@@ -2,6 +2,7 @@ export async function clip(channel, userID, apiClient, chatClient, duration) {
     let message = "";
 
     try {
+        
         const clip = await apiClient.clips.createClip({
             channel: userID,
             createAfterDelay: true,

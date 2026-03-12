@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../font/JetBrainsMono-Regular.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
     color: white;
     margin: 0;
@@ -12,19 +19,7 @@ html {
 
 body {
     background-color: black;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-.background {
-    z-index: -100;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background-image: url("../VID/star-bg.gif");
-    background-size: cover;
-    background-repeat: no-repeat;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .policys a {
