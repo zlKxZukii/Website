@@ -1,9 +1,11 @@
 <div class="alert-box middle-middle" id="alert-box">
     <div class="alert-img" id="alertImg">
-        
+
     </div>
-    <div class="alert-text">
-        <p id="beforeText"> </p>
+    <div class="alert-text" id="text">
+
+    </div>
+    <div class="audio" id="audio">
     </div>
 </div>
 
@@ -16,17 +18,20 @@
 
     socket.on("connect", () => {
         console.log("Erfolgreich mit Server verbunden!");
-        socket.emit("join-room", username)
+        socket.emit("join-room", username);
     });
 
-    socket.on("new-follower", (data) => {
+    socket.on("new-alert", (data) => {
         console.log(data)
-        document.getElementById("alertImg").innerHTML = data.alertImg;
-        document.getElementById("beforeText").innerText = data.beforeText;
-        const alertBox = document.getElementById("alert-box")
-        alertBox.classList.add("fade-animation")
+        document.getElementById("alertImg").innerHTML = `<img src="${data.img}" alt="">`;
+        document.getElementById("text").innerHTML = `<p style="color:${data.color};">${data.text} </p>`;
+        document.getElementById("audio").innerHTML = `<audio id="alertSound" src="${data.sound}" autoplay></audio>`;
+        // zahl / 100 weil nur zahlen zwischen 0 und 1 erlaubt
+        document.getElementById("alertSound").volume = data.volume / 100;
+        const alertBox = document.getElementById("alert-box");
+        alertBox.classList.add("fade-animation");
         setTimeout(() => {
-            alertBox.classList.remove("fade-animation")
+            alertBox.classList.remove("fade-animation");
         }, 10000);
     })
 </script>

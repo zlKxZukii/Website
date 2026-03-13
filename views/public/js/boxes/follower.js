@@ -7,11 +7,11 @@ function readVal() {
     saveValue(volume.value, colorPicker.value, text.value)
 }
 
-function saveValue(volume, colorPicker, text) {
+function saveValue(volume, color, text) {
     const obj = {
         volume: volume,
-        colorPicker: colorPicker,
-        responseText: text
+        color: color,
+        response_text: text
     };
 
     document.cookie = `${"Follow"}=${decodeURIComponent(JSON.stringify(obj))};max-age=10000000`

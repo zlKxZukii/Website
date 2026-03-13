@@ -14,17 +14,16 @@ alertBoxRoute.get("/", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
-
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const DB = await Select.AlertBox([sessionData.userId])
         const obj = {
-            link: `https://scaletta.live/alertbox/${DB.alert_key}`,
+            link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
             css: "../../css/boxes/alert-box-route.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
             title: "Alert Box",
             showBody: true,
-            change: `http://scaletta.live/alertbox/${DB.alert_key}/renew`
+            change: `http://scaletta.live/alertbox/${DB[0].alert_key}/renew`
         }
         res.render("main/boxes/alertBoxRoute.ejs", obj)
     } catch (error) {

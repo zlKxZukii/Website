@@ -4,14 +4,14 @@ dotenv.config({
 });
 
 import chalk from "chalk";
-
 import { followProtection } from "./functions/spamProtection.js";
 import { getAds } from "../obs_docks/ads/ads.js";
 import { apiClient } from "../src/server.js";
 import { HelixUserSubscription } from "@twurple/api";
 import { ClientManager } from "./connectBot.js";
 import { Select } from "../sql/sqlHandler.js";
-import { sendFollow } from "../boxes/alert/follow.js";
+import { Alerts } from "../boxes/alert/alerts.js";
+import client from "../src/redisClient.js";
 
 // for schleife hinzufügen für spätere eventuelle erweiterungen der Subscriptions
 
@@ -25,23 +25,12 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
     // }
 
     try {
-        const followerObject = {
-        }
-        console.log(followerObject)
+
         const user = ClientManager.getClient(userId)
-        const AlertDB = await Select.AlertBox([userId])
-        for (const element of AlertDB) {
-            if (element.type === "Follow") {
-                Object.assign(followerObject, element.settings)
-                followerObject.imagePath = element.settings.imagePath
-                followerObject.soundPath = element.settings.soundPath
-            }
-        }
-        console.log(followerObject)
         const subs = await apiClient.eventSub.getSubscriptionsForUser(userId, 10)
         // console.log(subs.data)
         const ad = await getAds(userId, client.get(userId).apiClient)
-
+        
         try {
             await eventSubListener.onStreamOnline(userId, async (event) => {
                 console.log(chalk.cyan(`[LIVE] ${event.broadcasterDisplayName}`));
@@ -69,8 +58,9 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
             console.log(chalk.red("Fehler beim abfangen der Werbung: " + error))
         }
         try {
+            console.log(user)
             eventSubListener.onChannelFollow(userId, userId, async (event) => {
-                await sendFollow(user, followerObject, event)
+                Alerts.saveAlert(userId, event, "Follow")
             })
         } catch (error) {
             console.log(chalk.red("Fehler beim abfangen der Follower: " + error))

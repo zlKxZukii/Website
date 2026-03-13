@@ -34,17 +34,19 @@ class InsertSQL {
 
     async AlertBoxKey(valuesArray){
                 try {
-            const sql = `INSERT INTO alert_box AS ab(
+            const sql = `INSERT INTO alert_box AS ab (
                             twitch_id,
                             alert_key,
                             type,
-                            settings)
+                            settings
+                        )
                         VALUES($1, $2, $3, $4)
                         ON CONFLICT (twitch_id, type)
                         DO UPDATE SET
-                        alert_key = EXCLUDED.alert_key,
-                        settings = EXCLUDED.settings,
-                        updated_at = NOW()
+                            alert_key = EXCLUDED.alert_key,
+                            -- Hier passiert die Magie: Alt + Neu zusammenfügen
+                            settings = ab.settings || EXCLUDED.settings,
+                            updated_at = NOW()
                         RETURNING *;`;
             const res = await query(sql, valuesArray);
             return res;

@@ -25,6 +25,8 @@ class BotManager {
         try {
             const { chatClient, wsKeys, apiClient } = await this.createBot(username, userId);
 
+            const alertBox = await this.getAlertBox(userId)
+            const alertQuery = {alert:false}
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
@@ -42,7 +44,9 @@ class BotManager {
                 accessShieldState,
                 customCommands,
                 spamBotProtection,
-                intervallList
+                intervallList,
+                alertQuery,
+                alertBox
             });
 
             await Insert.BotState([userId, true, username]);
@@ -133,10 +137,6 @@ class BotManager {
 
     }
 
-    getClient(userID) {
-        return this.client.get(userID);
-    }
-
     async restartBot(username, userID, loginKey) {
         const botState = await Select.Users(['bot_state'], [loginKey])
         if (botState.bot_state) {
@@ -170,22 +170,45 @@ class BotManager {
         if (!alertKey[0]) {
             alertKey = await this.CreateAlertBox(userId)
         }
-        Object.assign(obj, { alertBoxKey: alertKey.alert_key })
+        Object.assign(obj, { alertBoxKey: alertKey[0].alert_key })
         return obj
+    }
+
+    async getAlertBox(userId) {
+        const DB = await Select.AlertBox([userId])
+        const obj = {
+
+        }
+        for (const element of DB) {
+            Object.assign(obj, {
+                [element.type]: {
+                    color: element.settings.color,
+                    volume: element.settings.volume,
+                    img: element.settings.imagePath,
+                    sound: element.settings.soundPath,
+                    text: element.settings.response_text
+                }
+            })
+        }
+        return obj
+    }
+
+    getClient(userID) {
+        return this.client.get(userID);
     }
 
     async CreateAlertBox(userId) {
         const alertKeyNew = crypto.randomBytes(64).toString("hex");
         const createAlertBoxArr = [
             { type: 'Follow', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } },
-            { type: 'Sub', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif',  soundPath: '../../uploads/default/sound.mp3' } },
-            { type: 'Raid', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif',  soundPath: '../../uploads/default/sound.mp3' } }
+            { type: 'Sub', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } },
+            { type: 'Raid', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } }
         ];
         for (const element in createAlertBoxArr) {
             await Insert.AlertBoxKey([userId, alertKeyNew, createAlertBoxArr[element].type, createAlertBoxArr[element].settings])
         }
         const alertKey = await Select.AlertBox([userId])
-        return alertKey[0]
+        return alertKey
     }
 }
 

@@ -18,9 +18,11 @@ FollowBoxRoute.get("/", async (req, res) => {
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-
-        const DB = await Select.AlertBox([sessionData.userId])
+        const user = ClientManager.getClient(sessionData.userId)
+        console.log(user)
+        const DB = await Select.AlertBox([sessionData.userId]);
         const obj = {
+
             link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
             css: "../../css/boxes/follow-box.css",
             username: sessionData.username,
@@ -32,18 +34,18 @@ FollowBoxRoute.get("/", async (req, res) => {
             color: "",
             volume: "",
             responseText: ""
-        }
+        };
         for (const element of DB) {
             if (element.type === "Follow") {
-                obj.color = element.settings.colorPicker
-                obj.volume = element.settings.volume
-                obj.responseText = element.settings.responseText
-            }
-        }
-        res.render("main/boxes/followBox.ejs", obj)
+                obj.color = element.settings.color;
+                obj.volume = element.settings.volume;
+                obj.responseText = element.settings.response_text;
+            };
+        };
+        res.render("main/boxes/followBox.ejs", obj);
     } catch (error) {
-        console.log(error)
-        res.redirect("/follows")
+        console.log(error);
+        res.redirect("/follows");
     };
 })
 
@@ -72,6 +74,11 @@ FollowBoxRoute.get('/save', async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
+        const cookie = JSON.parse(req.cookies.Follow)
+        user.alertBox.Follow.color = cookie.color
+        user.alertBox.Follow.volume = cookie.volume
+        user.alertBox.Follow.text = cookie.response_text
+
         await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Follow", req.cookies.Follow]);
         res.cookie('Follow', "", { maxAge: 0 });
     } catch (error) {
@@ -83,7 +90,7 @@ FollowBoxRoute.get('/save', async (req, res) => {
 FollowBoxRoute.post('/upload/follow',
     upload.fields([
         { name: 'image', maxCount: 1 },
-        { name: 'sound', maxCount: 1 } // Hier stand vorher zweimal 'image'
+        { name: 'sound', maxCount: 1 }
     ]),
     async (req, res) => {
         const key = req.signedCookies.access_validator;
@@ -92,9 +99,9 @@ FollowBoxRoute.post('/upload/follow',
         try {
             const sessionDataRaw = await client.get(`sess:${key}`);
             if (!sessionDataRaw) return res.status(401).send("Session abgelaufen.");
-
             const sessionData = JSON.parse(sessionDataRaw);
             const userId = sessionData.userId;
+            const user = ClientManager.getClient(userId);
             const userFolder = path.join("uploads", "follow", String(userId));
 
             if (!fs.existsSync(userFolder)) {
@@ -116,7 +123,7 @@ FollowBoxRoute.post('/upload/follow',
                 });
             };
 
-            // 1. BILD VERARBEITUNG (req.files statt req.file)
+            // 1. BILD VERARBEITUNG
             if (req.files && req.files['image']) {
                 const file = req.files['image'][0];
                 const imageName = `image-${Date.now()}.webp`;
@@ -135,6 +142,9 @@ FollowBoxRoute.post('/upload/follow',
                         await fs.promises.unlink(path.join(userFolder, f)).catch(() => { });
                     }
                 }
+                const imagePathEnd = `../../${imagePath}`;
+                user.alertBox.Follow.img = imagePathEnd;
+                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { imagePath: imagePathEnd }]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -154,6 +164,9 @@ FollowBoxRoute.post('/upload/follow',
                         await fs.promises.unlink(path.join(userFolder, f)).catch(() => { });
                     }
                 }
+                const soundPathEnd = `../../${soundPath}`;
+                user.alertBox.Follow.sound = soundPathEnd;
+                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { soundPath: soundPathEnd }]);
             }
 
             res.redirect("/follows");
