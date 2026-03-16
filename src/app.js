@@ -91,7 +91,7 @@ async function startServer() {
 async function runPostStartLogic() {
     try {
         // Optional: Kurze Pause, damit Nginx/Proxy bereit sind
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // User aus DB holen
         const userData = await Select.UsersForStart("botState");
@@ -110,7 +110,7 @@ async function runPostStartLogic() {
             } catch (error) {
                 console.error(chalk.red(`[FAIL] ${user.username}:`), error.message);
             }
-        }
+        };
 
         // Finaler Sync-Check
         const finalSubs = await apiClient.eventSub.getSubscriptions();

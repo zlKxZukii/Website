@@ -49,21 +49,8 @@ export async function initializeTwurple() {
     }
 }
 
-io.on('connection', (socket) => {
-    console.log('Ein Client ist verbunden:', socket.id);
-
-    // Wenn der Server eine Nachricht "trigger-alert" empfängt...
-    socket.on('trigger-alert', () => {
-        console.log('Sound-Befehl empfangen, sende an alle...');
-        // ...sendet er "play-sound" an ALLE (inkl. OBS)
-        io.emit('play-sound');
-    });
-});
-
 io.on("connection", (socket) => {
-    io.emit('play-sound');
     socket.on("join-room", (room) => {
-
         socket.join(room);
         console.log(`AlertBox von ${room} beigetreten.`);
     });

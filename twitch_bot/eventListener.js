@@ -2,16 +2,14 @@ import dotenv from "dotenv";
 dotenv.config({
     path: './src/.env', quiet: true
 });
-
 import chalk from "chalk";
+
+import { Select } from "../sql/sqlHandler.js";
 import { followProtection } from "./functions/spamProtection.js";
 import { getAds } from "../obs_docks/ads/ads.js";
 import { apiClient } from "../src/server.js";
-import { HelixUserSubscription } from "@twurple/api";
 import { ClientManager } from "./connectBot.js";
-import { Select } from "../sql/sqlHandler.js";
 import { Alerts } from "../boxes/alert/alerts.js";
-import client from "../src/redisClient.js";
 
 // for schleife hinzufügen für spätere eventuelle erweiterungen der Subscriptions
 
@@ -30,7 +28,7 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
         const subs = await apiClient.eventSub.getSubscriptionsForUser(userId, 10)
         // console.log(subs.data)
         const ad = await getAds(userId, client.get(userId).apiClient)
-        
+
         try {
             await eventSubListener.onStreamOnline(userId, async (event) => {
                 console.log(chalk.cyan(`[LIVE] ${event.broadcasterDisplayName}`));
@@ -58,12 +56,25 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
             console.log(chalk.red("Fehler beim abfangen der Werbung: " + error))
         }
         try {
-            console.log(user)
             eventSubListener.onChannelFollow(userId, userId, async (event) => {
                 Alerts.saveAlert(userId, event, "Follow")
             })
         } catch (error) {
             console.log(chalk.red("Fehler beim abfangen der Follower: " + error))
+        }
+        try {
+            eventSubListener.onChannelSubscription(userId, async (event) => {
+                Alerts.saveAlert(userId, event, "Sub")
+            })
+        } catch (error) {
+            console.log(chalk.red("Fehler bei abfangen des Subscribers: " + error))
+        }
+        try {
+            eventSubListener.onChannelRaidTo(userId, async (event) => {
+                Alerts.saveAlert(userId, event, "Raid")
+            })
+        } catch (error) {
+            console.log(chalk.red("Fehler bei abfangen des Raids: " + error))
         }
 
         console.log(chalk.green(`[SUCCESS] Subscriptions für ${userId} initiiert.`));

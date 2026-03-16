@@ -19,7 +19,6 @@ FollowBoxRoute.get("/", async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId)
-        console.log(user)
         const DB = await Select.AlertBox([sessionData.userId]);
         const obj = {
 
@@ -27,13 +26,15 @@ FollowBoxRoute.get("/", async (req, res) => {
             css: "../../css/boxes/follow-box.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
+            boxes: "Follower Box",
             title: "Follower Box",
             showBody: true,
             helpLink: `http://scaletta.live/alertbox`,
             change: `http://scaletta.live/follows/${DB[0].alert_key}/renew`,
             color: "",
             volume: "",
-            responseText: ""
+            responseText: "",
+            key: DB[0].alert_key
         };
         for (const element of DB) {
             if (element.type === "Follow") {

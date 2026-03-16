@@ -75,6 +75,7 @@ commandsRoute.get("", async (req, res) => {
 
 
 commandsRoute.get("/save", async (req, res) => {
+    console.log(req.cookies)
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");

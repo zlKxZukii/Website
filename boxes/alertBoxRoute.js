@@ -3,7 +3,6 @@ import client from "../src/redisClient.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
 import { ClientManager } from "../twitch_bot/connectBot.js";
 import crypto from "crypto";
-import { title } from "process";
 
 export let alertBoxRoute = express.Router()
 
@@ -18,7 +17,7 @@ alertBoxRoute.get("/", async (req, res) => {
         const DB = await Select.AlertBox([sessionData.userId])
         const obj = {
             link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
-            css: "../../css/boxes/alert-box-route.css",
+            css: "../../css/boxes/help.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
             title: "Alert Box",
