@@ -23,13 +23,14 @@ export async function authTwitch(code, ipAddress, res) {
         const authProvider = await getAuthProvider(tokenData);
         const info = await getTokenInfo(tokenData.accessToken, clientId);
         const user = await createHelixClient(authProvider, info.userId);
-
+        
+        // Create Redis
         const loginKey = crypto.randomBytes(64).toString("base64url");
         const redisKey = `sess:${loginKey}`
         await client.set(redisKey, JSON.stringify({
             userId: user.id,
             username: user.displayName,
-            profilePicture: user.profilePictureUrl,
+            profilePicture: user.profilePictureUrl
         }), { EX: 1209600 })
 
         const DB = await Select.AccessShield([info.userId])

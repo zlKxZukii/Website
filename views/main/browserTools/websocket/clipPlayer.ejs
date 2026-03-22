@@ -1,0 +1,111 @@
+<link rel="stylesheet" href="../../../css/browserTools/websocket/websocket-assets.css">
+
+<div class="clip" id="clipContainer"></div>
+
+
+<script src="https://embed.twitch.tv/embed/v1.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    const key = "<%= targetUser %>";
+
+    let player = null;
+    let checkTimeout = null;
+    let durationTimeout = null;
+
+    socket.on("connect", () => {
+        console.log("Verbunden für Raum: " + key);
+        socket.emit("join-room", key);
+        getClip(); // Ersten Clip laden
+    });
+
+    socket.on("newClip", (data) => {
+        console.log("Neuer Clip-Slug erhalten:", data.id);
+
+        // Sicherheitscheck: Falls data.id ein Objekt ist (Twurple-Fehler), extrahieren wir den String
+        const cleanId = typeof data.id === 'object' ? data.id.id : data.id;
+
+        if (!cleanId) {
+            console.error("Fehler: Keine Clip-ID vorhanden!");
+            return;
+        }
+
+        const container = document.getElementById("clipContainer");
+        container.innerHTML = ""; // Container leeren
+
+        const options = {
+            width: "100%",
+            height: "100%",
+            clip: cleanId,
+            // WICHTIG: Parent immer als Array, und keine IP-Adressen!
+            parent: ["localhost"], autoplay: true,
+            muted: false
+        };
+
+        try {
+            // Initialisierung des Embed-Players
+            const embed = new Twitch.Embed("clipContainer", options);
+            let hasStarted = false;
+
+            embed.addEventListener(Twitch.Embed.VIDEO_READY, () => {
+                console.log("SDK: Video-Player ist bereit.");
+                const playerInstance = embed.getPlayer();
+
+                // Wir hören auf das PLAYING Event
+                playerInstance.addEventListener(Twitch.Player.PLAYING, () => {
+                    if (!hasStarted) {
+                        hasStarted = true;
+                        console.log("✅ Clip läuft!");
+
+                        // Timer für den nächsten Clip (duration in Sekunden * 1000)
+                        setTimeout(() => {
+                            console.log("Clip beendet, lade nächsten...");
+                            nextStep();
+                        }, (data.duration || 30) * 1000);
+                    }
+                });
+            });
+        } catch (err) {
+            console.error("Kritischer Fehler beim Laden des Embeds:", err);
+        }
+    });
+
+    // 3. AGGRESSIVER LILA-SCREEN-DETEKTOR
+    // Wenn nach 3 Sekunden kein "PLAYING" kam -> Skip!
+    // checkTimeout = setTimeout(() => {
+    //     if (!hasStartedPlaying) {
+    //         console.warn("⚠️ Lila Screen oder Lade-Hänger erkannt. Skippe...");
+    //         // Player sicherheitshalber pausieren, falls er im Hintergrund doch noch startet
+    //         if (player) {
+    //             try { player.pause(); } catch (e) { }
+    //         }
+    //         nextStep();
+    //     }
+    // }, 3000) // Deine gewünschte kurze Zeit
+
+
+    // function nextStep() {
+    //     const container = document.getElementById("clipContainer");
+    //     container.classList.add("invisible");
+
+    //     // Nach dem Fade-Out (1 Sek) den nächsten Clip anfordern
+    //     setTimeout(() => {
+    //         getClip();
+    //     }, 1000);
+    // }
+
+    async function getClip() {
+        try {
+            await fetch(`/clipsplayer/getclip`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            });
+        } catch (error) {
+            console.error("Fehler beim Clip-Abruf:", error);
+            // Bei Netzwerkfehler nach 3 Sek neu versuchen
+            setTimeout(getClip, 3000);
+        }
+    }
+</script>

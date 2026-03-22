@@ -25,7 +25,7 @@ function openCookieWindow() {
 
 function acceptButton() {
     let banner = document.getElementById("cookieWindow")
-    document.cookie = "cookie=accepted; Max-Age=1209600; Path=/"
+    document.cookie = "cookie=accepted; Max-Age=1209600000; Path=/"
     banner.remove()
     openCookieOwl()
 }

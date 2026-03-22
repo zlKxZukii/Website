@@ -107,39 +107,6 @@
     animation: rainbow 10s infinite;
 }
 
-@keyframes rainbow {
-    0% {
-        color: red;
-    }
-
-    14% {
-        color: orange;
-    }
-
-    28% {
-        color: yellow;
-    }
-
-    42% {
-        color: green;
-    }
-
-    57% {
-        color: #2bdffe;
-    }
-
-    71% {
-        color: rgb(101, 2, 172);
-    }
-
-    85% {
-        color: violet;
-    }
-
-    100% {
-        color: red;
-    }
-}
 
 .not-signed{
     font-size: 32px;

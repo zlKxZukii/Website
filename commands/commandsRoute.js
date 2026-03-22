@@ -74,39 +74,51 @@ commandsRoute.get("", async (req, res) => {
 });
 
 
-commandsRoute.get("/save", async (req, res) => {
-    console.log(req.cookies)
+commandsRoute.post("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     }
+    const keys = Object.keys(req.body)
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    const cookieKeys = Object.keys(req.cookies)
+    const userId = sessionData.userId
+    const user = await ClientManager.getClient(userId)
+    for (let index = 0; index < keys.length; index++) {
+        const userParams = user.defaultCommands[index]
 
-    for (let index = 0; index < cookieKeys.length; index++) {
-        if (cookieKeys[index] != "cookie") {
-            const params = JSON.parse(req.cookies[cookieKeys[index]])
-            const settings = {}
-            const fields = ['cooldown', 'delay', 'clipLength'];
-            fields.forEach(field => {
-                if (field in params) settings[field] = params[field];
-            });
 
+        const { value, state, stateTitle } = req.body[keys[index]]
+
+        const settings = {}
+        const fields = ['cooldown', 'delay', 'clipLength'];
+        fields.forEach(field => {
+            if (field in req.body[keys[index]]) settings[field] = req.body[keys[index]][field];
+        });
+
+        // aktualisierung des CLients
+        userParams.response_text = value;
+        userParams.state = state;
+        userParams.settings = settings;
+        userParams.anybody = stateTitle.anybody;
+        userParams.broadcaster = stateTitle.broadcaster;
+        userParams.vip = stateTitle.vip;
+        userParams.subscriber = stateTitle.subscriber;
+        userParams.moderator = stateTitle.moderator;
+
+        // aktualisierung der Datenbank
             await Insert.updateDefCommand([
-                sessionData.userId,
-                cookieKeys[index],
-                params.value,
+                userId,
+                keys[index],
+                value,
                 settings,
-                params.state,
-                params.stateTitle.anybody,
-                params.stateTitle.broadcaster,
-                params.stateTitle.moderator,
-                params.stateTitle.subscriber,
-                params.stateTitle.vip
+                state,
+                stateTitle.anybody,
+                stateTitle.broadcaster,
+                stateTitle.moderator,
+                stateTitle.subscriber,
+                stateTitle.vip
             ]);
-            res.cookie(cookieKeys[index], "", { maxAge: 0 })
-        }
-        ClientManager.restartBot(sessionData.username, sessionData.userId, key)
     }
-    res.redirect("/commands");
+    // wichtig redirecten
+    res.redirect("/commands")
 })

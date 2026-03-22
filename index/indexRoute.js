@@ -7,22 +7,31 @@ import client from "../src/redisClient.js";
 import chalk from "chalk";
 
 indexRoute.get("", async (req, res) => {
-    const key = req.signedCookies.access_validator;
 
+    const key = req.signedCookies.access_validator;
     const indexObj = {
         title: "Start",
         css: "../css/index.css",
-        showBody: true
+        showBody: true,
+        username: null,
+        img:null
     };
-    
+
     Object.assign(indexObj, randomSocialMedia(), await randomJoke());
 
     if (key) {
-        const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        Object.assign(indexObj, {
-            username: sessionData.username,
-            img: sessionData.profilePicture
-        });
+
+        try {
+            const rawData = await client.get(`sess:${key}`);
+            if (rawData) {
+                const sessionData = JSON.parse(rawData);
+                indexObj.username = sessionData.username;
+                indexObj.img = sessionData.profilePicture;
+            }
+
+        } catch (err) {
+            console.log("Redis Fehler ignoriert");
+        }
     };
 
     // ändern

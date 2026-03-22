@@ -10,9 +10,9 @@ import { upload } from "../multer/upload.js";
 import path from "path";
 import { Alerts } from "./alert/alerts.js";
 
-export let FollowBoxRoute = express.Router()
+export let SubscriberBoxRoute = express.Router()
 
-FollowBoxRoute.get("/", async (req, res) => {
+SubscriberBoxRoute.get("/", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
@@ -25,50 +25,47 @@ FollowBoxRoute.get("/", async (req, res) => {
             css: "../../css/boxes/box.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
-            boxes: "Follower Box",
-            title: "Follower Box",
+            boxes: "Subscriber Box",
+            title: "Subscriber Box",
             showBody: true,
             helpLink: `https://scaletta.live/alertbox`,
-            change: `https://scaletta.live/follows/${DB[0].alert_key}/renew`,
+            change: `https://scaletta.live/subs/${DB[0].alert_key}/renew`,
             color: "",
             volume: "",
             responseText: "",
-            key: DB[0].alert_key,
-            type: "follow"
+            key: DB[0].alert_key
         };
 
         for (const element of DB) {
-            if (element.type === "Follow") {
+            if (element.type === "Sub") {
                 obj.color = element.settings.color;
                 obj.volume = element.settings.volume;
                 obj.responseText = element.settings.response_text;
             };
         };
-        res.render("main/boxes/followBox.ejs", obj);
+        res.render("main/boxes/subBox.ejs", obj);
     } catch (error) {
         console.log(error);
-        res.redirect("/follows");
+        res.redirect("/subs");
     };
 })
 
-FollowBoxRoute.get("/:key/renew", async (req, res) => {
+SubscriberBoxRoute.get("/:key/renew", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     };
     try {
-
         const newKey = crypto.randomBytes(64).toString("hex");
         await Insert.AlertBoxKey([sessionData.userId, newKey])
         await ClientManager.restartBot(sessionData.username, sessionData.userId, key)
-
     } catch (error) {
         console.log("Neuer Key kann nicht generiert werden " + error)
     }
-    res.redirect("/follows")
+    res.redirect("/subs")
 })
 
-FollowBoxRoute.post('/save', async (req, res) => {
+SubscriberBoxRoute.post('/save', async (req, res) => {
     // const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
     const key = req.signedCookies.access_validator;
     if (!key) {
@@ -78,20 +75,20 @@ FollowBoxRoute.post('/save', async (req, res) => {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
         const { volume, color, response_text } = req.body
+        console.log(user)
+        user.alertBox.Sub.color = color
+        user.alertBox.Sub.volume = volume
+        user.alertBox.Sub.text = response_text
 
-        user.alertBox.Follow.color = color
-        user.alertBox.Follow.volume = volume
-        user.alertBox.Follow.text = response_text
-
-        await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Follow", JSON.stringify({ color, volume, response_text })]);
+        await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Sub", JSON.stringify({ color, volume, response_text })]);
 
     } catch (error) {
-        console.log("Fehler beim Speichern des Followers: " + error)
+        console.log("Fehler beim Speichern des Subscribers: " + error)
     }
-    res.redirect('/follows');
+    res.redirect('/subs');
 });
 
-FollowBoxRoute.post('/upload/follow',
+SubscriberBoxRoute.post('/upload/sub',
     upload.fields([
         { name: 'image', maxCount: 1 },
         { name: 'sound', maxCount: 1 }
@@ -106,7 +103,7 @@ FollowBoxRoute.post('/upload/follow',
             const sessionData = JSON.parse(sessionDataRaw);
             const userId = sessionData.userId;
             const user = ClientManager.getClient(userId);
-            const userFolder = path.join("uploads", "follow", String(userId));
+            const userFolder = path.join("uploads", "sub", String(userId));
 
             if (!fs.existsSync(userFolder)) {
                 fs.mkdirSync(userFolder, { recursive: true });
@@ -156,8 +153,8 @@ FollowBoxRoute.post('/upload/follow',
                     }
                 }
                 const imagePathEnd = `../../${imagePath}`;
-                user.alertBox.Follow.img = imagePathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { imagePath: imagePathEnd }]);
+                user.alertBox.Sub.img = imagePathEnd;
+                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Sub", { imagePath: imagePathEnd }]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -178,12 +175,10 @@ FollowBoxRoute.post('/upload/follow',
                     }
                 }
                 const soundPathEnd = `../../${soundPath}`;
-                user.alertBox.Follow.sound = soundPathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { soundPath: soundPathEnd }]);
+                user.alertBox.Sub.sound = soundPathEnd;
+                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Sub", { soundPath: soundPathEnd }]);
             }
-
-            res.redirect("/follows");
-
+            res.redirect("/subs");
         } catch (error) {
             console.error("Upload Error:", error);
             // Temp-Dateien aufräumen im Fehlerfall
@@ -197,12 +192,12 @@ FollowBoxRoute.post('/upload/follow',
     }
 );
 
-FollowBoxRoute.post('/test', async (req, res) => {
+SubscriberBoxRoute.post('/test', async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     };
 
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    Alerts.testAlert(sessionData.userId, "Follow", sessionData.username)
+    Alerts.testAlert(sessionData.userId, "Sub", sessionData.username)
 })

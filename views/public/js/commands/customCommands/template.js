@@ -48,7 +48,7 @@ function checkLinkState(elementTitle) {
 }
 
 function creationWindow(counter) {
-    return `            <div class="creation-window" id="creationWindow${counter}">
+    return `<div class="creation-window" id="creationWindow${counter}">
                 <h2>Erstelle deinen eigenen Befehl:</h2>
                 <div><label for="newDescription${counter}">Beschreibung:</label><input type="text" id="newDescription${counter}"
                         placeholder="Beschreibung des Befehls" autocomplete="off"></div>
@@ -57,6 +57,18 @@ function creationWindow(counter) {
                 </div>
                 <div><label for="newTrigger${counter}">Trigger:</label><input type="text" id="newTrigger${counter}"
                         placeholder="Wie dieser Befehl angesprochen wird" autocomplete="off"></div>
+                <button style="cursor: pointer;
+    font-size: 24px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+    width: 30%;
+    align-text:center;
+    display:flex;
+    justify-content:center;" class="creation-buttons" onclick="createCommand('${counter}', this)"> Speichern </button>
             </div>`
 }
 

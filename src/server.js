@@ -52,7 +52,7 @@ export async function initializeTwurple() {
 io.on("connection", (socket) => {
     socket.on("join-room", (room) => {
         socket.join(room);
-        console.log(`AlertBox von ${room} beigetreten.`);
+        console.log(`Socket von ${room} beigetreten.`);
     });
     socket.on("disconnect", (reason) => {
         console.log("client disconnected reason:", reason);

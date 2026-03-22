@@ -6,7 +6,7 @@ import MainLayouts from "express-ejs-layouts";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
 
-import { app, PORT, httpServer, eventSubListener, initializeTwurple, io, apiClient } from "./server.js";
+import { app, PORT, httpServer, eventSubListener, initializeTwurple, apiClient } from "./server.js";
 
 
 import { indexRoute } from "../index/indexRoute.js";
@@ -24,8 +24,12 @@ import { Select } from "../sql/sqlHandler.js";
 import { obsDocks } from "../obs_docks/obsDocksRoute.js";
 import { adsRoute } from "../obs_docks/ads/adsRoute.js";
 
+import { browserToolsRoute } from "../browserTools/browserToolsRoute.js";
+import { clipPlayerRoute } from "../browserTools/tools/clipPlayerRoute.js"
 import { test } from "./testRoute.js";
 import { FollowBoxRoute } from "../boxes/followerBoxRoute.js";
+import { SubscriberBoxRoute } from "../boxes/subscriberBoxRoute.js";
+import { RaidBoxRoute } from "../boxes/raidBoxRoute.js";
 
 // --- INITIALISIERUNGS-LOGIK ---
 
@@ -37,9 +41,12 @@ async function startServer() {
         await nukeAllSubscriptions(apiClient)
         eventSubListener.apply(app)
 
-        app.use(express.json());
+        app.set('trust proxy', 1)
+
+        app.use(express.json({ limit: '10kb' }));
         app.use(express.urlencoded({ extended: true }));
         app.use(cookieParser(process.env.COOKIE_SECRET));
+
         app.use(express.static("views/public"));
         app.set("view engine", "ejs");
         app.use(MainLayouts);
@@ -51,11 +58,13 @@ async function startServer() {
         app.use("/uploads", express.static('uploads'))
         app.use("/dashboard", dashboardRoute);
         app.use("/alertbox", alertBoxRoute);
-        app.use("/follows", FollowBoxRoute)
+        app.use("/follows", FollowBoxRoute);
+        app.use("/subs", SubscriberBoxRoute);
+        app.use("/raid", RaidBoxRoute);
         app.use("/security", securityRoute);
         app.use("/jokes", jokesRoute);
         app.use("/commands", commandsRoute);
-        app.use("/customCommands", customCommandsRoute);
+        app.use("/customcommands", customCommandsRoute);
         app.use("/dataSecure", dataSecureRoute);
         app.use("/impressum", impressumRoute);
         app.use("/Intervall", intervallRoute);
@@ -64,6 +73,8 @@ async function startServer() {
         app.use("/obsdocks", obsDocks);
         app.use("/ads", adsRoute);
         app.use("/test", test)
+        app.use("/browsertools", browserToolsRoute)
+        app.use("/clipsplayer", clipPlayerRoute)
 
         // 404 Handler
         app.use((req, res) => {

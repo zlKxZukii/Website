@@ -23,10 +23,10 @@ class BotManager {
         if (this.client.has(userId)) return;
 
         try {
-            const { chatClient, wsKeys, apiClient } = await this.createBot(username, userId);
+            const { chatClient, wsKeys, apiClient, browserKeys } = await this.createBot(username, userId);
 
             const alertBox = await this.getAlertBox(userId)
-            const alertQuery = {alert:false}
+            const alertQuery = { alert: false }
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
@@ -46,7 +46,8 @@ class BotManager {
                 spamBotProtection,
                 intervallList,
                 alertQuery,
-                alertBox
+                alertBox,
+                browserKeys
             });
 
             await Insert.BotState([userId, true, username]);
@@ -67,11 +68,12 @@ class BotManager {
     }
 
     async createBot(username, userId) {
-        // wenn kein key  existiert wird einer neuer erstellt  
+        // wenn kein key  existiert wird einer neuer erstellt 
         const wsKeys = await this.getWsKeys(userId)
         const tokenData = await Select.Token([userId])
         const authProviderComp = await getAuthProvider(tokenData)
         const apiClient = await createApiClient(authProviderComp)
+        const browserKeys = await this.browserTools(userId)
 
         const chatClient = new ChatClient({
             authProvider: authProviderComp,
@@ -103,7 +105,8 @@ class BotManager {
         return {
             chatClient: chatClient,
             wsKeys: wsKeys,
-            apiClient: apiClient
+            apiClient: apiClient,
+            browserKeys: browserKeys
         }
     }
 
@@ -209,6 +212,25 @@ class BotManager {
         }
         const alertKey = await Select.AlertBox([userId])
         return alertKey
+    }
+
+    async browserTools(userId) {
+        const retObj = {}
+        const DB = await Select.GetBrowserToolsKey([userId])
+        if (!DB || DB.length <= 0) {
+            const creationArr = [{ type: 'ClipBox' }];
+            for (const tool of creationArr) {
+                const key = crypto.randomBytes(64).toString("hex");
+                Object.assign(retObj, { clipKey: key })
+                await Insert.CreateBrowserTool([userId, tool.type, key])
+            }
+        }
+        else {
+            for (const tool in DB) {
+                Object.assign(retObj, { [DB[tool].type]: DB[tool].key })
+            }
+        }
+        return retObj
     }
 }
 

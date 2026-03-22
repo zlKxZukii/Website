@@ -12,7 +12,7 @@
                         <div class="upload-section">
                             <div class="upload-group">
                                 <h2>Bild / Video / GIF</h2>
-                                <form class="upload-form" action="/follows/upload/follow" method="POST"
+                                <form class="upload-form" action="/raid/upload/raid" method="POST"
                                     enctype="multipart/form-data"
                                     onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
                                     <label for="image-upload" class="custom-file-button">Datei auswählen</label>
@@ -26,7 +26,7 @@
                             <div class="upload-group">
                                 <h2>Sound</h2>
 
-                                <form class="upload-form" action="/follows/upload/follow" method="POST"
+                                <form class="upload-form" action="/raid/upload/raid" method="POST"
                                     enctype="multipart/form-data"
                                     onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
                                     <label for="sound-upload" class="custom-file-button">Sound auswählen</label>
@@ -41,7 +41,7 @@
 
                         <div class="test-window">
                             <iframe src="<%= locals.link %>" frameborder="0" allow="autoplay"></iframe>
-                            <button onclick="testWS(this, 'follows')">Teste Mich.</button>
+                            <button onclick="testWS(this, 'raid')">Teste Mich.</button>
                         </div>
 
                     </div>
@@ -51,10 +51,10 @@
                     <div class="options">
                         <div class="text-options">
                             <div class="option">
-                                <label for="responseText">Dein Text der bei einem Follow Event<br> ausgegeben werden
+                                <label for="responseText">Dein Text der bei einem Raid Event<br> ausgegeben werden
                                     soll.</label>
                                 <textarea style="color:<%= locals.color %>" name="responseText" id="responseText"
-                                    rows="8" cols="50" placeholder="Hier den Follower Text hinzufügen."
+                                    rows="8" cols="50" placeholder="Hier den Raid Text hinzufügen."
                                     spellCheck="false"><%= locals.responseText %></textarea>
                             </div>
                             <div style="align-items: center; display: flex;">
@@ -72,6 +72,9 @@
                                 <li>-</li>
                                 <li>Streamer</li>
                                 <li>[streamer]</li>
+                                <li>-</li>
+                                <li>Anzahl</li>
+                                <li>[amount]</li>
                             </ul>
                         </div>
                         <div class="sounds">
@@ -83,7 +86,7 @@
                         </div>
                     </div>
                     <div class="save-button">
-                        <button onclick="readVal(this, 'follows')">Speichern</button>
+                        <button onclick="readVal(this, 'raid')">Speichern</button>
                     </div>
             </div>
             <script>

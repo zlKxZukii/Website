@@ -24,12 +24,12 @@ intervallRoute.get((""), async (req, res) => {
         for (let index = 0; index < DB.length; index++) {
             Object.assign(obj.data, {
                 [DB[index].category]: {
-                    intervallName:DB[index].category,
+                    intervallName: DB[index].category,
                     text: DB[index].response_text,
                     intervall: DB[index].intervall,
                     state: DB[index].state
                 }
-            })   
+            })
         }
     }
     res.render("main/commands/intervall", obj)

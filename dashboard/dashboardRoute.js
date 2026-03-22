@@ -20,18 +20,22 @@ dashboardRoute.get((""), async (req, res) => {
     if (!key) {
         return res.redirect("/?index=true")
     }
-
+    
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
     const userId = sessionData.userId
-    const user = await Select.Users(['bot_state'], [key])
+    const user = await Select.Users(['bot_state'], [userId])
     const tokenData = await Select.Token([sessionData.userId]);
-
+    const parentRAW = process.env.PARENT
+    let parent = parentRAW
+    if (req.headers.host.includes("www.")) {
+        parent = "www."+parentRAW
+    }
     const obj = {
         title: "Dashboard",
         css: "../css/dashboard/dashboard.css",
         username: sessionData.username,
         img: sessionData.profilePicture,
-        parent: process.env.PARENT,
+        parent: parent,
         showBody: true,
         botState: user.bot_state
     };
@@ -80,6 +84,9 @@ dashboardRoute.get((""), async (req, res) => {
 
 dashboardRoute.get("/bot/:state", async (req, res) => {
     const key = req.signedCookies.access_validator;
+    if (!key) {
+        return res.redirect("/?index=true")
+    }
     const sessionData = await JSON.parse(await client.get(`sess:${key}`));
     const userID = sessionData.userId
     const username = sessionData.username

@@ -40,7 +40,8 @@ function renderGetState(state) {
         return "checked"
     }
 }
-// abreigen des namens für speichern des intervalls
+
+// abreifen des namens für speichern des intervalls
 function stateCheck(intervallName) {
     saveIntervallNames.push(intervallName)
 }

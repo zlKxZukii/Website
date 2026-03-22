@@ -32,8 +32,8 @@ class InsertSQL {
         }
     }
 
-    async AlertBoxKey(valuesArray){
-                try {
+    async AlertBoxKey(valuesArray) {
+        try {
             const sql = `INSERT INTO alert_box AS ab (
                             twitch_id,
                             alert_key,
@@ -55,7 +55,7 @@ class InsertSQL {
         }
     }
 
-    async obsDocks(valuesArray){
+    async obsDocks(valuesArray) {
         try {
             const sql = `INSERT INTO obs_docks AS od(
                             twitch_id,
@@ -301,7 +301,24 @@ class InsertSQL {
             console.error(chalk.red("Benutzer konnte nicht gespeichert werden.", error));
         };
     }
-
+    async CreateBrowserTool(valuesArray) {
+        try {
+            const sql = `INSERT INTO browser_tools (
+                            twitch_id,
+                            type,
+                            key
+                        )
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id, "type", "key")
+                        DO UPDATE SET
+                        updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
+        };
+    }
 };
 
 class SelectSQL {
@@ -310,11 +327,11 @@ class SelectSQL {
         this.whitelist = ['username', 'twitch_id', 'bot_state', 'picture_url'];
     };
 
-    async UsersForStart(){
-         try {
-            const sql = `SELECT username, twitch_id, bot_state FROM users;`;
-            const res = await query(sql,[]);
-            
+    async UsersForStart() {
+        try {
+            const sql = `SELECT username, twitch_id, bot_state FROM users; `;
+            const res = await query(sql, []);
+
             return res.rows;
         } catch (error) {
             console.log(chalk.red("Fehler im Starten aller User" + error.message));
@@ -329,10 +346,10 @@ class SelectSQL {
             };
         }
         try {
-            const sql = `SELECT ${injectString.slice(0, -2) + " "}FROM users WHERE login_key=$1;`;
-            
+            const sql = `SELECT ${injectString.slice(0, -2) + " "}FROM users WHERE twitch_id = $1; `;
+
             const res = await query(sql, valuesArray);
-            
+
             return res.rows[0];
         } catch (error) {
             console.log(chalk.red("Fehler im Select Statement" + error.message));
@@ -341,7 +358,7 @@ class SelectSQL {
 
     async Token(valuesArray) {
         try {
-            const sql = `SELECT * FROM tokens WHERE twitch_id=$1;`;
+            const sql = `SELECT * FROM tokens WHERE twitch_id = $1; `;
             const res = await query(sql, valuesArray);
 
             return {
@@ -358,7 +375,7 @@ class SelectSQL {
 
     async AlertBox(valuesArray) {
         try {
-            const sql = `SELECT * FROM alert_box WHERE twitch_id=$1;`;
+            const sql = `SELECT * FROM alert_box WHERE twitch_id = $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
 
@@ -367,9 +384,9 @@ class SelectSQL {
         };
     };
 
-    async obsDocks(valuesArray){
-                try {
-            const sql = `SELECT * FROM obs_docks WHERE twitch_id=$1`;
+    async obsDocks(valuesArray) {
+        try {
+            const sql = `SELECT * FROM obs_docks WHERE twitch_id = $1`;
             const res = await query(sql, valuesArray);
             return res.rows;
 
@@ -380,7 +397,7 @@ class SelectSQL {
 
     async JokesWithTrigger(valuesArray) {
         try {
-            const sql = `SELECT response_text, triggers FROM jokes WHERE category ILIKE $1;`;
+            const sql = `SELECT response_text, triggers FROM jokes WHERE category ILIKE $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         } catch (error) {
@@ -389,14 +406,14 @@ class SelectSQL {
     };
     async JokeDataForUser(valuesArray) {
         try {
-            const sql = `SELECT DISTINCT ON (js.category) 
-                            js.category, js.state, j.triggers 
-                        FROM 
+            const sql = `SELECT DISTINCT ON(js.category)
+        js.category, js.state, j.triggers
+        FROM 
                             joke_states js
                         INNER JOIN
-                            public.jokes j ON js.category= j.category
-                        WHERE
-                            twitch_id = $1;`;
+        public.jokes j ON js.category = j.category
+        WHERE
+        twitch_id = $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         } catch (error) {
@@ -405,11 +422,11 @@ class SelectSQL {
     };
     async AllJokes(valuesArray) {
         try {
-            const sql = `SELECT 
-                            response_text 
-                        FROM
-                            jokes 
-                        WHERE category ILIKE $1;`;
+            const sql = `SELECT
+        response_text
+        FROM
+        jokes 
+                        WHERE category ILIKE $1; `;
 
             const res = await query(sql, valuesArray);
             return res.rows;
@@ -420,23 +437,23 @@ class SelectSQL {
 
     async Commands(valuesArray) {
         try {
-            const sql = `SELECT 
-                            dc.category,
-                            dc.response_text,
-                            dc.state,
-                            dc.triggers,
-                            dc.settings,
-                            dp.anybody,
-                            dp.broadcaster,
-                            dp.vip,
-                            dp.subscriber,
-                            dp.moderator 
-                        FROM
+            const sql = `SELECT
+        dc.category,
+            dc.response_text,
+            dc.state,
+            dc.triggers,
+            dc.settings,
+            dp.anybody,
+            dp.broadcaster,
+            dp.vip,
+            dp.subscriber,
+            dp.moderator
+        FROM
                             def_commands AS dc
-                        JOIN 
+        JOIN 
                             def_permissions AS dp ON dc.twitch_id = dp.twitch_id AND dc.category = dp.category
-                        WHERE
-                            dc.twitch_id ILIKE ($1);`;
+        WHERE
+        dc.twitch_id ILIKE($1); `;
 
             const res = await query(sql, valuesArray);
             return res.rows;
@@ -448,36 +465,36 @@ class SelectSQL {
 
     async CustomCommand(valuesArray) {
         try {
-            const sql = `SELECT  DISTINCT ON (cc.category)
-                            cc.category,
-                            cc.response_text,
-                            cc.cooldown,
-                            cc.delay,
-                            cc.state,
-                            cc.triggers,
-                            cp.anybody,
-                            cp.broadcaster,
-                            cp.vip,
-                            cp.subscriber,
-                            cp.moderator 
-                        FROM
+            const sql = `SELECT  DISTINCT ON(cc.category)
+        cc.category,
+            cc.response_text,
+            cc.cooldown,
+            cc.delay,
+            cc.state,
+            cc.triggers,
+            cp.anybody,
+            cp.broadcaster,
+            cp.vip,
+            cp.subscriber,
+            cp.moderator
+        FROM
                             custom_commands AS cc
-                        JOIN 
+        JOIN 
                             custom_permissions AS cp ON cc.twitch_id = cp.twitch_id AND cc.category = cp.category
-                        WHERE
-                            cc.twitch_id ILIKE ($1) 
-                        GROUP BY 
-                            cc.category,
-                            cc.response_text,
-                            cc.cooldown,
-                            cc.delay,
-                            cc.state,
-                            cc.triggers,
-                            cp.anybody,
-                            cp.broadcaster,
-                            cp.vip,
-                            cp.subscriber,
-                            cp.moderator;`;
+        WHERE
+        cc.twitch_id ILIKE($1) 
+                        GROUP BY
+        cc.category,
+            cc.response_text,
+            cc.cooldown,
+            cc.delay,
+            cc.state,
+            cc.triggers,
+            cp.anybody,
+            cp.broadcaster,
+            cp.vip,
+            cp.subscriber,
+            cp.moderator; `;
 
             const res = await query(sql, valuesArray);
             return res.rows;
@@ -488,15 +505,15 @@ class SelectSQL {
 
     async Intervall(valuesArray) {
         try {
-            const sql = `SELECT 
-                            category,
-                            response_text,
-                            intervall,
-                            state 
-                        FROM
-                            intervall 
-                        WHERE 
-                            twitch_id = $1;`;
+            const sql = `SELECT
+        category,
+            response_text,
+            intervall,
+            state
+        FROM
+        intervall
+        WHERE
+        twitch_id = $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         }
@@ -507,18 +524,54 @@ class SelectSQL {
 
     async AccessShield(valuesArray) {
         try {
-            const sql = `SELECT 
-                            category,
-                            state 
-                        FROM
-                            access_shield 
-                        WHERE 
-                            twitch_id = $1;`;
+            const sql = `SELECT
+        category,
+            state
+        FROM
+        access_shield
+        WHERE
+        twitch_id = $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         }
         catch (error) {
             console.log(chalk.red("Sicherheit nicht gefunden " + error.message));
+        }
+    }
+
+    async GetBrowserToolsKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            "key",
+                            "type"
+                        FROM
+                            browser_tools
+                        WHERE
+                            twitch_id = $1; `;
+            const res = await query(sql, valuesArray)
+            return res.rows;
+        } catch (error) {
+            console.log(chalk.red("BrowserToolsKey schmeißt einen Fehler: " + error))
+        }
+    }
+
+    async GetUserIdFromTools(valuesArray) {
+        try {
+            const sql = `SELECT
+                            bt.twitch_id,
+                            username
+                        FROM
+                            browser_tools bt
+                        JOIN
+                            users u
+                        ON
+                            bt.twitch_id = u.twitch_id
+                        WHERE
+                            key = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
         }
     }
 };
@@ -527,25 +580,25 @@ class AuthSQL {
     async saveTwitchTokens(twitchId, tokens, scopes) {
         try {
             const sql = `
-        INSERT INTO tokens (
-            twitch_id, 
-            access_token, 
-            refresh_token, 
-            expires_in, 
-            obtainment_timestamp, 
+        INSERT INTO tokens(
+            twitch_id,
+            access_token,
+            refresh_token,
+            expires_in,
+            obtainment_timestamp,
             scopes
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (twitch_id) 
-        DO UPDATE SET 
-            access_token = EXCLUDED.access_token,
+        VALUES($1, $2, $3, $4, $5, $6)
+        ON CONFLICT(twitch_id) 
+        DO UPDATE SET
+        access_token = EXCLUDED.access_token,
             refresh_token = EXCLUDED.refresh_token,
             expires_in = EXCLUDED.expires_in,
             obtainment_timestamp = EXCLUDED.obtainment_timestamp,
             scopes = EXCLUDED.scopes,
             updated_at = NOW()
         RETURNING *;
-    `;
+        `;
             const values = [
                 twitchId,
                 tokens.accessToken,
@@ -564,24 +617,24 @@ class AuthSQL {
     async loginUser(twitchId, username, ip_address, login_key, picture_url) {
         try {
             const sql = `
-        INSERT INTO users (
-            twitch_id, 
-            username, 
+        INSERT INTO users(
+            twitch_id,
+            username,
             ip_address,
             login_key,
             picture_url
         )
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (twitch_id) 
-        DO UPDATE SET 
-            twitch_id = EXCLUDED.twitch_id,
+        VALUES($1, $2, $3, $4, $5)
+        ON CONFLICT(twitch_id) 
+        DO UPDATE SET
+        twitch_id = EXCLUDED.twitch_id,
             username = EXCLUDED.username,
             ip_address = EXCLUDED.ip_address,
             login_key = EXCLUDED.login_key,
             picture_url = EXCLUDED.picture_url,
             updated_at = NOW()
-        RETURNING (SELECT login_key FROM users WHERE twitch_id = $1) AS old_key;
-    `;
+        RETURNING(SELECT login_key FROM users WHERE twitch_id = $1) AS old_key;
+        `;
             const values = [
                 twitchId,
                 username,
@@ -600,12 +653,12 @@ class AuthSQL {
 class DeleteSQL {
     async CustomCommands(valuesArray) {
         try {
-            const sql = `WITH deleted_commands AS (
-                            DELETE FROM custom_commands 
+            const sql = `WITH deleted_commands AS(
+            DELETE FROM custom_commands 
                             WHERE twitch_id = $1 AND category = $2
-                        )
+        )
                         DELETE FROM custom_permissions 
-                        WHERE twitch_id = $1 AND category = $2;`;
+                        WHERE twitch_id = $1 AND category = $2; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         } catch (error) {
@@ -616,7 +669,7 @@ class DeleteSQL {
     async Intervall(valuesArray) {
         try {
             const sql = `DELETE FROM intervall 
-                         WHERE twitch_id = $1 AND category = $2;`;
+                         WHERE twitch_id = $1 AND category = $2; `;
             const res = await query(sql, valuesArray);
             return res.rows;
         } catch (error) {
