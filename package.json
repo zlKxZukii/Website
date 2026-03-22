@@ -1,0 +1,38 @@
+{
+  "name": "scaletta",
+  "version": "3.0.0",
+  "type": "module",
+  "description": "Die Website von dem Bot.",
+  "main": "src/index.js",
+  "scripts": {
+    "predev": "fuser -k 3000/tcp || true",
+    "dev": "nodemon --quiet src/index.js",
+    "start": "node src/index.js"
+  },
+  "author": "Zuki",
+  "license": "ISC",
+  "dependencies": {
+    "@twurple/api": "^8.0.3",
+    "@twurple/auth": "^8.0.3",
+    "@twurple/chat": "^8.0.3",
+    "@twurple/eventsub-http": "^8.0.3",
+    "@twurple/eventsub-ws": "^8.0.3",
+    "chalk": "^5.6.2",
+    "cookie": "^1.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.3.1",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "multer": "^2.1.1",
+    "pg": "^8.18.0",
+    "redis": "^5.11.0",
+    "request-ip": "^3.3.0",
+    "sharp": "^0.34.5",
+    "socket.io": "^4.8.3",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
