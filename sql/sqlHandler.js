@@ -32,22 +32,100 @@ class InsertSQL {
         }
     }
 
-    async AlertBoxKey(valuesArray) {
+    async CreateAlertBox(valuesArray) {
         try {
             const sql = `INSERT INTO alert_box AS ab (
                             twitch_id,
-                            alert_key,
                             type,
-                            settings
+                            settings,
+                            image_path,
+                            sound_path
                         )
-                        VALUES($1, $2, $3, $4)
+                        VALUES($1, $2, $3, $4, $5)
                         ON CONFLICT (twitch_id, type)
                         DO UPDATE SET
-                            alert_key = EXCLUDED.alert_key,
-                            -- Hier passiert die Magie: Alt + Neu zusammenfügen
                             settings = ab.settings || EXCLUDED.settings,
                             updated_at = NOW()
                         RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Alert Box nicht gespeichert " + error.message))
+        }
+    }
+
+    async UpdateAlertBoxSettings(valuesArray) {
+        try {
+            const sql = `INSERT INTO alert_box AS ab (
+                            twitch_id,
+                            type,
+                            settings
+                        )
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id, type)
+                        DO UPDATE SET
+                            settings = ab.settings || EXCLUDED.settings,
+                            updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Alert Box nicht gespeichert " + error.message))
+        }
+    }
+
+        async UpdateAlertBoxImage(valuesArray) {
+        try {
+            const sql = `INSERT INTO alert_box (
+                            twitch_id,
+                            type,
+                            image_path
+                        )
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id, type)
+                        DO UPDATE SET
+                            image_path = EXCLUDED.image_path,
+                            updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Alert Box nicht gespeichert " + error.message))
+        }
+    }
+
+    async UpdateAlertBoxSound(valuesArray) {
+        try {
+            const sql = `INSERT INTO alert_box AS ab (
+                            twitch_id,
+                            type,
+                            sound_path
+                        )
+                        VALUES($1, $2, $3)
+                        ON CONFLICT (twitch_id, type)
+                        DO UPDATE SET
+                            sound_path = EXCLUDED.sound_path,
+                            updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log(chalk.red("Alert Box nicht gespeichert " + error.message))
+        }
+    }
+
+    async AlertBoxKey(valuesArray) {
+        try {
+            const sql = `INSERT INTO alert_box_key (
+                            twitch_id,
+                            key
+                        )
+                        VALUES($1, $2)
+                        ON CONFLICT (twitch_id)
+                        DO UPDATE SET
+                            key = EXCLUDED.key,
+                            updated_at = NOW()
+                        RETURNING*;`;
             const res = await query(sql, valuesArray);
             return res;
         } catch (error) {
@@ -257,7 +335,7 @@ class InsertSQL {
     }
 
     // jokes
-    async jokeState(twitch_id, category, state = false) {
+    async jokeState(valuesArray) {
         try {
             const sql = `INSERT INTO joke_states (
                             twitch_id,
@@ -270,12 +348,7 @@ class InsertSQL {
                         state = EXCLUDED.state,
                         updated_at = NOW()
                         RETURNING *;`;
-            const values = [
-                twitch_id,
-                category,
-                state
-            ];
-            const res = await query(sql, values);
+            const res = await query(sql, valuesArray);
             return res;
         } catch (error) {
             console.error(chalk.red("Benutzer konnte nicht gespeichert werden.", error));
@@ -313,6 +386,90 @@ class InsertSQL {
                         DO UPDATE SET
                         updated_at = NOW()
                         RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
+        };
+    }
+    async UpdateBrowserJSON(valuesArray) {
+        try {
+            const sql = `INSERT INTO browser_tools (
+                            twitch_id,
+                            type,
+                            settings,
+                            "key"
+                        )
+                        VALUES($1, $2, $3, $4)
+                        ON CONFLICT (twitch_id, "type", "key")
+                        DO UPDATE SET
+                        settings = EXCLUDED.settings,
+                        updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
+        };
+    }
+
+    async CreateGame(valuesArray) {
+        try {
+            const sql = `INSERT INTO games (
+                            twitch_id,
+                            game,
+                            triggers,
+                            key,
+                            settings,
+                            leaderboard
+                        )
+                        VALUES($1, $2, $3, $4, $5, $6)
+                        ON CONFLICT (twitch_id, game, "key")
+                        DO UPDATE SET
+                        updated_at = NOW()
+                        RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
+        };
+    }
+    async UpdateGame(valuesArray) {
+        try {
+            const sql = `
+            INSERT INTO games (
+                twitch_id, 
+                game,
+                settings
+            )
+            VALUES ($1, $2, $3)
+            ON CONFLICT (twitch_id, game) 
+            DO UPDATE SET 
+                settings = games.settings || EXCLUDED.settings,
+                updated_at = NOW()
+            RETURNING *;`;
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
+        };
+
+    }
+    async UpdateLeaderboard(valuesArray) {
+        try {
+            const sql = `
+            INSERT INTO games (
+                twitch_id, 
+                game,
+                "key", 
+                leaderboard
+            )
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (twitch_id, game, "key") 
+            DO UPDATE SET 
+                leaderboard = games.leaderboard || EXCLUDED.leaderboard,
+                updated_at = NOW()
+            RETURNING *;`;
             const res = await query(sql, valuesArray);
             return res;
         } catch (error) {
@@ -378,6 +535,17 @@ class SelectSQL {
             const sql = `SELECT * FROM alert_box WHERE twitch_id = $1; `;
             const res = await query(sql, valuesArray);
             return res.rows;
+
+        } catch (error) {
+            console.log(chalk.red("AlertBox konnte nicht geladen werden " + error.message));
+        };
+    };
+
+    async AlertBoxKey(valuesArray) {
+        try {
+            const sql = `SELECT key FROM alert_box_key WHERE twitch_id = $1; `;
+            const res = await query(sql, valuesArray);
+            return res.rows[0];
 
         } catch (error) {
             console.log(chalk.red("AlertBox konnte nicht geladen werden " + error.message));
@@ -543,7 +711,8 @@ class SelectSQL {
         try {
             const sql = `SELECT
                             "key",
-                            "type"
+                            "type",
+                            settings
                         FROM
                             browser_tools
                         WHERE
@@ -570,6 +739,35 @@ class SelectSQL {
                             key = $1;`
             const res = await query(sql, valuesArray)
             return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async GetGames(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            games
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows;
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    async GetGamesByKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            games
+                        WHERE
+                            "key" = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows;
         } catch (error) {
             console.log(error)
         }

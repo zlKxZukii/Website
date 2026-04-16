@@ -55,28 +55,62 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
         } catch (error) {
             console.log(chalk.red("Fehler beim abfangen der Werbung: " + error))
         }
+
+        // Follow Alert
         try {
             eventSubListener.onChannelFollow(userId, userId, async (event) => {
-                Alerts.saveAlert(userId, event, "Follow")
+                Alerts.saveAlert(userId, event, "Follower")
             })
         } catch (error) {
             console.log(chalk.red("Fehler beim abfangen der Follower: " + error))
         }
-        try {
-            eventSubListener.onChannelSubscription(userId, async (event) => {
-                Alerts.saveAlert(userId, event, "Sub")
-            })
-        } catch (error) {
-            console.log(chalk.red("Fehler bei abfangen des Subscribers: " + error))
-        }
+
+        // Raid Alert
         try {
             eventSubListener.onChannelRaidTo(userId, async (event) => {
-                Alerts.saveAlert(userId, event, "Raid")
+                Alerts.saveAlert(userId, event, "Raids")
             })
         } catch (error) {
-            console.log(chalk.red("Fehler bei abfangen des Raids: " + error))
+            console.log(chalk.red("Fehler beim abfangen des Raids: " + error))
         }
 
+        // Bits Alert
+        try {
+            eventSubListener.onChannelBitsUse(userId, async (event) => {
+                Alerts.saveAlert(userId, event, "Bits")
+            })
+        } catch (error) {
+            console.log("Fehler beim abfangen der Bits: ", error)
+        }
+
+        // Sub Alert
+        try {
+            eventSubListener.onChannelSubscription(userId, async (event) => {
+                if (event.isGift) {
+                    console.log(event.isGift)
+                    return
+                }
+                Alerts.saveAlert(userId, event, "Subscriber")
+            })
+        } catch (error) {
+            console.log(chalk.red("Fehler beim abfangen des Subscribers: " + error))
+        }
+
+        try {
+            eventSubListener.onChannelSubscriptionMessage(userId, async (event) => {
+                Alerts.saveAlert(userId, event, "Fortlaufende Subscriber")
+            })
+        } catch (error) {
+            console.log(chalk.red("Fehler beim abfangen der Sub Verlängerung: " + error))
+        }
+
+        try {
+            eventSubListener.onChannelSubscriptionGift(userId, async (event) => {
+                Alerts.saveAlert(userId, event, "Subscriber Geschenke");
+            });
+        } catch (error) {
+            console.log("Fehler beim abfangen der SubGifts: ", error)
+        };
         console.log(chalk.green(`[SUCCESS] Subscriptions für ${userId} initiiert.`));
     } catch (error) {
         console.log(error.message)

@@ -25,7 +25,7 @@ adsRoute.get("/", async (req, res) => {
         type: 'OBS Dock Link',
         back: `http://localhost:3000/ads/${wsKeys.obsDocksKeys.ads}/renew`,
         link: `https://scaletta.live/ads/${wsKeys.obsDocksKeys.ads}`,
-        helpLink: "/obsdocks#help"
+        helpLink: "https://scaletta.live/obsdocks#help"
     };
     res.render("main/obs_docks/ads/ads.ejs", obj)
 

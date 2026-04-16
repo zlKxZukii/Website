@@ -19,30 +19,65 @@ SubscriberBoxRoute.get("/", async (req, res) => {
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const DB = await Select.AlertBox([sessionData.userId]);
+        const user = await ClientManager.getClient(sessionData.userId)
+
+        const AlertBox = await Select.AlertBox([sessionData.userId]);
+        const alertKey = await Select.AlertBoxKey([sessionData.userId])
         const obj = {
-            link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
+            link: `https://scaletta.live/alertbox/${alertKey.key}`,
             css: "../../css/boxes/box.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
-            boxes: "Subscriber Box",
+            boxes: "Subscriber",
             title: "Subscriber Box",
             showBody: true,
             helpLink: `https://scaletta.live/alertbox`,
-            change: `https://scaletta.live/subs/${DB[0].alert_key}/renew`,
-            color: "",
-            volume: "",
-            responseText: "",
-            key: DB[0].alert_key
+            change: `https://scaletta.live/follows/${alertKey.key}/renew`,
+            key: alertKey.key,
         };
-
-        for (const element of DB) {
-            if (element.type === "Sub") {
-                obj.color = element.settings.color;
-                obj.volume = element.settings.volume;
-                obj.responseText = element.settings.response_text;
+        if (!user) {
+            for (const element of AlertBox) {
+                if (element.type === "Subscriber") {
+                    Object.assign(obj, {
+                        [obj.boxes]: {
+                            color: element.settings.color,
+                            state: element.settings.state,
+                            selectedLayout: element.settings.layout,
+                            viewer: element.settings.viewer,
+                            volume: element.settings.volume,
+                            tier: element.settings.tier,
+                            duration: element.settings.duration,
+                            streamer: element.settings.streamer,
+                            text: element.settings.responseText,
+                            family: element.settings.family,
+                            size: element.settings.size,
+                            decoration: element.settings.decoration,
+                            weight: element.settings.weight
+                        }
+                    })
+                };
             };
-        };
+        }
+        else {
+            const element = user.alertBox['Subscriber']
+            Object.assign(obj, {
+                [obj.boxes]: {
+                    color: element.settings.color,
+                    state: element.settings.state,
+                    selectedLayout: element.settings.layout,
+                    viewer: element.settings.viewer,
+                    volume: element.settings.volume,
+                    tier: element.settings.tier,
+                    duration: element.settings.duration,
+                    streamer: element.settings.streamer,
+                    text: element.settings.responseText,
+                    family: element.settings.family,
+                    size: element.settings.size,
+                    decoration: element.settings.decoration,
+                    weight: element.settings.weight
+                }
+            })
+        }
         res.render("main/boxes/subBox.ejs", obj);
     } catch (error) {
         console.log(error);
@@ -56,9 +91,13 @@ SubscriberBoxRoute.get("/:key/renew", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
-        const newKey = crypto.randomBytes(64).toString("hex");
-        await Insert.AlertBoxKey([sessionData.userId, newKey])
-        await ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const user = await ClientManager.getClient(sessionData.userId)
+        const newAlertKey = crypto.randomBytes(64).toString("hex");
+
+        user.wsKeys.alertBoxKey = newAlertKey
+        await Insert.AlertBoxKey([sessionData.userId, newAlertKey])
+
     } catch (error) {
         console.log("Neuer Key kann nicht generiert werden " + error)
     }
@@ -74,21 +113,34 @@ SubscriberBoxRoute.post('/save', async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-        const { volume, color, response_text } = req.body
-        console.log(user)
-        user.alertBox.Sub.color = color
-        user.alertBox.Sub.volume = volume
-        user.alertBox.Sub.text = response_text
 
-        await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Sub", JSON.stringify({ color, volume, response_text })]);
+        const { state, volume, duration, responseText, color, selectedLayout, viewer, streamer, tier, family, size, decoration, weight } = req.body;
 
+        if (user) {
+            const alertBox = user.alertBox['Subscriber'].settings;
+            alertBox.state = state
+            alertBox.volume = volume
+            alertBox.duration = duration
+            alertBox.responseText = responseText
+            alertBox.color = color
+            alertBox.layout = selectedLayout
+            alertBox.viewer = viewer
+            alertBox.streamer = streamer
+            alertBox.tier = tier
+            alertBox.family = family
+            alertBox.size = size
+            alertBox.decoration = decoration
+            alertBox.weight = weight
+        }
+
+        await Insert.UpdateAlertBoxSettings([sessionData.userId, "Subscriber", JSON.stringify({ state, volume, duration, responseText, color, layout: selectedLayout, viewer, streamer, tier, family, size, decoration, weight })]);
     } catch (error) {
-        console.log("Fehler beim Speichern des Subscribers: " + error)
+        console.log("Fehler beim Speichern der SubGifts: " + error)
     }
     res.redirect('/subs');
 });
 
-SubscriberBoxRoute.post('/upload/sub',
+SubscriberBoxRoute.post('/upload/raid',
     upload.fields([
         { name: 'image', maxCount: 1 },
         { name: 'sound', maxCount: 1 }
@@ -103,7 +155,7 @@ SubscriberBoxRoute.post('/upload/sub',
             const sessionData = JSON.parse(sessionDataRaw);
             const userId = sessionData.userId;
             const user = ClientManager.getClient(userId);
-            const userFolder = path.join("uploads", "sub", String(userId));
+            const userFolder = path.join("uploads", "subs", String(userId));
 
             if (!fs.existsSync(userFolder)) {
                 fs.mkdirSync(userFolder, { recursive: true });
@@ -136,9 +188,9 @@ SubscriberBoxRoute.post('/upload/sub',
                     '-vf', 'fps=30,scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=yuva420p',
                     '-vcodec', 'libwebp',
                     '-lossless', '0',
-                    '-q:v', '75',                
-                    '-compression_level', '6',   
-                    '-preset', 'picture',        
+                    '-q:v', '75',
+                    '-compression_level', '6',
+                    '-preset', 'picture',
                     '-loop', '0',
                     '-an',
                     '-y',
@@ -153,8 +205,10 @@ SubscriberBoxRoute.post('/upload/sub',
                     }
                 }
                 const imagePathEnd = `../../${imagePath}`;
-                user.alertBox.Sub.img = imagePathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Sub", { imagePath: imagePathEnd }]);
+                if (user) {
+                    user.alertBox.Bits.img = imagePathEnd;
+                }
+                await Insert.UpdateAlertBoxImage([userId, "Subscriber", imagePathEnd]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -175,8 +229,10 @@ SubscriberBoxRoute.post('/upload/sub',
                     }
                 }
                 const soundPathEnd = `../../${soundPath}`;
-                user.alertBox.Sub.sound = soundPathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Sub", { soundPath: soundPathEnd }]);
+                if (user) {
+                    user.alertBox.Bits.sound = soundPathEnd;
+                }
+                await Insert.UpdateAlertBoxSound([userId, "Subscriber", soundPathEnd]);
             }
             res.redirect("/subs");
         } catch (error) {
@@ -199,5 +255,6 @@ SubscriberBoxRoute.post('/test', async (req, res) => {
     };
 
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    Alerts.testAlert(sessionData.userId, "Sub", sessionData.username)
+    Alerts.testAlert(sessionData.userId, "Subscriber", sessionData.username)
+    res.redirect("/subs")
 })

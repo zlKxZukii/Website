@@ -8,7 +8,9 @@ import chalk from "chalk";
 
 import { app, PORT, httpServer, eventSubListener, initializeTwurple, apiClient } from "./server.js";
 
-
+import { SpotifyAuthRoute } from "../spotify/auth/authSpotify.js";
+import { SpotifyRoute } from "../spotify/route/spotifyRoute.js";
+import { auth, twitch } from "../auth/twitchRoute.js";
 import { indexRoute } from "../index/indexRoute.js";
 import { dashboardRoute } from "../dashboard/dashboardRoute.js";
 import { alertBoxRoute } from "../boxes/alertBoxRoute.js";
@@ -18,18 +20,21 @@ import { commandsRoute } from "../commands/commandsRoute.js";
 import { customCommandsRoute } from "../commands/customCommandsRoute.js";
 import { intervallRoute } from "../commands/intervallPostRoute.js";
 import { dataSecureRoute, impressumRoute } from "../legally/legallyRoute.js";
-import { auth, twitch } from "../auth/twitchRoute.js";
 import { ClientManager } from "../twitch_bot/connectBot.js";
 import { Select } from "../sql/sqlHandler.js";
 import { obsDocks } from "../obs_docks/obsDocksRoute.js";
 import { adsRoute } from "../obs_docks/ads/adsRoute.js";
-
+import { gamesRoute } from "../games/gamesRoute.js";
+import { batGameRoute } from "../games/batGame/batGameRoute.js"
 import { browserToolsRoute } from "../browserTools/browserToolsRoute.js";
 import { clipPlayerRoute } from "../browserTools/tools/clipPlayerRoute.js"
 import { test } from "./testRoute.js";
 import { FollowBoxRoute } from "../boxes/followerBoxRoute.js";
 import { SubscriberBoxRoute } from "../boxes/subscriberBoxRoute.js";
 import { RaidBoxRoute } from "../boxes/raidBoxRoute.js";
+import { SubGiftBoxRoute } from "../boxes/subGiftBoxRoute.js";
+import { BitBoxRoute } from "../boxes/bitBoxRoute.js";
+import { SubscriberOngoingRoute } from "../boxes/subOngoingRoute.js";
 
 // --- INITIALISIERUNGS-LOGIK ---
 
@@ -59,8 +64,11 @@ async function startServer() {
         app.use("/dashboard", dashboardRoute);
         app.use("/alertbox", alertBoxRoute);
         app.use("/follows", FollowBoxRoute);
+        app.use("/raids", RaidBoxRoute);
+        app.use("/bits", BitBoxRoute)
         app.use("/subs", SubscriberBoxRoute);
-        app.use("/raid", RaidBoxRoute);
+        app.use("/subgifts", SubGiftBoxRoute)
+        app.use("/subongoings", SubscriberOngoingRoute)
         app.use("/security", securityRoute);
         app.use("/jokes", jokesRoute);
         app.use("/commands", commandsRoute);
@@ -68,6 +76,8 @@ async function startServer() {
         app.use("/dataSecure", dataSecureRoute);
         app.use("/impressum", impressumRoute);
         app.use("/Intervall", intervallRoute);
+        app.use("/authspotify", SpotifyAuthRoute)
+        app.use("/spotify", SpotifyRoute)
         app.use("/auth", auth);
         app.use("/auth/twitch", twitch);
         app.use("/obsdocks", obsDocks);
@@ -75,6 +85,8 @@ async function startServer() {
         app.use("/test", test)
         app.use("/browsertools", browserToolsRoute)
         app.use("/clipsplayer", clipPlayerRoute)
+        app.use("/games", gamesRoute)
+        app.use("/bat", batGameRoute)
 
         // 404 Handler
         app.use((req, res) => {

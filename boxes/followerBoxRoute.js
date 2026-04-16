@@ -19,31 +19,62 @@ FollowBoxRoute.get("/", async (req, res) => {
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const DB = await Select.AlertBox([sessionData.userId]);
+        const user = await ClientManager.getClient(sessionData.userId)
+        const AlertBox = await Select.AlertBox([sessionData.userId]);
+        const alertKey = await Select.AlertBoxKey([sessionData.userId])
         const obj = {
-            link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
+            link: `https://scaletta.live/alertbox/${alertKey.key}`,
             css: "../../css/boxes/box.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
-            boxes: "Follower Box",
+            boxes: "Follower",
             title: "Follower Box",
             showBody: true,
             helpLink: `https://scaletta.live/alertbox`,
-            change: `https://scaletta.live/follows/${DB[0].alert_key}/renew`,
-            color: "",
-            volume: "",
-            responseText: "",
-            key: DB[0].alert_key,
-            type: "follow"
+            change: `https://scaletta.live/follows/${alertKey.key}/renew`,
+            key: alertKey.key,
         };
-
-        for (const element of DB) {
-            if (element.type === "Follow") {
-                obj.color = element.settings.color;
-                obj.volume = element.settings.volume;
-                obj.responseText = element.settings.response_text;
+        if (!user) {
+            for (const element of AlertBox) {
+                if (element.type === "Follower") {
+                    Object.assign(obj, {
+                        [obj.boxes]: {
+                            color: element.settings.color,
+                            state: element.settings.state,
+                            selectedLayout: element.settings.layout,
+                            viewer: element.settings.viewer,
+                            volume: element.settings.volume,
+                            duration: element.settings.duration,
+                            streamer: element.settings.streamer,
+                            text: element.settings.responseText,
+                            family: element.settings.family,
+                            size: element.settings.size,
+                            decoration: element.settings.decoration,
+                            weight: element.settings.weight
+                        }
+                    })
+                };
             };
-        };
+        }
+        else {
+            const element = user.alertBox.Follower
+            Object.assign(obj, {
+                [obj.boxes]: {
+                    color: element.settings.color,
+                    state: element.settings.state,
+                    selectedLayout: element.settings.layout,
+                    viewer: element.settings.viewer,
+                    volume: element.settings.volume,
+                    duration: element.settings.duration,
+                    streamer: element.settings.streamer,
+                    text: element.settings.responseText,
+                    family: element.settings.family,
+                    size: element.settings.size,
+                    decoration: element.settings.decoration,
+                    weight: element.settings.weight
+                }
+            })
+        }
         res.render("main/boxes/followBox.ejs", obj);
     } catch (error) {
         console.log(error);
@@ -57,10 +88,12 @@ FollowBoxRoute.get("/:key/renew", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const user = await ClientManager.getClient(sessionData.userId)
+        const newAlertKey = crypto.randomBytes(64).toString("hex");
 
-        const newKey = crypto.randomBytes(64).toString("hex");
-        await Insert.AlertBoxKey([sessionData.userId, newKey])
-        await ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+        user.wsKeys.alertBoxKey = newAlertKey
+        await Insert.AlertBoxKey([sessionData.userId, newAlertKey])
 
     } catch (error) {
         console.log("Neuer Key kann nicht generiert werden " + error)
@@ -77,14 +110,24 @@ FollowBoxRoute.post('/save', async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-        const { volume, color, response_text } = req.body
 
-        user.alertBox.Follow.color = color
-        user.alertBox.Follow.volume = volume
-        user.alertBox.Follow.text = response_text
-
-        await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Follow", JSON.stringify({ color, volume, response_text })]);
-
+        const { state, volume, duration, responseText, color, selectedLayout, viewer, streamer, family, size, decoration, weight } = req.body;
+        if (user) {
+            const alertBox = user.alertBox.Follower.settings;
+            alertBox.state = state
+            alertBox.volume = volume
+            alertBox.duration = duration
+            alertBox.responseText = responseText
+            alertBox.color = color
+            alertBox.layout = selectedLayout
+            alertBox.viewer = viewer
+            alertBox.streamer = streamer
+            alertBox.family = family
+            alertBox.size = size
+            alertBox.decoration = decoration
+            alertBox.weight = weight
+        }
+        await Insert.UpdateAlertBoxSettings([sessionData.userId, "Follower", JSON.stringify({ state, volume, duration, responseText, color, layout: selectedLayout, viewer, streamer, family, size, decoration, weight })]);
     } catch (error) {
         console.log("Fehler beim Speichern des Followers: " + error)
     }
@@ -139,9 +182,9 @@ FollowBoxRoute.post('/upload/follow',
                     '-vf', 'fps=30,scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=yuva420p',
                     '-vcodec', 'libwebp',
                     '-lossless', '0',
-                    '-q:v', '75',                
-                    '-compression_level', '6',   
-                    '-preset', 'picture',        
+                    '-q:v', '75',
+                    '-compression_level', '6',
+                    '-preset', 'picture',
                     '-loop', '0',
                     '-an',
                     '-y',
@@ -156,8 +199,10 @@ FollowBoxRoute.post('/upload/follow',
                     }
                 }
                 const imagePathEnd = `../../${imagePath}`;
-                user.alertBox.Follow.img = imagePathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { imagePath: imagePathEnd }]);
+                if (user) {
+                    user.alertBox.Follower.img = imagePathEnd;
+                }
+                await Insert.UpdateAlertBoxImage([userId, "Follower", imagePathEnd]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -178,12 +223,12 @@ FollowBoxRoute.post('/upload/follow',
                     }
                 }
                 const soundPathEnd = `../../${soundPath}`;
-                user.alertBox.Follow.sound = soundPathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Follow", { soundPath: soundPathEnd }]);
+                if (user) {
+                    user.alertBox.Follower.sound = soundPathEnd;
+                }
+                await Insert.UpdateAlertBoxSound([userId, "Follower", soundPathEnd]);
             }
-
             res.redirect("/follows");
-
         } catch (error) {
             console.error("Upload Error:", error);
             // Temp-Dateien aufräumen im Fehlerfall
@@ -204,5 +249,6 @@ FollowBoxRoute.post('/test', async (req, res) => {
     };
 
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    Alerts.testAlert(sessionData.userId, "Follow", sessionData.username)
+    Alerts.testAlert(sessionData.userId, "Follower", sessionData.username)
+    res.redirect('/follows')
 })

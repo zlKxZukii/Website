@@ -194,13 +194,13 @@
     }
 }
 
-.align-slide{
+.align-slide {
     width: 30%;
     display: flex;
     align-items: center;
     justify-content: space-around;
     flex-direction: column;
-    padding-right: 40px ;
+    padding-right: 40px;
 }
 
 
@@ -209,10 +209,40 @@ label {
     align-items: center;
 }
 
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: sans-serif;
+}
+
+#ShoutoutSafe {
+    display: flex;
+    height: 100%;
+    justify-content: start;
+    width: 100%;
+}
+
+.text-section {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
+    width: 30%;
+}
+
+.text-section input{
+    width: 100%;
+}
+
+.text-section ul{
+    width: 100%;
+}
+
 .toggle {
     position: relative;
-    margin: 0 10px;
-    width: 40px;
+    width: 60px;
     /* neue Breite */
     height: 20px;
     /* Höhe 20px */
@@ -248,8 +278,8 @@ input[type="checkbox"]:checked+.toggle {
 }
 
 input[type="checkbox"]:checked+.toggle::after {
-    transform: translateX(20px);
-    
+    transform: translateX(42px);
+    /* 60 - 16 - 2*2 = 42px */
 }
 
 /* Optional: Beschriftung AN/AUS */
@@ -262,22 +292,4 @@ input[type="checkbox"]:checked+.toggle::after {
     color: white;
     pointer-events: none;
     user-select: none;
-}
-
-.end-buttons{
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.end-buttons button{
-        margin: 5px;
-    padding: 5px;
-    cursor: pointer;
-    border-radius: 10px;
-    font-size: 24px;
-    border-color: #2bdffe;
-    background-color: #222222;
-    color: white;
-    width: 80%;
 }

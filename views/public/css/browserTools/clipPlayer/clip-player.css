@@ -1,0 +1,86 @@
+.link-box{
+    align-items: center
+}
+
+#clipsPlayer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#clipsPlayer iframe {
+    pointer-events: none;
+    width: 70%;
+    height: 100%;
+}
+
+.parent {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.parent h2 {
+    height: 60px;
+    display: flex;
+    margin: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+#headline {
+    width: 100%;
+}
+
+.settings {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+.color-settings {
+    width: 45%;
+}
+
+.options-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    padding: 10px 20px;
+    height: 60px;
+}
+
+.options-head:nth-child(even) {
+    background-color: black;
+}
+
+.options-clip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+    font-size: 24px;
+    padding: 10px 20px;
+    height: 60px;
+}
+
+.options-clip:nth-child(odd) {
+    background-color: black;
+}
+
+.save-button-clip {
+    cursor: pointer;
+    font-size: 24px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+    width: 60%;
+}

@@ -1,6 +1,6 @@
 <%- include("../../layouts/commandBar") %>
 
-    <div class="box" >
+    <div class="box">
         <div class="box-line">
             <p>Bearbeiten</p>
             <p>Name</p>
@@ -13,10 +13,53 @@
         <div class="box-line">
             <div class="creation-buttons">
                 <button onclick="createIntervall()">Hinzufügen</button>
-                <button onclick="saveIntervall()" id="safeButton">Speichern</button>
+                <button onclick="saveIntervall(this)" id="safeButton">Speichern</button>
             </div>
         </div>
     </div>
 
-    <script> const data = <%- JSON.stringify(locals.data) %> </script>
+    <script> const data = <%- JSON.stringify(locals.data) %>; </script>
+    <script>
+        const keys = Object.keys(data)
+        window.addEventListener("load", () => {
+            renderIntervall()
+        });
+
+        function renderIntervall() {
+            keys.sort()
+            const headline = document.getElementById("headline")
+            for (let index = 0; index < keys.length; index++) {
+                headline.innerHTML += renderTemplate(data[keys[index]].intervallName, data[keys[index]].text, data[keys[index]].intervall, data[keys[index]].state)
+            }
+        };
+
+        function renderTemplate(category, respone_text, intervall, state) {
+            return `<div style="border-radius: 0;" class="box-line" id="${category}">
+                <div class="img-tag">
+                    <button onclick="deleteIntervall('${category}')">x</button>
+                    <img src="./img/intervall/pencil.png" alt="" onclick="editIntervall('${category}')">
+                </div>
+                <div style="width: 10%;">
+                    ${category}
+                </div>
+                <div style="width: 60%;" id="${category}Text">
+                    <p style="width: 80%;" id="${category}ShowText">${respone_text}</p>
+                </div>
+                <div style="width: 10%;" id="${category}Intervall">
+                    <p style="width: 100%;" id="${category}ShowIntervall">${intervall}</p>
+                </div>
+                <label>
+                    <input id="${category}IntervallState" onclick="stateCheck('${category}')" type="checkbox" ${renderGetState(state)} >
+                    <div class="toggle"><span></span></div>
+                </label>
+            </div>`
+        };
+
+        function renderGetState(state) {
+            if (state) {
+                return "checked"
+            }
+        };
+
+    </script>
     <script src="./js/commands/intervall.js"></script>

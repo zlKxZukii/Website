@@ -26,20 +26,23 @@ securityRoute.get("", async (req, res) => {
     res.render("main/commands/security", obj)
 })
 
-securityRoute.get("/save", async (req, res) => {
+securityRoute.post("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     }
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    const accessKey = Object.keys(req.cookies);
-    for (let index = 0; index < accessKey.length; index++) {
-        if (accessKey[index] !== "cookie") {
-            await Insert.AccessShield([sessionData.userId, accessKey[index], req.cookies[accessKey[index]]]);
-            res.cookie(accessKey[index], "", { maxAge: 0 });
-        };
-    };
-    
-    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+    const accessKey = Object.keys(req.body);
+    const user = ClientManager.getClient(sessionData.userId)
+
+    for (const key of accessKey) {
+        for (const keyIndex in accessKey) {
+            if (key === user.accessShieldState[keyIndex].category) {
+                user.accessShieldState[keyIndex].state = req.body[key]
+            }
+        }
+        await Insert.AccessShield([sessionData.userId, key, req.body[key]]);
+    }
+
     res.redirect("/security");
 });

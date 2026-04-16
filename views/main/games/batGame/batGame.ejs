@@ -1,0 +1,277 @@
+<%- include("../../../layouts/gameBoxBar") %>
+    <div class="link-box">
+        <%- include("../../../layouts/linkBox") %>
+
+            <h3>Vorschau</h3>
+            <div id="flattermann-frame"
+                style="height: 450px; position: relative; overflow: hidden; background: transparent; ">
+                <div id="leaderboard"
+                    style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white; min-width: 180px; font-family: Arial, sans-serif; border: 2px solid #555; z-index: 10;">
+                    <h3
+                        style="margin: 0 0 10px 0; color: #ffcc00; text-transform: uppercase; font-size: 16px; border-bottom: 1px solid #444; padding-bottom: 5px;">
+                        Top 5 All-Time</h3>
+                    <div id="scores" style="font-size: 14px;">Warte auf Flattermänner...</div>
+                </div>
+                <canvas id="world"></canvas>
+            </div>
+            <div style="display: flex;flex-direction: column;">
+                <h3>Einstellungen</h3>
+                <div>
+                    <div class="option">
+                        <p>Beschreibung</p>
+                        <p>Farbe</p>
+                        <p>Deckkraft</p>
+                    </div>
+                    <div class="option">
+                        <label style="color:<%= wallColor %>" for="wallColor" id="wallLabel">Wandfarbe</label>
+
+                        <input type="color" id="wallColor" value="<%= wallColor?.substring(0,7) || '#000000' %>">
+                        <input type="range" id="wallOpacity" min="0" max="255" value="255">
+                        <input type="hidden" name="wallColor" id="finalWallColor"
+                            value="<%= wallColor || '#000000ff' %>">
+                    </div>
+                    <div class="option">
+                        <label for="pathColor" id="pathLabel">Pfadfarbe</label>
+
+                        <input type="color" id="pathColor" value="<%= pathColor?.substring(0,7) || '#000000' %>">
+                        <input type="range" id="pathOpacity" min="0" max="255" value="255">
+                        <input type="hidden" name="pathColor" id="finalPathColor"
+                            value="<%= pathColor || '#000000ff' %>">
+                    </div>
+                </div>
+                <button class="button-class" onclick="saveBatGame(this, currentSettings)">Speichern</button>
+            </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('flattermann-frame');
+        const canvas = document.getElementById('world');
+        const ctx = canvas.getContext('2d');
+        const scoresDiv = document.getElementById('scores');
+
+        let bats = [];
+        let highscores = {};
+        let cavePoints = [];
+        const segmentWidth = 30;
+        const caveGap = 260;
+
+        // SPEED MULTIPLIER: 0.3 entspricht 70% langsamer
+        const speedMult = 0.3;
+
+        let currentSettings = {
+            wallColor: '<%= wallColor %>',
+            pathColor: '<%= pathColor %>'
+        };
+
+        function resize() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            initCave();
+        }
+
+        window.addEventListener('resize', resize);
+
+        function initCave() {
+            cavePoints = [];
+            for (let i = 0; i < Math.ceil(canvas.width / segmentWidth) + 10; i++) {
+                cavePoints.push({ y: canvas.height / 2, gap: caveGap });
+            }
+        }
+
+        function spawnBot() {
+            const botNames = ["Turbo-Tobi", "Nacht-Nils", "Flatter-Fee", "Echo-Erik", "Schatten-Susi", "Hektik-Hans"];
+            const name = botNames[Math.floor(Math.random() * botNames.length)] + " " + Math.floor(Math.random() * 99);
+            const spawnY = cavePoints[Math.floor(120 / segmentWidth)].y;
+            const newColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+
+            if (!highscores[name]) highscores[name] = { dist: 0, color: newColor };
+
+            bats.push({
+                name: name, baseX: 120, x: 120, y: spawnY, v: 0, color: newColor,
+                dist: 0, alive: true, phase: Math.random() * 10,
+                offsetY: (Math.random() - 0.5) * 80,
+                reaction: (0.20 + Math.random() * 0.25) * speedMult, // Reaktion verlangsamt
+                lag: Math.floor(Math.random() * 8),
+                wobble: (1.8 + Math.random() * 3.8) * speedMult,
+                jitterPhase: Math.random() * 10,
+                horizontalPhase: Math.random() * 10
+            });
+        }
+
+        // Hilfsvariable für die flüssige Höhlenbewegung bei niedriger Speed
+        let caveScrollPos = 0;
+
+        function update() {
+            if (bats.filter(b => b.alive).length < 3) spawnBot();
+
+            // Höhlenbewegung verlangsamt
+            caveScrollPos += (1 * speedMult);
+            if (caveScrollPos >= 1) {
+                const last = cavePoints[cavePoints.length - 1];
+                let nextY = last.y + (Math.random() - 0.5) * 85 + (canvas.height / 2 - last.y) * 0.05;
+                nextY = Math.max(160, Math.min(canvas.height - 160, nextY));
+                cavePoints.shift();
+                cavePoints.push({ y: nextY, gap: caveGap });
+                caveScrollPos = 0;
+            }
+
+            bats.forEach(b => {
+                if (!b.alive) {
+                    b.x -= (6 * speedMult);
+                    return;
+                }
+                b.horizontalPhase += (0.05 * speedMult);
+                b.x = b.baseX + Math.sin(b.horizontalPhase) * 28;
+                b.offsetY += (Math.random() - 0.5) * b.wobble;
+
+                let lookAhead = Math.floor((b.x + 45) / segmentWidth) + (b.lag - 4);
+                let target = cavePoints[Math.min(Math.max(0, lookAhead), cavePoints.length - 1)];
+
+                // Physik an Geschwindigkeit angepasst (v sinkt langsamer)
+                if (b.y > (target.y + b.offsetY) + 8 && b.v > 0) b.v -= (1.9 * speedMult * speedMult);
+                b.v += b.reaction * speedMult;
+                b.y += b.v;
+
+                b.dist += (0.6 * speedMult);
+                b.phase += (0.4 * speedMult);
+                b.jitterPhase += (0.6 * speedMult);
+
+                if (b.dist > highscores[b.name].dist) highscores[b.name].dist = b.dist;
+
+                if (Math.abs(b.y - target.y) > (target.gap / 2) - 8) b.alive = false;
+            });
+
+            bats = bats.filter(b => b.x > -100);
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            const sorted = Object.keys(highscores)
+                .map(n => ({ name: n, ...highscores[n] }))
+                .sort((a, b) => b.dist - a.dist)
+                .slice(0, 5);
+
+            scoresDiv.innerHTML = sorted.map((b, i) => {
+                const active = bats.some(a => a.name === b.name && a.alive);
+                return `<div style="color: ${b.color}; margin-bottom: 6px; display: flex; justify-content: space-between; font-weight: bold;">
+                    <span>${i + 1}. ${active ? '▶' : '💀'} ${b.name}</span>
+                    <span style="color:#fff; margin-left:15px">${Math.floor(b.dist)}m</span>
+                </div>`;
+            }).join('');
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Höhle
+            ctx.fillStyle = currentSettings.pathColor;
+            ctx.beginPath();
+            // Offset für flüssiges Scrollen bei geringer Speed
+            const xOffset = -caveScrollPos * segmentWidth;
+            cavePoints.forEach((p, i) => {
+                const x = i * segmentWidth + xOffset;
+                const y = p.y - p.gap / 2;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            for (let i = cavePoints.length - 1; i >= 0; i--) {
+                ctx.lineTo(i * segmentWidth + xOffset, cavePoints[i].y + cavePoints[i].gap / 2);
+            }
+            ctx.fill();
+
+            // 2. Wände
+            ctx.strokeStyle = currentSettings.wallColor;
+            ctx.lineWidth = 4;
+            [1, -1].forEach(side => {
+                ctx.beginPath();
+                cavePoints.forEach((p, i) => {
+                    const x = i * segmentWidth + xOffset;
+                    const y = p.y + (side * p.gap / 2);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            });
+
+            // 3. Fledermäuse
+            bats.forEach(b => {
+                ctx.save();
+                ctx.translate(b.x, b.y + (b.alive ? Math.sin(b.jitterPhase) * 6 : 0));
+                ctx.globalAlpha = b.alive ? 1 : 0.3;
+
+                ctx.fillStyle = b.color;
+                let w = b.alive ? Math.sin(b.phase) * 20 : 10;
+
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-30, w); ctx.lineTo(-8, 8); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(30, w); ctx.lineTo(8, 8); ctx.fill();
+                ctx.beginPath(); ctx.arc(0, 4, 5, 0, 7); ctx.fill();
+
+                ctx.font = "bold 16px Arial";
+                ctx.textAlign = "center";
+                ctx.shadowColor = "rgba(0,0,0,0.8)";
+                ctx.shadowBlur = 4;
+                ctx.fillStyle = b.alive ? "#fff" : "rgba(200,200,200,0.5)";
+                ctx.fillText(b.name, 0, -35);
+                ctx.restore();
+            });
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        resize();
+        loop();
+    </script>
+    <script>
+        const wallColorInput = document.getElementById('wallColor');
+        const wallOpacityInput = document.getElementById('wallOpacity');
+        const wallLabel = document.getElementById('wallLabel');
+        const finalHiddenInput = document.getElementById('finalWallColor');
+
+        function updateColor() {
+            const color = wallColorInput.value; // Hol Dir #RRGGBB
+            // Konvertiere 0-255 in 2-stelligen Hex-Wert
+            const alpha = parseInt(wallOpacityInput.value).toString(16).padStart(2, '0');
+
+            const fullHex = color + alpha; // Ergibt #RRGGBBAA
+
+            // UI & Daten aktualisieren
+            wallLabel.style.color = color;
+            finalHiddenInput.value = fullHex;
+            currentSettings.wallColor = fullHex;
+        }
+
+        wallColorInput.addEventListener('input', updateColor);
+        wallOpacityInput.addEventListener('input', updateColor);
+
+        updateColor()
+    </script>
+    <script>
+        const pathColorPicker = document.getElementById('pathColor');
+        const pathOpacity = document.getElementById('pathOpacity');
+        const pathLabel = document.getElementById('pathLabel');
+        const finalPathInput = document.getElementById('finalPathColor');
+
+        function updatePathColor() {
+            const hex = pathColorPicker.value; // z.B. #ff0000
+            // Wandelt 0-255 in 2-stelligen Hex-Code um (z.B. 128 -> 80)
+            const alpha = parseInt(pathOpacity.value).toString(16).padStart(2, '0');
+
+            const fullHex = hex + alpha; // Ergibt #ff000080
+
+            // UI & Datenmodell aktualisieren
+            pathLabel.style.color = hex;
+            finalPathInput.value = fullHex;
+            if (typeof currentSettings !== 'undefined') {
+                currentSettings.pathColor = fullHex;
+            }
+        }
+
+        pathColorPicker.addEventListener('input', updatePathColor);
+        pathOpacity.addEventListener('input', updatePathColor);
+
+        updatePathColor()
+    </script>
+
+    <script src="../../../js/games/batGame.js"></script>

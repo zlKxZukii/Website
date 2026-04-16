@@ -19,6 +19,7 @@ intervallRoute.get((""), async (req, res) => {
         showBody: true,
         data: {}
     }
+
     const DB = await Select.Intervall([sessionData.userId])
     if (DB) {
         for (let index = 0; index < DB.length; index++) {
@@ -35,33 +36,45 @@ intervallRoute.get((""), async (req, res) => {
     res.render("main/commands/intervall", obj)
 })
 
-intervallRoute.get("/save", async (req, res) => {
+intervallRoute.post("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     };
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    const cookieKeys = Object.keys(req.cookies);
+    const user = ClientManager.getClient(sessionData.userId)
+    const bodyKeys = Object.keys(req.body)
+    for (const key of bodyKeys) {
+        const { text, intervall, state, intervallName } = req.body[key]
 
-    for (let index = 0; index < cookieKeys.length; index++) {
-        if (cookieKeys[index] != "cookie") {
-            const cookie = JSON.parse(req.cookies[cookieKeys[index]])
-            await Insert.CreateIntervall([sessionData.userId, cookie.intervallName, cookie.text, cookie.intervall, cookie.state]);
-            res.cookie(cookieKeys[index], "", { maxAge: 0 });
+        if (user.intervallList[intervallName]) {
+            clearInterval(user.intervallList[intervallName]);
+            delete user.intervallList[intervallName];
+        }
+        if (state) {
+            Object.assign(user.intervallList, {
+                [intervallName]: setInterval(() => {
+                    user.chatClient.say(sessionData.username, text)
+                }, intervall * 1000)
+            })
         };
-    };
-    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+
+        await Insert.CreateIntervall([sessionData.userId, intervallName, text, intervall, state])
+    }
     res.redirect("/intervall");
 })
 
-intervallRoute.get("/delete/:category", async (req, res) => {
+intervallRoute.post("/delete", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true");
     };
+    const keys = Object.keys(req.body)
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    await Delete.Intervall([sessionData.userId, req.params.category])
-    ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+    const user = ClientManager.getClient(sessionData.userId)
+
+    await Delete.Intervall([sessionData.userId, req.body[keys]])
+
     res.redirect("/intervall")
 })
 

@@ -12,4 +12,4 @@ export async function createCookie(res, login_key) {
         sameSite: 'lax',
         maxAge: 1209600000
     });
-}
+};

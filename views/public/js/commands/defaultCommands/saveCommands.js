@@ -38,21 +38,14 @@ async function readValues() {
         }
         // functions
         else if (functionsArray.includes(DBKeys[index])) {
-            const obj = {
-                state: document.getElementById(DBKeys[index] + "State").checked,
-                stateTitle: {
-                    anybody: document.getElementById(DBKeys[index] + "Anybody").checked,
-                    subscriber: document.getElementById(DBKeys[index] + "Subscriber").checked,
-                    vip: document.getElementById(DBKeys[index] + "Vip").checked,
-                    moderator: document.getElementById(DBKeys[index] + "Moderator").checked,
-                    broadcaster: document.getElementById(DBKeys[index] + "Broadcaster").checked
-                },
-                clipLength: document.getElementById("clipLength").value
+            if (DBKeys[index] === 'Clip') {
+                const obj = saveClip(DBKeys, index)
+                Object.assign(fetchData, { [DBKeys[index]]: obj })
             }
-            if (obj.clipLength > 60) {
-                obj.clipLength = 60
+            else if (DBKeys[index] === 'Shoutout') {
+                const obj = saveShoutout(DBKeys, index)
+                Object.assign(fetchData, { [DBKeys[index]]: obj })
             }
-            Object.assign(fetchData, { [DBKeys[index]]: obj })
         }
     }
     await saveValues(fetchData, saveBtn, btnText);
@@ -77,6 +70,7 @@ async function saveValues(fetchData, saveBtn, btnText) {
                 saveBtn.disabled = false;
                 saveBtn.style.color = "white"
                 saveBtn.innerText = btnText;
+                saveBtn.style.animation = null;
             }, 5000);
         }
         else {
@@ -102,4 +96,45 @@ function deleteValues() {
             ID.value = ""
         }
     }
+}
+
+function saveShoutout(DBKeys, index) {
+    const obj = {
+        state: document.getElementById(DBKeys[index] + "State").checked,
+        value: document.getElementById(DBKeys[index] + "Text").value,
+        stateTitle: {
+            anybody: document.getElementById(DBKeys[index] + "Anybody").checked,
+            subscriber: document.getElementById(DBKeys[index] + "Subscriber").checked,
+            vip: document.getElementById(DBKeys[index] + "Vip").checked,
+            moderator: document.getElementById(DBKeys[index] + "Moderator").checked,
+            broadcaster: document.getElementById(DBKeys[index] + "Broadcaster").checked
+        },
+        color: document.getElementById("colorPicker").value
+    }
+    if (obj.value.trim() === "") {
+        obj.value = document.getElementById(DBKeys[index] + "Safe").innerText;
+    }
+    else{
+        document.getElementById(DBKeys[index] + "Safe").innerText = obj.value;
+    }
+    return obj
+}
+
+function saveClip(DBKeys, index) {
+    const obj = {
+        state: document.getElementById(DBKeys[index] + "State").checked,
+        stateTitle: {
+            anybody: document.getElementById(DBKeys[index] + "Anybody").checked,
+            subscriber: document.getElementById(DBKeys[index] + "Subscriber").checked,
+            vip: document.getElementById(DBKeys[index] + "Vip").checked,
+            moderator: document.getElementById(DBKeys[index] + "Moderator").checked,
+            broadcaster: document.getElementById(DBKeys[index] + "Broadcaster").checked
+        },
+        clipLength: document.getElementById("clipLength").value
+    }
+    if (obj.clipLength > 60 || obj.clipLength < 0) {
+        obj.clipLength = 60
+    }
+    console.log(obj)
+    return obj
 }

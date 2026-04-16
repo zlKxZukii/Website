@@ -10,11 +10,10 @@
         <div id="renderJokes"></div>
 
         <div class="joke-buttons">
-            <button onclick="acDeButton(false)">Alle Deaktivieren</button>
-            <button
-                onclick="acDeButton(true)">Alle
+            <button id="button1" onclick="acDeButton(false, this)">Alle Deaktivieren</button>
+            <button id="button2" onclick="acDeButton(true, this)">Alle
                 aktivieren</button>
-            <button onclick="safeJokes()">Speichern</button>
+            <button id="button3" onclick="safeJokes(this)">Speichern</button>
         </div>
     </div>
 
@@ -24,13 +23,14 @@
         window.onload = function () { render() }
         function render() {
             for (let index = 0; index < keys.length; index++) {
+                console.log(data[keys[index]].trigger)
                 const renderJokes = document.getElementById("renderJokes")
                 renderJokes.innerHTML += `<div class="joke-section">
                                     <p>${data[keys[index]].trigger}</p>
                                     <p>${data[keys[index]].category}</p>
                                     <p><a href="/jokes/${data[keys[index]].id.split(" ").join("%20")}">Entdecke die Liste</a></p>
                                                 <label>
-                <input class="toggle" id="${data[keys[index]].id.split(" ").join("")}" type="checkbox" ${checkState(index)}>
+                <input class="toggle" id="${data[keys[index]].id}" type="checkbox" ${checkState(index)}>
                 <div class="toggle"><span></span></div>
             </label>
                                     

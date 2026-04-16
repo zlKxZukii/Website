@@ -14,7 +14,7 @@ jokesRoute.get("", async (req, res) => {
     }
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const jokeDB = await Select.JokeDataForUser([sessionData.userId])
+        let jokeDB = await Select.JokeDataForUser([sessionData.userId])
         const obj = {
             title: "Witze",
             css: "css/commands/jokes.css",
@@ -23,14 +23,12 @@ jokesRoute.get("", async (req, res) => {
             showBody: true,
             jokeData: {}
         }
-
         if (!jokeDB || jokeDB.length < 1) {
             const jokeArray = ['Chuck Norris Witze', 'Deine Mutter Witze', 'Tier Witze', 'Flach Witze'];
             for (const element of jokeArray) {
-
-                await Insert.jokeState(sessionData.userId, element)
+                await Insert.jokeState([sessionData.userId, element, false])
             };
-            return res.redirect("/jokes")
+            jokeDB = await Select.JokeDataForUser([sessionData.userId])
         }
         for (let index = 0; index < jokeDB.length; index++) {
             Object.assign(obj.jokeData, {
@@ -42,7 +40,6 @@ jokesRoute.get("", async (req, res) => {
                 }
             })
         }
-
         res.render("main/commands/jokes", obj)
     }
     catch (error) {
@@ -51,27 +48,28 @@ jokesRoute.get("", async (req, res) => {
 })
 
 // Route für Speichern der States
-jokesRoute.get("/save", async (req, res) => {
+jokesRoute.post("/save", async (req, res) => {
     const key = req.signedCookies.access_validator;
     if (!key) {
         return res.redirect("/?index=true")
     }
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const cookieKey = Object.keys(req.cookies)
+        const bodyKeys = Object.keys(req.body)
+        const user = ClientManager.getClient(sessionData.userId)
         // insert Statements
-        for (const element of cookieKey) {
-            if (element != "cookie") {
-                await Insert.jokeState(sessionData.userId, element.split("_").join(" "), req.cookies[element])
-                res.cookie(element, "", { maxAge: 0 })
+        for (const key of bodyKeys) {
+            await Insert.jokeState([sessionData.userId, key, req.body[key]])
+            for (const keyIndex in bodyKeys) {
+                if(user.jokeState[keyIndex].category === key){
+                    user.jokeState[keyIndex].state = req.body[key]
+                }
             }
         }
-
-        ClientManager.restartBot(sessionData.username, sessionData.userId, key)
         res.redirect("/jokes")
     } catch (error) {
         console.log(error)
-        res.redirect("/")
+        res.redirect("/jokes")
     }
 })
 

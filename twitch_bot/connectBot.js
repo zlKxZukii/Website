@@ -24,9 +24,10 @@ class BotManager {
 
         try {
             const { chatClient, wsKeys, apiClient, browserKeys } = await this.createBot(username, userId);
-
+            const clipBoxColors = await this.boxSettings(userId)
+            const games = await this.games(userId)
             const alertBox = await this.getAlertBox(userId)
-            const alertQuery = { alert: false }
+            const alertQuery = {}
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
@@ -47,9 +48,16 @@ class BotManager {
                 intervallList,
                 alertQuery,
                 alertBox,
-                browserKeys
+                alertIsActive: false,
+                browserKeys,
+                clipRun: true,
+                clipBoxColors,
+                isShoutout: true,
+                gameRuns: false,
+                gamePlayer: [],
+                games
             });
-
+            console.log(username)
             await Insert.BotState([userId, true, username]);
 
             // zeigt die komplette User Lise
@@ -74,7 +82,6 @@ class BotManager {
         const authProviderComp = await getAuthProvider(tokenData)
         const apiClient = await createApiClient(authProviderComp)
         const browserKeys = await this.browserTools(userId)
-
         const chatClient = new ChatClient({
             authProvider: authProviderComp,
             authUserId: userId,
@@ -84,7 +91,6 @@ class BotManager {
                 connectionRetries: 15
             }
         });
-
         chatClient.onConnect(async () => {
 
         });
@@ -101,7 +107,6 @@ class BotManager {
                 console.log(chalk.red("der bot ist abgeschmiert" + reason))
             }
         }))
-
         return {
             chatClient: chatClient,
             wsKeys: wsKeys,
@@ -110,20 +115,9 @@ class BotManager {
         }
     }
 
-    async initTimer(client, username, userId) {
-        const intervallList = {};
-        const DB = await Select.Intervall([userId]);
-        for (let index = 0; index < DB.length; index++) {
-            if (DB[index].state) {
-                Object.assign(intervallList, {
-                    [DB[index].category]: setInterval(() => {
-                        client.say(username, DB[index].response_text)
-                    }, Number(DB[index].intervall) * 1000)
-                });
-            };
-        };
-        return intervallList
-    };
+    getClient(userID) {
+        return this.client.get(userID);
+    }
 
     async disconnect(userID) {
         const data = this.client.get(userID);
@@ -169,50 +163,82 @@ class BotManager {
         }
 
         // alertBox
-        let alertKey = await Select.AlertBox([userId])
-        if (!alertKey[0]) {
+        let alertKey = await Select.AlertBoxKey([userId])
+        if (!alertKey) {
             alertKey = await this.CreateAlertBox(userId)
         }
-        Object.assign(obj, { alertBoxKey: alertKey[0].alert_key })
+        Object.assign(obj, { alertBoxKey: alertKey.key })
         return obj
     }
 
     async getAlertBox(userId) {
         const DB = await Select.AlertBox([userId])
-        const obj = {
-
-        }
+        const obj = {}
         for (const element of DB) {
-            Object.assign(obj, {
-                [element.type]: {
-                    color: element.settings.color,
-                    volume: element.settings.volume,
-                    img: element.settings.imagePath,
-                    sound: element.settings.soundPath,
-                    text: element.settings.response_text
-                }
-            })
+            Object.assign(obj, this.saveAlertBoxInClient(element.type, element.settings, element.image_path, element.sound_path))
         }
         return obj
     }
 
-    getClient(userID) {
-        return this.client.get(userID);
-    }
+    saveAlertBoxInClient(type, settings, img, sound) {
+        return {
+            [type]: {
+                settings,
+                img,
+                sound
+            }
+        };
+    };
 
     async CreateAlertBox(userId) {
         const alertKeyNew = crypto.randomBytes(64).toString("hex");
+
+        class UserSettings {
+            constructor(color = '#ffffff', rainbow = false, animation = 'off') {
+                this.color = color;
+                this.rainbow = rainbow;
+                this.animation = animation;
+            };
+        };
+
+        const viewer = new UserSettings();
+        const streamer = new UserSettings();
+        const amount = new UserSettings();
+        const tier = new UserSettings();
+        const bundle = new UserSettings();
+        const cumulativ = new UserSettings();
+        const streak = new UserSettings();
+        const post = new UserSettings();
+
         const createAlertBoxArr = [
-            { type: 'Follow', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } },
-            { type: 'Sub', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } },
-            { type: 'Raid', settings: { volume: 20, color: '#ffffff', response_text: '', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3' } }
+            { type: 'Follower', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] folgt jetzt auch [streamer]!', color: '#ffffff', layout: 'top', viewer, streamer, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
+            { type: 'Raids', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] raidet [streamer] mit [amount] Zuschauern!', color: '#ffffff', layout: 'top', viewer, streamer, amount, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
+            { type: 'Bits', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] wirft [amount] Bits in den Chat von [streamer]!', color: '#ffffff', layout: 'top', viewer, streamer, amount, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
+            { type: 'Subscriber', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] Subt auf Stufe [tier] bei [streamer]!', color: '#ffffff', layout: 'top', viewer, streamer, tier, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
+            { type: 'Subscriber Geschenke', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] haut im Chat von [streamer], [amount] Subs raus mit Stufe [tier]. Insgesamt hat [viewer] schon [cumulativ] Subs gedropt!', color: '#ffffff', layout: 'top', viewer, streamer, amount, tier, cumulativ, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
+            { type: 'Fortlaufende Subscriber', imagePath: '../../uploads/default/owl.gif', soundPath: '../../uploads/default/sound.mp3', settings: { state: true, volume: 20, duration: '12', responseText: '[viewer] Resubt auf Stufe [tier] bei [streamer] und ist seit [streak] Monaten dabei damit hat [viewer] insgesamt [cumulativ] Monate gesubt! Das sagt er dazu: [post]', color: '#ffffff', layout: 'top', viewer, streamer, bundle, tier, streak, cumulativ, post, family: "'Inter', sans-serif", size: 20, decoration: 'normal', weight: 100 } },
         ];
+
         for (const element in createAlertBoxArr) {
-            await Insert.AlertBoxKey([userId, alertKeyNew, createAlertBoxArr[element].type, createAlertBoxArr[element].settings])
+            await Insert.CreateAlertBox([userId, createAlertBoxArr[element].type, createAlertBoxArr[element].settings, createAlertBoxArr[element].imagePath, createAlertBoxArr[element].soundPath])
         }
-        const alertKey = await Select.AlertBox([userId])
-        return alertKey
+
+        const key = await Insert.AlertBoxKey([userId, alertKeyNew]);
+        return key.rows[0].key
     }
+
+    async initTimer(client, username, userId) {
+        const tasks = {}
+        const DB = await Select.Intervall([userId]);
+        for (const entry of DB) {
+            if (entry.state) {
+                Object.assign(tasks,{[entry.category]: setInterval(() => {
+                    client.say(username, entry.response_text)
+                }, entry.intervall * 1000)})
+            };
+        };
+        return tasks
+    };
 
     async browserTools(userId) {
         const retObj = {}
@@ -221,7 +247,7 @@ class BotManager {
             const creationArr = [{ type: 'ClipBox' }];
             for (const tool of creationArr) {
                 const key = crypto.randomBytes(64).toString("hex");
-                Object.assign(retObj, { clipKey: key })
+                Object.assign(retObj, { [tool.type]: key })
                 await Insert.CreateBrowserTool([userId, tool.type, key])
             }
         }
@@ -231,6 +257,96 @@ class BotManager {
             }
         }
         return retObj
+    }
+
+    async games(userId) {
+        const gameObj = [
+            {
+                game: 'Bat',
+                trigger: ['!bat', '!bats'],
+            }
+        ];
+        const settings = {
+            wallColor: '#fff',
+            pathColor: '#333'
+        }
+        const retObj = {}
+        const DB = await Select.GetGames([userId])
+        if (!DB) {
+            const key = crypto.randomBytes(64).toString("hex");
+            for (const gameName of gameObj) {
+                console.log(await Insert.CreateGame([
+                    userId,
+                    gameName.game,
+                    gameName.trigger,
+                    key,
+                    settings,
+                    {}]));
+                Object.assign(retObj, {
+                    [gameName]: {
+                        game: gameName.game,
+                        triggers: gameName.trigger,
+                        key: key,
+                        settings,
+                        leaderboard: {},
+                        state: false
+                    }
+                })
+            }
+        }
+        else if (DB.length < gameObj.length) {
+            let key = DB[0]
+            if (key === undefined) {
+                key = crypto.randomBytes(64).toString("hex");
+            }
+            else {
+                key === DB[0].key
+            }
+            for (const gameName of gameObj) {
+                await Insert.CreateGame([
+                    userId,
+                    gameName.game,
+                    gameName.trigger,
+                    key,
+                    settings,
+                    {}])
+                Object.assign(retObj, {
+                    [gameName.game]: {
+                        game: gameName.game,
+                        triggers: gameName.trigger,
+                        key: key,
+                        settings,
+                        leaderboard: {},
+                        state: false
+                    }
+                })
+            }
+
+        }
+        else {
+            for (const entries of DB) {
+                Object.assign(retObj, {
+                    [entries.game]: {
+                        game: entries.game,
+                        key: entries.key,
+                        settings: entries.settings,
+                        leaderboard: entries.leaderboard,
+                        triggers: entries.triggers,
+                        state: entries.state
+                    }
+                })
+            }
+        }
+        return retObj
+    }
+
+    async boxSettings(userId) {
+        const DB = await Select.GetBrowserToolsKey([userId])
+        for (const tool of DB) {
+            if (tool.type === "ClipBox") {
+                return tool.settings
+            }
+        }
     }
 }
 

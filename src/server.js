@@ -11,6 +11,7 @@ import { AppTokenAuthProvider } from '@twurple/auth';
 import { EventSubMiddleware } from '@twurple/eventsub-http';
 import pkg from 'pg';
 import chalk from "chalk";
+import SpotifyWebApi from "spotify-web-api-node";
 const { Pool } = pkg;
 
 export const app = express();
@@ -81,3 +82,9 @@ try {
 }
 
 export const query = (text, params) => pool.query(text, params);
+
+export const spotifyApi = new SpotifyWebApi({
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    redirectUri: process.env.SPOTIFY_REDIRECT_URI // Hier die IP statt localhost
+});

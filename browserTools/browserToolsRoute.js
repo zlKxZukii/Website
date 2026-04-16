@@ -14,14 +14,16 @@ browserToolsRoute.get('/', async (req, res) => {
 
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        // Sql Einträge erstellen.
-        // const DB = await Select
+        const user = ClientManager.getClient(sessionData.userId);
+        const clipKey = user.browserKeys.ClipBox
         const obj = {
             css: "../../css/boxes/help.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
             title: "Browser Tools",
+            type: "Browser Tools",
             showBody: true,
+            link: `https://scaletta.live/clipsplayer/${clipKey}`
         }
         res.render("main/browserTools/browserTools.ejs", obj)
     } catch (error) {

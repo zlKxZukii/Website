@@ -4,14 +4,13 @@ dotenv.config({
 });
 
 import express from "express"
+export const clipPlayerRoute = express.Router()
+
 import client from "../../src/redisClient.js";
 import { Select, Insert } from "../../sql/sqlHandler.js";
 import { ClientManager } from "../../twitch_bot/connectBot.js";
-import crypto from "crypto";
-import { getRandomInt } from "../../randomizer/randomNumber.js";
 import { io } from "../../src/server.js";
-
-export const clipPlayerRoute = express.Router()
+import { ActionManager } from "../../ToolManager/Manager.js";
 
 clipPlayerRoute.get('/', async (req, res) => {
     const key = req.signedCookies.access_validator;
@@ -22,29 +21,28 @@ clipPlayerRoute.get('/', async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-        let clipKey = ""
+        let clipKey = user.browserKeys.ClipBox
         if (!user) {
-            const DB = await Select.GetBrowserToolsKey([sessionData.userId])
-            for (const tool of DB) {
-                if (tool.type === "ClipBox") {
-                    clipKey = tool.key
-                }
-            }
+            return res.redirect('/dashboard')
         }
-        else {
-            clipKey = user.browserKeys.ClipBox
-        }
+
         const obj = {
-            css: "../../css/boxes/help.css",
+            css: "../../css/browserTools/clipPlayer/clip-player.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
             title: "Clip Player",
             showBody: true,
             boxes: 'Clip Player',
             helpLink: 'https://scaletta.live/browsertools',
-            link: `https://scaletta.live/clipsplayer/${clipKey}`
+            link: `https://scaletta.live/clipsplayer/${clipKey}?autoplay=1&muted=1`,
+            clipKey
         }
-
+        if (user.clipBoxColors) {
+            Object.assign(obj, {
+                clip: user.clipBoxColors['Clip'],
+                head: user.clipBoxColors['Head']
+            })
+        }
         res.render("main/browserTools/tools/clipPlayer.ejs", obj)
     } catch (error) {
         console.log(error)
@@ -57,41 +55,55 @@ clipPlayerRoute.get('/:key', async (req, res) => {
         css: "../../css/browserTools/websocket/clip-player.css",
         title: "CLIP PLAYER",
         targetUser: req.params.key,
-        showBody: false,
-        parent: process.env.PARENT
+        showBody: false
     };
 
     res.render("main/browserTools/websocket/clipPlayer.ejs", obj)
 })
 
-clipPlayerRoute.post('/getclip', async (req, res) => {
+clipPlayerRoute.post('/getclip/:key', async (req, res) => {
     const { key } = req.body;
 
     if (!key) {
         return res.json({ send: "netter Versuch" })
-    }
+    };
 
-    const { twitch_id, username }=await Select.GetUserIdFromTools([key])
-    const user = ClientManager.getClient(twitch_id)
+    const { twitch_id, username } = await Select.GetUserIdFromTools([key]);
 
-    const clip = await getClips(twitch_id, user.apiClient)
+    const user = ClientManager.getClient(twitch_id);
+    const { video, duration, game, cover, cliper } = await ActionManager.initClipForBroadcaster(twitch_id, user.apiClient, user)
 
     io.to(key).emit("newClip", {
-        id: clip.clipId.id,
-        duration: clip.clipId.duration,
-        parent: process.env.PARENT,
-        channel: username
-    })
-    res.redirect(`/clipsplayer/${key}`)
+        video: video,
+        duration: duration,
+        game: game,
+        cover: cover,
+        cliper: cliper || username
+    });
+    res.redirect(`/clipsplayer/${key}`);
+});
+
+clipPlayerRoute.post('/save', async (req, res) => {
+    const key = req.signedCookies.access_validator
+
+    if (!key) {
+        return res.json({ send: "netter Versuch" })
+    };
+    const sessionData = JSON.parse(await client.get(`sess:${key}`));
+    const user = ClientManager.getClient(sessionData.userId);
+    const settings = {}
+    const valArr = ['Head', 'Clip']
+    for (const val of valArr) {
+        const { color, x, y, blur, rgba, alpha } = req.body[val]
+        Object.assign(settings, { [val]: { color, x, y, blur, rgba, alpha } })
+        if (user.clipBoxColors === null) {
+            user.clipBoxColors = {
+                Head: "",
+                Clip: ""
+            }
+        }
+        user.clipBoxColors[val] = { x, y, blur, rgba, alpha, color }
+    }
+    await Insert.UpdateBrowserJSON([sessionData.userId, 'ClipBox', settings, req.body.key])
+    res.redirect("/clipsplayer")
 })
-
-async function getClips(userID, apiClient) {
-    const clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 100 })
-
-    if (clips.data.length != 0) {
-        return { clipId: clips.data[getRandomInt(clips.data.length)] }
-    }
-    else {
-        return { clipId: "CloudySarcasticSashimiTwitchRPG" }
-    }
-}

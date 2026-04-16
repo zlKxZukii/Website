@@ -1,16 +1,29 @@
-<div class="alert-box middle-middle" id="alert-box">
-    <div class="alert-img" id="alertImg">
-
-    </div>
-    <div class="alert-text" id="text">
-
-    </div>
-    <div class="audio" id="audio">
-        <audio id="alertSound" src="" autoplay></audio>
-    </div>
+<link rel="stylesheet" href="/css/boxes/extra/animations.css">
+<link rel="stylesheet" href="/css/boxes/later.css">
+<div class="standard-box" id="alert-box">
 </div>
 
+
+<script src="/js/boxes/extra/animations.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+
+<script>
+    function startAnimation(id) {
+        const idArr = id
+        for (const element of idArr) {
+            const el = document.getElementById(element)
+            if (el.classList.contains('wave')) {
+                wave()
+            }
+            else if (el.classList.contains('glitch')) {
+                glitch()
+            }
+            else if (el.classList.contains('staircase')) {
+                staircase()
+            };
+        };
+    };
+</script>
 <script>
     const socket = io();
 
@@ -22,18 +35,55 @@
         socket.emit("join-room", username);
     });
 
-    socket.on("new-alert", (data) => {
-        console.log(data)
-        document.getElementById("alertImg").innerHTML = `<img src="${data.img}" alt="">`;
-        document.getElementById("text").innerHTML = `<p style="color:${data.color};">${data.text} </p>`;
-        document.getElementById("audio").innerHTML = `<audio id="alertSound" src="${data.sound}" autoplay></audio>`;
-        // zahl / 100 weil nur zahlen zwischen 0 und 1 erlaubt
-        document.getElementById("alertSound").volume = data.volume / 100;
+    socket.on("new-alert", async (data) => {
         const alertBox = document.getElementById("alert-box");
-        alertBox.classList.add("fade-animation");
-        setTimeout(() => {
-            alertBox.classList.remove("fade-animation");
-        }, 10000);
-    })
-
+        if (data.type === 'Shoutout') {
+            alertBox.innerHTML = `  <div class="introduction-text">
+                                        <img style="height: 200px; border-radius:100px; " src="${data.viewerProfilePicture}" alt="">
+                                        <h2 style="font-size: 50px; margin-left:10px; color:${data.color};">${data.viewerName}</h2>
+                                    </div>
+                                    <div class="audio" id="audio">
+                                        <audio id="alertSound" src="${data.sound}" autoplay></audio>
+                                    </div>`
+            alertBox.classList.add('fade-shoutout')
+            await new Promise(res => setTimeout(res, 6000));
+            alertBox.classList.remove('fade-shoutout')
+            alertBox.innerHTML = `<div class="shoutout-player">
+                                    <video src="${data.video}" autoplay></video>
+                                    <p style="color:${data.color};" >${data.responseText}</p>
+                                    <img src="${data.gameImg}" alt="">
+                                </div>`
+            alertBox.classList.remove('standard-box')
+            alertBox.classList.add('fade-shoutout-in')
+            await new Promise(res => setTimeout(res, data.duration * 1000 - 2000))
+            alertBox.classList.remove('fade-shoutout-in')
+            alertBox.classList.add('fade-shoutout-out')
+            await new Promise(res => setTimeout(res, 3000))
+            alertBox.innerHTML = ""
+            alertBox.classList.remove('fade-shoutout-out')
+            console.log("end")
+        }
+        else {
+            alertBox.innerHTML = `  
+            <div class="alert-box-player ${data.align}" >
+                <div class="alert-img" id="alertImg">
+                    <img src="${data.img}" alt="">
+                </div>
+                <div class="alert-text" id="text">
+                    <p style="font-family:${data.family}; font-style:${data.decoration}; font-weight:${data.weight}; font-size:${data.size}; color:${data.color};">${data.text}</p>
+                </div>
+                <div class="audio" id="audio">
+                    <audio id="alertSound" src="${data.sound}" autoplay></audio>
+                </div>
+            </div>`
+            alertBox.style.animation = `fadeInOut ${data.duration}s linear forwards`
+            // zahl / 100 weil nur zahlen zwischen 0 und 1 erlaubt
+            startAnimation(data.id)
+            document.getElementById("alertSound").volume = data.volume / 100;
+            setTimeout(() => {
+                alertBox.innerHTML = "";
+                alertBox.style.animation = null;
+            }, data.duration * 1000 + 1000);
+        };
+    });
 </script>

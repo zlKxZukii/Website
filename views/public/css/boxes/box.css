@@ -12,7 +12,9 @@ textarea {
     border-radius: 10px;
     border-color: #2bdffe;
     background-color: rgba(34, 34, 34, 1);
-    resize: none
+    resize: none;
+    width: 600px;
+    height: 150px;
 }
 
 
@@ -117,11 +119,9 @@ textarea {
     font-size: 0.8rem;
     color: #888;
     margin-top: 5px;
-
 }
 
 .upload-group h2 {
-
     color: white;
     margin-bottom: 10px;
 }
@@ -136,7 +136,7 @@ textarea {
 
 .test-window iframe {
     height: 600px;
-        width: 100%;
+    width: 100%;
 }
 
 .test-window button {
@@ -147,24 +147,282 @@ textarea {
 
 .options {
     display: flex;
-    justify-content: space-around;
-    padding: 20px;
-    background-color: black;
-    border-radius: 0 0 10px 10px;
-    flex-direction: row;
+    flex-direction: column;
 }
 
-.option {
+.options h2 {
+    display: flex;
+    align-items: start;
+    height: 50px;
+    font-size: 20px;
+}
+
+.layout-options {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px 40px;
+}
+
+.layout-options:nth-child(odd) {
+    background-color: black;
+}
+
+.layout-options:last-child {
+    border-radius: 0 0 10px 10px;
+}
+
+.master {
+    width: 33%;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.master input {
+    height: 30px;
+}
+
+#switch label {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#switch p {
+    width: 70px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+#durationDIV input {
+    width: 20%;
+    border: solid 2px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 20px;
+    padding: 5px;
+}
+
+/* Start des Sliders */
+
+.toggle {
+    position: relative;
+    margin: 0 10px;
+    width: 40px;
+    /* neue Breite */
+    height: 20px;
+    /* Höhe 20px */
+    background: red;
+    border-radius: 10px;
+    /* Hälfte der Höhe */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Der kleine Kreis */
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    /* Padding für 16px Kreis */
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Checkbox ausblenden */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* Wenn aktiviert: Hintergrund grün + Kreis nach rechts */
+input[type="checkbox"]:checked+.toggle {
+    background: #4caf50;
+}
+
+input[type="checkbox"]:checked+.toggle::after {
+    transform: translateX(20px);
+
+}
+
+/* Optional: Beschriftung AN/AUS */
+.toggle span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}
+
+.end-buttons {
     display: flex;
     justify-content: center;
+    width: 100%;
+}
+
+.end-buttons button {
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 24px;
+    border-color: #2bdffe;
+    background-color: #222222;
+    color: white;
+    width: 80%;
+}
+
+input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    background: none;
+}
+
+/* Die Rundung für Chrome/Edge/Safari */
+input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+}
+
+/* Die Rundung für Firefox */
+input[type="color"]::-moz-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+}
+
+.middle {
+    width: 100%;
+    height: 200px;
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.option label {
+.alert-text{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#config{
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group{
+    height: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     text-align: center;
     margin-bottom: 20px;
 }
+
+
+
+.layout-manager {
+    display: flex;
+    flex-direction: row;
+}
+
+.layout-manager-option {
+    height: 124px;
+}
+
+.layout-manager-option img {
+    height: 100px;
+}
+
+.layout-manager-option p {
+    font-size: 16px;
+}
+
+.layout-manager-option {
+    border: solid 1px #2bdffe;
+    border-radius: 10px;
+    margin: 0px 20px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#leftText label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#topText label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#rightText label {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+#topText label {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+}
+
+#insideText label {
+    position: relative;
+    display: inline-block;
+    width: 100px;
+}
+
+#insideText img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#insideText p {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+fieldset {
+    border: none;
+}
+
+/* Start des Color Pickers */
 
 input[type="color"] {
     appearance: none;
@@ -195,28 +453,51 @@ input[type="color"]::-moz-color-swatch {
     font-family: sans-serif;
 }
 
-.var-list h2 {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 200;
-    text-align: center;
-}
-
-.var-list li {
-    text-align: center;
-}
-
-.sounds {
+.last {
+    height: 400px;
+    width: 33%;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.last label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    width: 300px;
+}
+
+.selecter {
+    border: solid 2px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 30px;
+    padding: 5px;
+    width: 130px;
+}
+
+option {
+    border: solid 2px #2bdffe;
+}
+
+option:checked {
+    background-color: #2bdffe;
+    color: black;
+}
+
+#varList li {
     text-align: center;
 }
 
-.sounds h2 {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 200;
-    text-align: center;
+.save-button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .save-button button {
@@ -225,8 +506,24 @@ input[type="color"]::-moz-color-swatch {
     width: 80%;
 }
 
-.save-button {
+.additional {
     margin: 20px;
+    margin-bottom: 60px;
     display: flex;
-    justify-content: center;
+    border: solid #2bdffe;
+    border-radius: 10px;
+    background-color: black;
+}
+
+.additional a {
+    width: 50%;
+    padding: 20px;
+    font-size: 20px;
+    text-decoration: none;
+    transition: color 1s ease;
+    text-align: center;
+}
+
+.additional a:hover {
+    color: #2BD6F1;
 }

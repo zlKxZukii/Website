@@ -1,0 +1,802 @@
+<link rel="stylesheet" href="/css/boxes/extra/animations.css">
+<link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Josefin+Sans:wght@100..700&family=Space+Grotesk:wght@300..700&display=swap"
+    rel="stylesheet">
+
+<%- include("../../layouts/alertBoxBar") %>
+
+    <% if (locals.boxes) { %>
+        <h1 style="display: flex; justify-content: center; margin-top: 60px;">
+            <%= locals.boxes %>
+        </h1>
+
+        <% } %>
+            <div class="link-box">
+                <%- include("../../layouts/linkBox") %>
+                    <div class="additional">
+                        <a href="/subs">Subscriber</a>
+                        <a href="/subongoings">Erneuerungen</a>
+                    </div>
+                    <div class="user-input">
+                        <div class="upload-section">
+                            <div class="upload-group">
+                                <h2>Bild / Video / GIF</h2>
+                                <form class="upload-form" action="/subgifts/upload/subgift" method="POST"
+                                    enctype="multipart/form-data"
+                                    onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
+                                    <label for="image-upload" class="custom-file-button">Datei auswählen</label>
+                                    <input id="image-upload" type="file" name="image" accept="image/*,video/*"
+                                        class="hidden-input">
+
+                                    <button type="submit" class="submit-btn">Hochladen</button>
+                                    <p id="image-name" class="file-status">Keine Datei gewählt</p>
+                                </form>
+                            </div>
+                            <div class="upload-group">
+                                <h2>Sound</h2>
+
+                                <form class="upload-form" action="/subgifts/upload/subgift" method="POST"
+                                    enctype="multipart/form-data"
+                                    onsubmit="this.querySelector('.submit-btn').disabled = true; this.querySelector('.submit-btn').innerText = 'Wird verarbeitet...';">
+                                    <label for="sound-upload" class="custom-file-button">Sound auswählen</label>
+                                    <input id="sound-upload" name="sound" type="file" accept="audio/*"
+                                        class="hidden-input">
+
+                                    <button type="submit" class="submit-btn">Hochladen</button>
+                                    <p id="sound-name" class="file-status">Kein Sound gewählt</p>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="test-window">
+                            <iframe src="<%= locals.link %>" frameborder="0" allow="autoplay"></iframe>
+                            <button onclick="testWS(this, 'subgifts')">Teste Mich.</button>
+                        </div>
+
+                    </div>
+                    <h2
+                        style="display: flex; justify-content: center; margin-top: 10px; padding: 10px; background-color: black; border-radius: 0 10px 0 0;">
+                        Kontrollzentrum</h2>
+                    <div class="options">
+                        <div class="layout-options">
+                            <div class="master" id="switch">
+                                <h2>
+                                    <%= boxes %> Switch
+                                </h2>
+                                <label>
+                                    <p id="subgiftsStateState"></p>
+                                    <input id="subgiftsState" type="checkbox" onclick="checkStateOfBox()"
+                                        <%=locals[boxes].state===true ? 'checked' :'' %>>
+                                    <div class="toggle"><span></span></div>
+                                </label>
+
+                            </div>
+                            <div class="master" id="sounds">
+                                <h2>Lautstärke</h2>
+                                <input id="volume" type="range" min="0" max="100"
+                                    value="<%= locals[boxes].volume || '50' %>" step="10">
+                            </div>
+                            <div class="master" id="durationDIV">
+                                <h2>Dauer</h2>
+                                <input id="duration" type="number" min="1" max="30"
+                                    value="<%= locals[boxes].duration || '50' %>">
+                            </div>
+                        </div>
+                        <div class="layout-options">
+                            <div class="middle" id="text">
+                                <h2>
+                                    <%= boxes %> Nachricht
+                                </h2>
+                                <div class="alert-text">
+                                    <div style="position: relative; width: fit-content;">
+                                        <textarea style="color:<%= locals[boxes].color %>" name="responseText"
+                                            id="responseText" rows="8" cols="80"
+                                            placeholder="Hier den Follower Text hinzufügen."
+                                            spellCheck="false"><%= locals[boxes].text %></textarea>
+                                        <input
+                                            style="position: absolute; bottom: 40px; right: -2px; border: none; background: none; cursor: pointer;"
+                                            type="color" name="colorPicker" id="textColor"
+                                            value="<%- locals[boxes].color || '#000000' %>">
+                                    </div>
+                                    <div id="config">
+                                        <div class="form-group">
+                                            <label for="font-weight">Schriftdicke</label>
+                                            <select class="selecter" id="font-weight">
+                                                <option value="100" <%=locals[boxes].weight==="100" ? 'selected' : '' %>
+                                                    >100</option>
+                                                <option value="400" <%=locals[boxes].weight==="400" ? 'selected' : '' %>
+                                                    >400</option>
+                                                <option value="700" <%=locals[boxes].weight==="700" ? 'selected' : '' %>
+                                                    >700</option>
+                                                <option value="900" <%=locals[boxes].weight==="900" ? 'selected' : '' %>
+                                                    >900</option>
+                                                <option value="1000" <%=locals[boxes].weight==="1000" ? 'selected' : ''
+                                                    %>>1000</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="font-decoration">Schriftart (Stil)</label>
+                                            <select class="selecter" id="font-decoration">
+                                                <option value="normal" <%=locals[boxes].decoration==="normal"
+                                                    ? 'selected' : '' %>>Standard</option>
+                                                <option value="italic" <%=locals[boxes].decoration==="italic"
+                                                    ? 'selected' : '' %>>Kursiv</option>
+                                                <option value="oblique" <%=locals[boxes].decoration==="oblique"
+                                                    ? 'selected' : '' %>>Schräggestellt</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="font-family">Schrifttyp</label>
+                                            <select class="selecter" id="font-family">
+                                                <option value="'Inter', sans-serif"
+                                                    <%=locals[boxes].family==="'Inter', sans-serif" ? 'selected' : '' %>
+                                                    >Inter</option>
+                                                <option value="'Roboto Flex', sans-serif"
+                                                    <%=locals[boxes].family==="'Roboto Flex', sans-serif" ? 'selected'
+                                                    : '' %>>Roboto Flex</option>
+                                                <option value="'Montserrat', sans-serif"
+                                                    <%=locals[boxes].family==="'Montserrat', sans-serif" ? 'selected'
+                                                    : '' %>>Montserrat</option>
+                                                <option value="'Poppins', sans-serif"
+                                                    <%=locals[boxes].family==="'Poppins', sans-serif" ? 'selected' : ''
+                                                    %>>Poppins</option>
+                                                <option value="'Open Sans', sans-serif"
+                                                    <%=locals[boxes].family==="'Open Sans', sans-serif" ? 'selected'
+                                                    : '' %>>Open Sans</option>
+                                                <option value="'Oswald', sans-serif"
+                                                    <%=locals[boxes].family==="'Oswald', sans-serif" ? 'selected' : ''
+                                                    %>>Oswald</option>
+                                                <option value="'Playfair Display', serif"
+                                                    <%=locals[boxes].family==="'Playfair Display', serif" ? 'selected'
+                                                    : '' %>>Playfair Display</option>
+                                                <option value="'Lora', serif" <%=locals[boxes].family==="'Lora', serif"
+                                                    ? 'selected' : '' %>>Lora</option>
+                                                <option value="'Fira Code', monospace"
+                                                    <%=locals[boxes].family==="'Fira Code', monospace" ? 'selected' : ''
+                                                    %>>Fira Code</option>
+                                                <option value="'Ubuntu', sans-serif"
+                                                    <%=locals[boxes].family==="'Ubuntu', sans-serif" ? 'selected' : ''
+                                                    %>>Ubuntu</option>
+                                                <option value="'Bebas Neue', sans-serif"
+                                                    <%=locals[boxes].family==="'Bebas Neue', sans-serif" ? 'selected'
+                                                    : '' %>>Bebas Neue</option>
+                                                <option value="'Space Grotesk', sans-serif"
+                                                    <%=locals[boxes].family==="'Space Grotesk', sans-serif" ? 'selected'
+                                                    : '' %>>Space Grotesk</option>
+                                                <option value="'Josefin Sans', sans-serif"
+                                                    <%=locals[boxes].family==="'Josefin Sans', sans-serif" ? 'selected'
+                                                    : '' %>>Josefin Sans</option>
+                                                <option value="'Fraunces', serif"
+                                                    <%=locals[boxes].family==="'Fraunces', serif" ? 'selected' : '' %>
+                                                    >Fraunces</option>
+                                                <option value="'Caveat', cursive"
+                                                    <%=locals[boxes].family==="'Caveat', cursive" ? 'selected' : '' %>
+                                                    >Caveat</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="font-size">Schriftgröße:</label>
+                                            <input type="range" class="selecter" id="font-size" min="8" max="100"
+                                                value="<%= locals[boxes].size %>" style="width: 100%;">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layout-options">
+                            <div class="middle">
+                                <h2>Layout</h2>
+                                <fieldset class="layout-manager" id="layoutManager">
+                                    <div id="leftText" class="layout-manager-option">
+                                        <label for="leftTextChosen">
+                                            <p style="text-align: center;">Form Text</p>
+                                            <img src="../../../uploads/default/owl.gif" alt="">
+                                        </label>
+                                        <div>
+                                            <input type="radio" name="layoutSelection" id="leftTextChosen" value="left"
+                                                <%=locals[boxes].selectedLayout==='left' ? 'checked' : '' %>>
+                                        </div>
+                                    </div>
+                                    <div id="bottomText" class="layout-manager-option">
+                                        <label for="bottomTextChosen">
+                                            <p style="text-align: center;">Form Text</p>
+                                            <img src="../../../uploads/default/owl.gif" alt="">
+                                        </label>
+                                        <div>
+                                            <input type="radio" name="layoutSelection" id="bottomTextChosen"
+                                                value="bottom" <%=locals[boxes].selectedLayout==='bottom' ? 'checked'
+                                                : '' %>>
+                                        </div>
+                                    </div>
+                                    <div id="insideText" class="layout-manager-option">
+                                        <label for="insideTextChosen">
+                                            <p>Form Text</p>
+                                            <img src="../../../uploads/default/owl.gif" alt="">
+                                        </label>
+                                        <div>
+                                            <input type="radio" name="layoutSelection" id="insideTextChosen"
+                                                value="inside" <%=locals[boxes].selectedLayout==='inside' ? 'checked'
+                                                : '' %>>
+                                        </div>
+                                    </div>
+                                    <div id="topText" class="layout-manager-option">
+                                        <label for="topTextChosen">
+                                            <p style="text-align: center;">Form Text</p>
+                                            <img src="../../../uploads/default/owl.gif" alt="">
+                                        </label>
+                                        <div>
+                                            <input type="radio" name="layoutSelection" id="topTextChosen" value="top"
+                                                <%=locals[boxes].selectedLayout==='top' ? 'checked' : '' %>>
+                                        </div>
+                                    </div>
+                                    <div id="rightText" class="layout-manager-option">
+                                        <label for="rightTextChosen">
+                                            <p style="text-align: center;">Form Text</p>
+                                            <img src="../../../uploads/default/owl.gif" alt="">
+                                        </label>
+                                        <div>
+                                            <input type="radio" name="layoutSelection" id="rightTextChosen"
+                                                value="right" <%=locals[boxes].selectedLayout==='right' ? 'checked' : ''
+                                                %>>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <div class="layout-options">
+                            <div style="width: 33%;">
+                                <div class="last" style="height: 200px; width: 100%;">
+                                    <h2 id="viewer" style="color: <%= locals[boxes].viewer.color || '#000000' %>;">
+                                        Zuschauer
+                                    </h2>
+                                    <label for="viewerColor">Farbe
+                                        <input type="color" name="viewerColor" id="viewerColor"
+                                            value="<%= locals[boxes].viewer.color || '#000000' %>">
+                                    </label>
+                                    <label for="viewerRainbow">
+                                        <p id="viewerRainbowState">Regenbogen</p>
+                                        <input id="viewerRainbow" type="checkbox"
+                                            onclick="checkStateOfBox(), checkRgb()"
+                                            <%=locals[boxes].viewer.rainbow===true ? 'checked' : '' %>>
+                                        <div class="toggle"><span></span></div>
+                                    </label>
+                                    <label for="viewerAnimation">Animationen
+                                        <select class="selecter" name="viewerAnimation" id="viewerAnimation">
+                                            <option value="off" <%=locals[boxes].viewer.animation==='off' ? 'selected'
+                                                : '' %>>Keine Animation</option>
+                                            <option value="wave" <%=locals[boxes].viewer.animation==='wave' ? 'selected'
+                                                : '' %>>Welle</option>
+                                            <option value="glitch" <%=locals[boxes].viewer.animation==='glitch'
+                                                ? 'selected' : '' %>>Glitch</option>
+                                            <option value="flicker" <%=locals[boxes].viewer.animation==='flicker'
+                                                ? 'selected' : '' %>>Flackern</option>
+                                            <option value="staircase" <%=locals[boxes].viewer.animation==='staircase'
+                                                ? 'selected' : '' %>>Stepper</option>
+                                            <option value="floating" <%=locals[boxes].viewer.animation==='floating'
+                                                ? 'selected' : '' %>>Schweber</option>
+                                            <option value="reveal" <%=locals[boxes].viewer.animation==='reveal'
+                                                ? 'selected' : '' %>>Enthüllung</option>
+                                            <option value="echo-pulse" <%=locals[boxes].viewer.animation==='echo-pulse'
+                                                ? 'selected' : '' %>>Echo</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="last" style="height: 200px; width: 100%;">
+                                    <h2 id="streamer" style="color: <%= locals[boxes].streamer.color || '#000000' %>;">
+                                        Streamer</h2>
+                                    <label for="streamerColor">Farbe
+                                        <input type="color" name="streamerColor" id="streamerColor"
+                                            value="<%= locals[boxes].streamer.color || '#000000' %>">
+                                    </label>
+                                    <label for="streamerRainbow">
+                                        <p id="streamerRainbowState">Regenbogen </p>
+                                        <input id="streamerRainbow" type="checkbox"
+                                            onclick="checkStateOfBox(), checkRgb()"
+                                            <%=locals[boxes].streamer.rainbow===true ? 'checked' : '' %>>
+                                        <div class="toggle"><span></span></div>
+                                    </label>
+                                    <label for="streamerAnimation">Animationen
+                                        <select class="selecter" name="streamerAnimation" id="streamerAnimation">
+                                            <option value="off" <%=locals[boxes].streamer.animation==='off' ? 'selected'
+                                                : '' %>>Keine Animation</option>
+                                            <option value="wave" <%=locals[boxes].streamer.animation==='wave'
+                                                ? 'selected' : '' %>>Welle</option>
+                                            <option value="glitch" <%=locals[boxes].streamer.animation==='glitch'
+                                                ? 'selected' : '' %>>Glitch</option>
+                                            <option value="flicker" <%=locals[boxes].streamer.animation==='flicker'
+                                                ? 'selected' : '' %>>Flackern</option>
+                                            <option value="staircase" <%=locals[boxes].streamer.animation==='staircase'
+                                                ? 'selected' : '' %>>Stepper</option>
+                                            <option value="floating" <%=locals[boxes].streamer.animation==='floating'
+                                                ? 'selected' : '' %>>Schweber</option>
+                                            <option value="reveal" <%=locals[boxes].streamer.animation==='reveal'
+                                                ? 'selected' : '' %>>Enthüllung</option>
+                                            <option value="echo-pulse"
+                                                <%=locals[boxes].streamer.animation==='echo-pulse' ? 'selected' : '' %>
+                                                >Echo</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="last" style="height: 200px;">
+                                <h2>Platzhalter</h2>
+                                <ul id="varList" name="varList">
+                                    <p style="height: 30px;"></p>
+                                    <li title="Der Name deines Zuschauers.">Zuschauer</li>
+                                    <li title="Der Name deines Zuschauers."><b style="color: #2bdffe;">[</b>viewer<b
+                                            style="color: #2bdffe;">]</b></li>
+                                    <p style="height: 30px;"></p>
+                                    <li title="Dein Künstlername.">Streamer</li>
+                                    <li title="Dein Künstlername."><b style="color: #2bdffe;">[</b>streamer<b
+                                            style="color: #2bdffe;">]</b></li>
+                                    <p style="height: 30px;"></p>
+                                    <li title="Die Anzahl der einmalig Geschenkten Subscriptions dieses Zuschauers.">
+                                        Anzahl</li>
+                                    <li title="Die Anzahl der einmalig Geschenkten Subscriptions dieses Zuschauers."><b
+                                            style="color: #2bdffe;">[</b>amount<b style="color: #2bdffe;">]</b></li>
+                                    <p style="height: 30px;"></p>
+                                    <li title="Die Stufe des Subs.">Tier (Stufe)</li>
+                                    <li title="Die Stufe des Subs."><b style="color: #2bdffe;">[</b>tier<b
+                                            style="color: #2bdffe;">]</b></li>
+                                    <p style="height: 30px;"></p>
+                                    <li title="Die Anzahl der insgesamten Geschenkten Subscriptions dieses Zuschauers.">
+                                        Gesamtanzahl</li>
+                                    <li title="Die Anzahl der insgesamten Geschenkten Subscriptions dieses Zuschauers.">
+                                        <b style="color: #2bdffe;">[</b>cumulativ<b style="color: #2bdffe;">]</b></li>
+                                </ul>
+                            </div>
+                            <div style="width: 33%;">
+                                <div class="last" style="height: 200px; width: 100%;">
+                                    <h2 id="amount" style="color: <%= locals[boxes].amount.color || '#000000' %>;">
+                                        Anzahl</h2>
+                                    <label for="amountColor">Farbe
+                                        <input type="color" name="amountColor" id="amountColor"
+                                            value="<%= locals[boxes].amount.color || '#000000' %>">
+                                    </label>
+                                    <label for="amountRainbow">
+                                        <p id="amountRainbowState">Regenbogen </p>
+                                        <input id="amountRainbow" type="checkbox"
+                                            onclick="checkStateOfBox(), checkRgb()"
+                                            <%=locals[boxes].amount.rainbow===true ? 'checked' : '' %>>
+                                        <div class="toggle"><span></span></div>
+                                    </label>
+                                    <label for="amountAnimation">Animationen
+                                        <select class="selecter" name="amountAnimation" id="amountAnimation">
+                                            <option value="off" <%=locals[boxes].amount.animation==='off' ? 'selected'
+                                                : '' %>>Keine Animation</option>
+                                            <option value="wave" <%=locals[boxes].amount.animation==='wave' ? 'selected'
+                                                : '' %>>Welle</option>
+                                            <option value="glitch" <%=locals[boxes].amount.animation==='glitch'
+                                                ? 'selected' : '' %>>Glitch</option>
+                                            <option value="flicker" <%=locals[boxes].amount.animation==='flicker'
+                                                ? 'selected' : '' %>>Flackern</option>
+                                            <option value="staircase" <%=locals[boxes].amount.animation==='staircase'
+                                                ? 'selected' : '' %>>Stepper</option>
+                                            <option value="floating" <%=locals[boxes].amount.animation==='floating'
+                                                ? 'selected' : '' %>>Schweber</option>
+                                            <option value="reveal" <%=locals[boxes].amount.animation==='reveal'
+                                                ? 'selected' : '' %>>Enthüllung</option>
+                                            <option value="echo-pulse" <%=locals[boxes].amount.animation==='echo-pulse'
+                                                ? 'selected' : '' %>
+                                                >Echo</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="last" style="height: 200px; width: 100%;">
+                                    <h2 id="tier" style="color: <%= locals[boxes].tier.color || '#000000' %>;">
+                                        Tier (Stufe)</h2>
+                                    <label for="tierColor">Farbe
+                                        <input type="color" name="tierColor" id="tierColor"
+                                            value="<%= locals[boxes].tier.color || '#000000' %>">
+                                    </label>
+                                    <label for="tierRainbow">
+                                        <p id="tierRainbowState">Regenbogen </p>
+                                        <input id="tierRainbow" type="checkbox" onclick="checkStateOfBox(), checkRgb()"
+                                            <%=locals[boxes].tier.rainbow===true ? 'checked' : '' %>>
+                                        <div class="toggle"><span></span></div>
+                                    </label>
+                                    <label for="tierAnimation">Animationen
+                                        <select class="selecter" name="tierAnimation" id="tierAnimation">
+                                            <option value="off" <%=locals[boxes].tier.animation==='off' ? 'selected'
+                                                : '' %>>Keine Animation</option>
+                                            <option value="wave" <%=locals[boxes].tier.animation==='wave' ? 'selected'
+                                                : '' %>>Welle</option>
+                                            <option value="glitch" <%=locals[boxes].tier.animation==='glitch'
+                                                ? 'selected' : '' %>>Glitch</option>
+                                            <option value="flicker" <%=locals[boxes].tier.animation==='flicker'
+                                                ? 'selected' : '' %>>Flackern</option>
+                                            <option value="staircase" <%=locals[boxes].tier.animation==='staircase'
+                                                ? 'selected' : '' %>>Stepper</option>
+                                            <option value="floating" <%=locals[boxes].tier.animation==='floating'
+                                                ? 'selected' : '' %>>Schweber</option>
+                                            <option value="reveal" <%=locals[boxes].tier.animation==='reveal'
+                                                ? 'selected' : '' %>>Enthüllung</option>
+                                            <option value="echo-pulse" <%=locals[boxes].tier.animation==='echo-pulse'
+                                                ? 'selected' : '' %>
+                                                >Echo</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="last" style="height: 200px; width: 100%;">
+                                    <h2 id="cumulativ"
+                                        style="color: <%= locals[boxes].cumulativ.color || '#000000' %>;">
+                                        Gesamtanzahl</h2>
+                                    <label for="cumulativColor">Farbe
+                                        <input type="color" name="cumulativColor" id="cumulativColor"
+                                            value="<%= locals[boxes].cumulativ.color || '#000000' %>">
+                                    </label>
+                                    <label for="cumulativRainbow">
+                                        <p id="cumulativRainbowState">Regenbogen </p>
+                                        <input id="cumulativRainbow" type="checkbox"
+                                            onclick="checkStateOfBox(), checkRgb()"
+                                            <%=locals[boxes].cumulativ.rainbow===true ? 'checked' : '' %>>
+                                        <div class="toggle"><span></span></div>
+                                    </label>
+                                    <label for="cumulativAnimation">Animationen
+                                        <select class="selecter" name="cumulativAnimation" id="cumulativAnimation">
+                                            <option value="off" <%=locals[boxes].cumulativ.animation==='off'
+                                                ? 'selected' : '' %>>Keine Animation</option>
+                                            <option value="wave" <%=locals[boxes].cumulativ.animation==='wave'
+                                                ? 'selected' : '' %>>Welle</option>
+                                            <option value="glitch" <%=locals[boxes].cumulativ.animation==='glitch'
+                                                ? 'selected' : '' %>>Glitch</option>
+                                            <option value="flicker" <%=locals[boxes].cumulativ.animation==='flicker'
+                                                ? 'selected' : '' %>>Flackern</option>
+                                            <option value="staircase" <%=locals[boxes].cumulativ.animation==='staircase'
+                                                ? 'selected' : '' %>>Stepper</option>
+                                            <option value="floating" <%=locals[boxes].cumulativ.animation==='floating'
+                                                ? 'selected' : '' %>>Schweber</option>
+                                            <option value="reveal" <%=locals[boxes].cumulativ.animation==='reveal'
+                                                ? 'selected' : '' %>>Enthüllung</option>
+                                            <option value="echo-pulse"
+                                                <%=locals[boxes].cumulativ.animation==='echo-pulse' ? 'selected' : '' %>
+                                                >Echo</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layout-options">
+                            <div class="save-button">
+                                <button onclick="readVal(this, 'subgifts')">Speichern</button>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <!-- files -->
+            <script>
+                const handleFileChange = (inputId, statusId) => {
+                    document.getElementById(inputId).addEventListener('change', function () {
+                        const fileName = this.files[0] ? this.files[0].name : "Keine Datei gewählt";
+                        document.getElementById(statusId).textContent = fileName;
+                    });
+                };
+
+                handleFileChange('image-upload', 'image-name');
+                handleFileChange('sound-upload', 'sound-name');
+            </script>
+            <!-- colors -->
+            <script>
+                const textColor = document.getElementById('textColor');
+                const text = document.getElementById('responseText');
+
+                textColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    text.style.color = selectedColor;
+                });
+
+                const viewerColor = document.getElementById('viewerColor');
+                const viewer = document.getElementById('viewer');
+
+                viewerColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    viewer.style.color = selectedColor;
+                });
+
+                const streamerColor = document.getElementById('streamerColor');
+                const streamer = document.getElementById('streamer');
+
+                streamerColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    streamer.style.color = selectedColor;
+                });
+
+                const amountColor = document.getElementById('amountColor');
+                const amount = document.getElementById('amount');
+
+                amountColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    amount.style.color = selectedColor;
+                });
+
+                const tierColor = document.getElementById('tierColor');
+                const tier = document.getElementById('tier');
+
+                tierColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    tier.style.color = selectedColor;
+                });
+
+                const cumulativColor = document.getElementById('cumulativColor');
+                const cumulativ = document.getElementById('cumulativ');
+
+                cumulativColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    cumulativ.style.color = selectedColor;
+                });
+
+            </script>
+            <!-- states -->
+            <script>
+                function checkStateOfBox() {
+                    const state = document.getElementById("subgiftsState")
+                    const viewerRainbow = document.getElementById("viewerRainbow")
+                    const streamerRainbow = document.getElementById("streamerRainbow")
+                    const amountRainbow = document.getElementById("amountRainbow")
+                    const tierRainbow = document.getElementById("tierRainbow")
+                    const cumulativRainbow = document.getElementById("cumulativRainbow")
+                    const stateArr = [state, viewerRainbow, streamerRainbow, amountRainbow, tierRainbow, cumulativRainbow]
+                    for (const state of stateArr) {
+                        const stateBox = document.getElementById(state.id + "State")
+                        if (state.checked) {
+                            if (state.id === 'subgiftsState') {
+                                stateBox.innerText = "Aktiv"
+                            }
+                            stateBox.style.color = "#4caf50"
+                        }
+                        else {
+                            if (state.id === 'subgiftsState') {
+                                stateBox.innerText = "Inaktiv"
+                            }
+                            stateBox.style.color = "red"
+                        }
+                    }
+                }
+                checkStateOfBox()
+            </script>
+            <!-- Rainbow checker -->
+            <script>
+                function checkRgb() {
+
+                    const viewerRainbow = document.getElementById("viewerRainbow")
+                    const streamerRainbow = document.getElementById("streamerRainbow")
+                    const amountRainbow = document.getElementById("amountRainbow")
+                    const tierRainbow = document.getElementById("tierRainbow")
+                    const cumulativRainbow = document.getElementById("cumulativRainbow")
+                    const stateArr = [viewerRainbow, streamerRainbow, amountRainbow, tierRainbow, cumulativRainbow]
+                    for (const state of stateArr) {
+                        const headline = document.getElementById(state.id.replace("Rainbow", ""))
+                        if (!headline.classList.entries.length <= 0) {
+                            removeClasses(headline)
+                        }
+                        if (state.checked) {
+                            headline.classList.add("rainbow-liquid");
+                            if (headline.id === 'viewer') {
+
+                                const viewerSelector = document.getElementById('viewerAnimation');
+                                viewerSelector.value = 'off'
+                                headline.innerHTML = "Zuschauer"
+                            }
+                            if (headline.id === 'streamer') {
+                                const streamerSelector = document.getElementById('streamerAnimation');
+                                streamerSelector.value = 'off'
+                                headline.innerHTML = "Streamer"
+                            }
+                            if (headline.id === 'amount') {
+                                const amountRainbow = document.getElementById('amountAnimation');
+                                amountRainbow.value = 'off'
+                                headline.innerHTML = "Anzahl"
+                            }
+                            if (headline.id === 'tier') {
+                                const tierSelector = document.getElementById('tierAnimation');
+                                tierSelector.value = 'off'
+                                headline.innerHTML = "Tier (Stufe)"
+                            }
+                            if (headline.id === 'cumulativ') {
+
+                                const cumulativSelector = document.getElementById('cumulativAnimation');
+                                cumulativSelector.value = 'off'
+                                headline.innerHTML = "Zuschauer"
+                            }
+                        }
+                        else {
+                            headline.classList.remove("rainbow-liquid");
+                        }
+                    }
+                }
+                checkRgb()
+            </script>
+            <!-- Animation Handler -->
+            <script>
+                const classArr = ['rainbow-liquid', 'off', 'glitch', 'flicker', 'staircase', 'floating', 'reveal', 'echo-pulse', 'wave']
+                const viewerSelector = document.getElementById('viewerAnimation');
+                const viewerTarget = document.getElementById('viewer');
+
+                viewerSelector.addEventListener('change', function () {
+                    const viewerRainbow = document.getElementById("viewerRainbow")
+                    const viewerRainbowState = document.getElementById("viewerRainbowState")
+
+                    viewerRainbow.checked = false;
+                    viewerRainbowState.style.color = "red";
+                    viewerTarget.innerHTML = 'Zuschauer'
+                    removeClasses(viewerTarget)
+                    const mode = this.value;
+                    viewerTarget.classList.add(mode)
+                    if (mode === 'wave') {
+                        wave()
+                    }
+                    else if (mode === 'glitch') {
+                        glitch()
+                    }
+                    else if (mode === 'staircase') {
+                        staircase()
+                    }
+                    else if (mode === 'off') {
+                        viewerTarget.innerHTML = "Zuschauer"
+                        removeClasses(viewerTarget)
+                    }
+                });
+            </script>
+            <script>
+                const streamerSelector = document.getElementById('streamerAnimation');
+                const streamerTarget = document.getElementById('streamer');
+
+                streamerSelector.addEventListener('change', function () {
+                    const streamerRainbow = document.getElementById("streamerRainbow")
+                    const streamerRainbowState = document.getElementById("streamerRainbowState")
+
+                    streamerRainbow.checked = false;
+                    streamerRainbowState.style.color = "red";
+                    streamerTarget.innerHTML = 'Streamer'
+                    removeClasses(streamerTarget)
+                    const mode = this.value;
+                    streamerTarget.classList.add(mode)
+                    if (mode === 'wave') {
+                        wave()
+                    }
+                    else if (mode === 'glitch') {
+                        glitch()
+                    }
+                    else if (mode === 'staircase') {
+                        staircase()
+                    }
+                    else if (mode === 'off') {
+                        streamerTarget.innerHTML = "Streamer"
+                        removeClasses(streamerTarget)
+                    }
+                });
+            </script>
+            <script>
+                const amountSelector = document.getElementById('amountAnimation');
+                const amountTarget = document.getElementById('amount');
+
+                amountSelector.addEventListener('change', function () {
+                    const amountRainbow = document.getElementById("amountRainbow")
+                    const amountRainbowState = document.getElementById("amountRainbowState")
+
+                    amountRainbow.checked = false;
+                    amountRainbowState.style.color = "red";
+                    amountTarget.innerHTML = 'Anzahl'
+                    removeClasses(amountTarget)
+                    const mode = this.value;
+                    amountTarget.classList.add(mode)
+                    if (mode === 'wave') {
+                        wave()
+                    }
+                    else if (mode === 'glitch') {
+                        glitch()
+                    }
+                    else if (mode === 'staircase') {
+                        staircase()
+                    }
+                    else if (mode === 'off') {
+                        amountTarget.innerHTML = "Anzahl"
+                        removeClasses(amountTarget)
+                    }
+                });
+            </script>
+            <script>
+                const tierSelector = document.getElementById('tierAnimation');
+                const tierTarget = document.getElementById('tier');
+
+                tierSelector.addEventListener('change', function () {
+                    const tierRainbow = document.getElementById("tierRainbow")
+                    const tierRainbowState = document.getElementById("tierRainbowState")
+
+                    tierRainbow.checked = false;
+                    tierRainbowState.style.color = "red";
+                    tierTarget.innerHTML = 'Tier (Stufe)'
+                    removeClasses(tierTarget)
+                    const mode = this.value;
+                    tierTarget.classList.add(mode)
+                    if (mode === 'wave') {
+                        wave()
+                    }
+                    else if (mode === 'glitch') {
+                        glitch()
+                    }
+                    else if (mode === 'staircase') {
+                        staircase()
+                    }
+                    else if (mode === 'off') {
+                        tierTarget.innerHTML = 'Tier (Stufe)'
+                        removeClasses(tierTarget)
+                    }
+                });
+            </script>
+            <script>
+                const cumulativSelector = document.getElementById('cumulativAnimation');
+                const cumulativTarget = document.getElementById('cumulativ');
+
+                cumulativSelector.addEventListener('change', function () {
+                    const cumulativRainbow = document.getElementById("cumulativRainbow")
+                    const cumulativRainbowState = document.getElementById("cumulativRainbowState")
+
+                    cumulativRainbow.checked = false;
+                    cumulativRainbowState.style.color = "red";
+                    cumulativTarget.innerHTML = 'Tier (Stufe)'
+                    removeClasses(cumulativTarget)
+                    const mode = this.value;
+                    cumulativTarget.classList.add(mode)
+                    if (mode === 'wave') {
+                        wave()
+                    }
+                    else if (mode === 'glitch') {
+                        glitch()
+                    }
+                    else if (mode === 'staircase') {
+                        staircase()
+                    }
+                    else if (mode === 'off') {
+                        cumulativTarget.innerHTML = 'Tier (Stufe)'
+                        removeClasses(cumulativTarget)
+                    }
+                });
+            </script>
+            <!-- Cleaner -->
+            <script>
+                function removeClasses(target) {
+                    for (const css of classArr) {
+                        target.classList.remove(css)
+                    }
+                }
+            </script>
+            <script>
+                // Elemente auswählen (inklusive der neuen Größe)
+                const fontWeightSelect = document.getElementById('font-weight');
+                const fontDecorationSelect = document.getElementById('font-decoration');
+                const fontFamilySelect = document.getElementById('font-family');
+                const fontSizeInput = document.getElementById('font-size');
+                const sizeValueDisplay = document.getElementById('size-value');
+                const testerArea = document.getElementById('responseText');
+
+                // Zentrale Update-Funktion
+                function updatePreview() {
+                    // Werte aus den Selectern/Inputs holen
+                    const weight = fontWeightSelect.value;
+                    const style = fontDecorationSelect.value;
+                    const family = fontFamilySelect.value;
+                    const size = fontSizeInput.value;
+
+                    // Werte auf die Textarea anwenden
+                    testerArea.style.fontWeight = weight;
+                    testerArea.style.fontStyle = style;
+                    testerArea.style.fontFamily = family;
+                    testerArea.style.fontSize = size + "px";
+                }
+
+                // Event-Listener für alle Steuerelemente
+                fontWeightSelect.addEventListener('change', updatePreview);
+                fontDecorationSelect.addEventListener('change', updatePreview);
+                fontFamilySelect.addEventListener('change', updatePreview);
+                fontSizeInput.addEventListener('input', updatePreview); // 'input' für Live-Vorschau beim Schieben
+
+                // Initialer Aufruf
+                updatePreview();
+            </script>
+            <!-- sources -->
+            <script src="../js/boxes/testWS.js"></script>
+            <script src="../js/boxes/saveBoxes.js"></script>
+            <script src="/js/boxes/extra/animations.js"></script>

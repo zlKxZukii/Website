@@ -15,7 +15,7 @@ obsDocks.get("/", async (req, res) => {
         css: "../css/obs_docks/docks.css",
         username: sessionData.username,
         img: sessionData.profilePicture,
-        link:"hure",
+        link:null,
         change: "obsdocks",
         showBody: true
     };

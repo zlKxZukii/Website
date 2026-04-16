@@ -1,46 +1,80 @@
-.clip {
-    height: 100%;
-    width: 100%;
-    /* pointer-events: none; */
+h2 {
+    font-size: 50px;
 }
 
-iframe {
-    position: absolute;
-    top: -100px;
-    bottom: 0;
-    left: 0;
-    right: 0;
+.clip {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    /* height: 80%; */
     width: 100%;
-    height: 130%;
-    border: none;
+}
+
+video {
+    display: flex;
+    justify-content: start;
+    width: 90%;
+}
+
+.cliper {
+    width: 100%;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.cliper p {
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: 900;
+    width: 90%;
+    margin: 0;
+    padding: 0;
+    font-size: 34px;
+}
+
+.cliper img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .visible {
     animation: getVisible 2s linear;
 }
 
-@keyframes getVisible{
-    0%{
+@keyframes getVisible {
+    0% {
         opacity: 0;
     }
-    100%{
+
+    100% {
         opacity: 1;
     }
 }
 
-.invisible{
+.invisible {
     animation: getInvisible 2s linear;
     opacity: 0;
 }
 
-@keyframes getInvisible{
-    0%{
+@keyframes getInvisible {
+    0% {
         opacity: 1;
     }
-    80%{
+
+    80% {
         opacity: 0;
     }
-    100%{
+
+    100% {
         opacity: 0;
     }
 }

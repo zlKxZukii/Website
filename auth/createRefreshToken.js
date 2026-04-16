@@ -7,11 +7,12 @@ import { RefreshingAuthProvider, exchangeCode } from '@twurple/auth';
 import { getTokenInfo } from "@twurple/auth";
 
 import crypto from "crypto";
-import { Auth, Select } from "../sql/sqlHandler.js";
+import { Auth, Select, Insert } from "../sql/sqlHandler.js";
 import { scopes } from "./scopes.js";
 import { createCookie } from "./createCookies.js";
 import { createHelixClient } from "../twitch_bot/createAPIclient.js";
 import client from "../src/redisClient.js";
+import { ClientManager } from "../twitch_bot/connectBot.js";
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -34,10 +35,11 @@ export async function authTwitch(code, ipAddress, res) {
         }), { EX: 1209600 })
 
         const DB = await Select.AccessShield([info.userId])
-        if (!DB) {
-            const category = ["Follow Schutz", "Nachrichten Schutz"]
+        if (!DB || DB < 1) {
+            // await ClientManager.start(user.displayName.toLowerCase())
+            const category = ["spamBot", "followBot"]
             for (let index = 0; index < category.length; index++) {
-                await Insert.AccessShield([info.userId], category[index], false)
+                await Insert.AccessShield([info.userId, category[index], false])
             }
         }
         await Auth.saveTwitchTokens(info.userId, tokenData, scopes);

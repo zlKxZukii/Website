@@ -9,11 +9,320 @@
 
             <div class="link-box">
                 <%- include("../../../layouts/linkBox") %>
-                <div>
-                    
+                    <h2 style=" height: 60px;
+                            display: flex;
+                            margin: 10px;
+                            align-items: center;
+                            justify-content: center;">Vorschau</h2>
+                    <div id="clipsPlayer">
+                        <button onclick="loadClipPlayer(this)" style="height: 60px;" class="save-button-clip">Hier
+                            drücken um
+                            Vorschau zu starten.</button>
+                    </div>
+                    <div class="parent">
+                        <div id="headline">
+                            <h2>Feintuning</h2>
+                            <p style="display: flex; justify-content: center;">Die Änderungen im "Test Text", werden
+                                beim
+                                nächsten Clip angezeigt!</p>
+                        </div>
+                        <div class="settings">
+                            <div class="color-settings">
+                                <h2>Überschrift</h2>
+                                <div class="options-head">
+                                    <label for="headColor">Schrift
+                                        Farbe</label>
+                                    <input type="color" name="headColor" id="headColor"
+                                        value="<%= locals.head?.color || '#ffffff' %>">
+                                </div>
+                                <div class="options-head">
+                                    <label for="headlineShadowColor">Schatten Farbe</label>
+                                    <input type="color" id="headlineShadowColor"
+                                        value="<%= locals.head?.rgba || '#ffffff' %>">
+                                </div>
+                                <div class="options-head">
+                                    <label for="headlineShadowOpacity">Schatten Deckkraft</label>
+                                    <input type="range" id="headlineShadowOpacity" min="0" max="100"
+                                        value="<%= Number(locals.head?.alpha)*100 || '50' %>">
+                                </div>
+                                <div class="options-head">
+                                    <label for="headlineShadowBlur">Schatten Schärfe</label>
+                                    <input type="range" id="headlineShadowBlur" min="0" max="30"
+                                        value="<%= locals.head?.blur.replace('px','') || '15' %>">
+                                </div>
+                                <div class="options-head">
+                                    <label for="headlineShadowX">Schatten X-Achse (Horizontal)</label>
+                                    <input type="range" id="headlineShadowX" min="-50" max="50"
+                                        value="<%= locals.head?.x.replace('px','') || '0' %>">
+                                </div>
+                                <div class="options-head">
+                                    <label for="headlineShadowy">Schatten Y-Achse (Vertikal)</label>
+                                    <input type="range" id="headlineShadowy" min="-50" max="50"
+                                        value="<%= locals.head?.y.replace('px','') || '0' %>">
+                                </div>
+                                <p id="testHead"
+                                    style=" color:<%= locals.head?.color || '#ffffff' %>; text-shadow:<%= locals.head?.rgba || 'rgba(0,0,0,1)' %> <%= locals.head?.x || '0px' %> <%= locals.head?.y || '0px' %> <%= locals.head?.blur || '15px' %>; font-size: 36px; margin: 80px; display: flex; justify-content: center;">
+                                    Test Text</p>
+                            </div>
 
-                </div>
-                <iframe src="" frameborder="0" allow="autoplay"></iframe>
+                            <div class="color-settings">
+                                <h2>Cliper</h2>
+                                <div class="options-clip">
+                                    <label for="clipColor">Schrift
+                                        Farbe</label>
+                                    <input type="color" name="clipColor" id="clipColor"
+                                        value="<%= locals.clip?.color || '#ffffff' %>">
+                                </div>
+                                <div class="options-clip">
+                                    <label for="clipShadowColor">Schatten Farbe</label>
+                                    <input type="color" id="clipShadowColor"
+                                        value="<%= locals.clip?.rgba || '#ffffff' %>">
+                                </div>
+                                <div class="options-clip">
+                                    <label for="clipShadowOpacity">Schatten Deckkraft</label>
+                                    <input type="range" id="clipShadowOpacity" min="0" max="100"
+                                        value="<%= Number(locals.clip?.alpha)*100 || '50' %>">
+                                </div>
+                                <div class="options-clip">
+                                    <label for="clipShadowBlur">Schatten Schärfe</label>
+                                    <input type="range" id="clipShadowBlur" min="0" max="30"
+                                        value="<%= locals.clip?.blur.replace('px','') || '15' %>">
+                                </div>
+                                <div class="options-clip">
+                                    <label for="clipShadowX">Schatten X-Achse (Horizontal)</label>
+                                    <input type="range" id="clipShadowX" min="-50" max="50"
+                                        value="<%= locals.clip?.x.replace('px','') || '0' %>">
+                                </div>
+                                <div class="options-clip">
+                                    <label for="clipShadowY">Schatten Y-Achse (Vertikal)</label>
+                                    <input type="range" id="clipShadowY" min="-50" max="50"
+                                        value="<%= locals.clip?.y.replace('px','') || '0' %>">
+                                </div>
+                                <div class="option-clip">
+                                    <label for="font-family">Schrifttyp</label>
+                                    <select class="selecter" id="font-family">
+                                        <option value="'Inter', sans-serif"
+                                            <%=locals[boxes].family==="'Inter', sans-serif" ? 'selected' : '' %>
+                                            >Inter</option>
+                                        <option value="'Roboto Flex', sans-serif"
+                                            <%=locals[boxes].family==="'Roboto Flex', sans-serif" ? 'selected' : '' %>
+                                            >Roboto Flex</option>
+                                        <option value="'Montserrat', sans-serif"
+                                            <%=locals[boxes].family==="'Montserrat', sans-serif" ? 'selected' : '' %>
+                                            >Montserrat</option>
+                                        <option value="'Poppins', sans-serif"
+                                            <%=locals[boxes].family==="'Poppins', sans-serif" ? 'selected' : '' %>
+                                            >Poppins</option>
+                                        <option value="'Open Sans', sans-serif"
+                                            <%=locals[boxes].family==="'Open Sans', sans-serif" ? 'selected' : '' %>
+                                            >Open Sans</option>
+                                        <option value="'Oswald', sans-serif"
+                                            <%=locals[boxes].family==="'Oswald', sans-serif" ? 'selected' : '' %>>Oswald
+                                        </option>
+                                        <option value="'Playfair Display', serif"
+                                            <%=locals[boxes].family==="'Playfair Display', serif" ? 'selected' : '' %>
+                                            >Playfair Display</option>
+                                        <option value="'Lora', serif" <%=locals[boxes].family==="'Lora', serif"
+                                            ? 'selected' : '' %>>Lora</option>
+                                        <option value="'Fira Code', monospace"
+                                            <%=locals[boxes].family==="'Fira Code', monospace" ? 'selected' : '' %>>Fira
+                                            Code</option>
+                                        <option value="'Ubuntu', sans-serif"
+                                            <%=locals[boxes].family==="'Ubuntu', sans-serif" ? 'selected' : '' %>>Ubuntu
+                                        </option>
+                                        <option value="'Bebas Neue', sans-serif"
+                                            <%=locals[boxes].family==="'Bebas Neue', sans-serif" ? 'selected' : '' %>
+                                            >Bebas Neue</option>
+                                        <option value="'Space Grotesk', sans-serif"
+                                            <%=locals[boxes].family==="'Space Grotesk', sans-serif" ? 'selected' : '' %>
+                                            >Space Grotesk</option>
+                                        <option value="'Josefin Sans', sans-serif"
+                                            <%=locals[boxes].family==="'Josefin Sans', sans-serif" ? 'selected' : '' %>
+                                            >Josefin Sans</option>
+                                        <option value="'Fraunces', serif" <%=locals[boxes].family==="'Fraunces', serif"
+                                            ? 'selected' : '' %>
+                                            >Fraunces</option>
+                                        <option value="'Caveat', cursive" <%=locals[boxes].family==="'Caveat', cursive"
+                                            ? 'selected' : '' %>
+                                            >Caveat</option>
+                                    </select>
+                                </div>
+                                <div class="option-clip">
+                                    <label for="font-size">Schriftgröße:</label>
+                                    <input type="range" class="selecter" id="font-size" min="8" max="100"
+                                        value="<%= locals[boxes].size %>" style="width: 100%;">
+                                </div>
+                                <p id="testClip"
+                                    style=" color:<%= locals.clip?.color || '#ffffff' %>; text-shadow: <%= locals.clip?.rgba || 'rgba(0,0,0,1)' %> <%= locals.clip?.x || '0px' %> <%= locals.clip?.y || '0px' %> <%= locals.clip?.blur || '15px' %>; font-size: 36px; margin: 80px; display: flex; justify-content: center;">
+                                    Test Text</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="save-button-clip" onclick="getColor(this)">Speichern</button>
             </div>
 
-            
+            <script>
+                const testHead = document.getElementById('testHead');
+                const headlineShadowX = document.getElementById('headlineShadowX');
+                const headlineShadowY = document.getElementById('headlineShadowy'); // Hier das kleine 'y' nutzen oder im HTML ändern
+                const headlineShadowColor = document.getElementById('headlineShadowColor');
+                const headlineShadowOpacity = document.getElementById('headlineShadowOpacity');
+                const headlineShadowBlur = document.getElementById('headlineShadowBlur');
+                const headlineColor = document.getElementById('headColor');
+
+                headlineColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    testHead.style.color = selectedColor;
+                });
+
+                function updateShadowHead() {
+
+                    const x = headlineShadowX.value + "px";
+                    const y = headlineShadowY.value + "px";
+                    const blur = headlineShadowBlur.value + "px";
+                    const color = headlineShadowColor.value;
+                    const opacity = headlineShadowOpacity.value / 100;
+
+                    const r = parseInt(color.slice(1, 3), 16);
+                    const g = parseInt(color.slice(3, 5), 16);
+                    const b = parseInt(color.slice(5, 7), 16);
+
+
+                    const shadowString = `${x} ${y} ${blur} rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+                    testHead.style.textShadow = shadowString;
+                }
+
+                [headlineShadowX, headlineShadowY, headlineShadowColor, headlineShadowOpacity, headlineShadowBlur].forEach(input => {
+                    input.addEventListener('input', updateShadowHead);
+                });
+
+                updateShadowHead();
+            </script>
+
+            <script>
+                const testClip = document.getElementById('testClip');
+                const clipShadowX = document.getElementById('clipShadowX');
+                const clipShadowY = document.getElementById('clipShadowY');
+                const clipShadowColor = document.getElementById('clipShadowColor');
+                const clipShadowOpacity = document.getElementById('clipShadowOpacity');
+                const clipShadowBlur = document.getElementById('clipShadowBlur');
+                const clipColor = document.getElementById('clipColor');
+
+                clipColor.addEventListener('input', (event) => {
+                    const selectedColor = event.target.value;
+                    testClip.style.color = selectedColor;
+                });
+
+                function updateShadowClip() {
+
+                    const x = clipShadowX.value + "px";
+                    const y = clipShadowY.value + "px";
+                    const blur = clipShadowBlur.value + "px";
+                    const color = clipShadowColor.value;
+                    const opacity = clipShadowOpacity.value / 100;
+
+                    const r = parseInt(color.slice(1, 3), 16);
+                    const g = parseInt(color.slice(3, 5), 16);
+                    const b = parseInt(color.slice(5, 7), 16);
+
+
+                    const shadowString = `${x} ${y} ${blur} rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+                    testClip.style.textShadow = shadowString;
+                }
+
+                [clipShadowX, clipShadowY, clipShadowColor, clipShadowOpacity, clipShadowBlur].forEach(input => {
+                    input.addEventListener('input', updateShadowClip);
+                });
+
+                updateShadowClip();
+            </script>
+
+            <script>
+                const typeArr = [testHead, testClip]
+
+                async function getColor(button) {
+                    const btnText = button.innerText;
+                    const data = { key: '<%= clipKey %>' };
+                    button.disabled = true;
+                    button.innerText = "Speichert...";
+                    button.style.color = 'gray';
+                    for (const value of typeArr) {
+                        const fullStyle = value.style.textShadow;
+
+                        const key = value.id.replace("test", "")
+                        const color = document.getElementById(key.toLocaleLowerCase() + "Color").value
+                        const shadowColor = fullStyle.match(/rgba?\(.*?\)/);
+                        const rgba = shadowColor[0]
+                        const values = rgba.match(/[\d.]+/g);
+                        let alpha = values[3]
+                        if (alpha === undefined) {
+                            alpha = 1
+                        }
+                        else if (alpha === '0') {
+                            alpha = 0.01
+                        }
+                        const coords = fullStyle.match(/-?\d+px/g);
+                        console.log(alpha)
+
+                        if (coords && coords.length >= 3) {
+                            const x = coords[0];
+                            const y = coords[1];
+                            const blur = coords[2];
+
+                            Object.assign(data, { [key]: { color, x, y, blur, rgba, alpha } });
+                        } else {
+                            console.log("Kein gültiger Schatten gefunden.");
+                        }
+                    }
+                    await fetchData(data, button, btnText)
+                }
+
+            </script>
+
+            <script>
+                async function fetchData(data, saveBtn, btnText) {
+                    try {
+                        const response = await fetch('/clipsplayer/save', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-Action-Type': 'Save-Follower-Settings'
+                            },
+                            body: JSON.stringify(data)
+                        })
+
+                        if (response.ok) {
+                            saveBtn.innerText = "Erfolgreich gespeichert.";
+                            saveBtn.style.animation = "rainbow 5s"
+                            setTimeout(() => {
+                                saveBtn.disabled = false;
+                                saveBtn.style.color = "white"
+                                saveBtn.innerText = btnText;
+                                saveBtn.style.animation = null;
+                            }, 5000);
+                        }
+                        else {
+                            alert("Fehler beim Speichern");
+                            saveBtn.disabled = false;
+                            saveBtn.innerText = btnText;
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                        alert("Server nicht erreichbar.");
+                        saveBtn.disabled = false;
+                        saveBtn.innerText = btnText;
+                        saveBtn.animation = null;
+                    }
+                }
+            </script>
+            <script>
+                const clipPlayer = document.getElementById('clipsPlayer')
+                async function loadClipPlayer(button) {
+                    clipPlayer.style.height = '900px'
+                    clipPlayer.innerHTML = `<iframe src="<%= link %>" frameborder="0" allow="autoplay; encrypted-media"></iframe>`
+                }
+            </script>

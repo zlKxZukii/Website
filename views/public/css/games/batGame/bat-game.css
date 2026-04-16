@@ -1,0 +1,40 @@
+.option {
+    padding: 10px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.option:nth-child(odd) {
+    background-color: black;
+}
+
+.option p,
+input,
+label {
+    display: flex;
+    justify-content: center;
+    width: 33%;
+}
+
+.option:first-child {
+    border-radius: 10px 10px 0px 0px;
+}
+
+.option:last-child {
+    border-radius: 0px 0px 10px 10px;
+}
+
+.button-class {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: rgba(34, 34, 34, 1);
+    border: solid #2bdffe;
+    border-radius: 10px;
+    width: 80%;
+    margin: auto;
+    margin-top: 10px;
+    padding: 9px 18px;
+}

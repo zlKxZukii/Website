@@ -1,54 +1,43 @@
-
-.top-left {
+.left {
     display: flex;
-    align-items: start;
-    justify-content: start;
+    flex-direction: row-reverse;
 }
 
-.top-middle {
+.right {
     display: flex;
-    align-items: start;
-    justify-content: center;
+    flex-direction: row;
 }
 
-.top-right {
+.top {
     display: flex;
-    align-items: start;
-    justify-content: end;
+    flex-direction: column;
 }
 
-.middle-left {
+.bottom {
     display: flex;
-    align-items: center;
-    justify-content: start;
+    flex-direction: column-reverse;
 }
 
-.middle-middle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.inner{
+    position: relative;
+    display: inline-block;
+
 }
 
-.middle-right {
-    display: flex;
-    align-items: center;
-    justify-content: end;
+.inner .alert-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
 }
 
-.bottom-left {
-    display: flex;
-    align-items: end;
-    justify-content: start;
-}
-
-.bottom-middle {
-    display: flex;
-    align-items: end;
-    justify-content: center;
-}
-
-.bottom-right {
-    display: flex;
-    align-items: end;
-    justify-content: end;
+/* Optional: Das Bild innerhalb der Box ansprechen */
+.inner .alert-img img {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }

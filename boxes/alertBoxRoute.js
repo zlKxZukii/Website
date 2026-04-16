@@ -3,26 +3,27 @@ import client from "../src/redisClient.js";
 import { Select, Insert } from "../sql/sqlHandler.js";
 import { ClientManager } from "../twitch_bot/connectBot.js";
 import crypto from "crypto";
+import { type } from "os";
 
 export let alertBoxRoute = express.Router()
 
 alertBoxRoute.get("/", async (req, res) => {
     const key = req.signedCookies.access_validator;
-
     if (!key) {
         return res.redirect("/?index=true");
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const DB = await Select.AlertBox([sessionData.userId])
+        const alertKey = await Select.AlertBoxKey([sessionData.userId])
         const obj = {
-            link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
+            link: `https://scaletta.live/alertbox/${alertKey.key}`,
             css: "../../css/boxes/help.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
             title: "Alert Box",
+            type: 'Alert Box',
             showBody: true,
-            change: `http://scaletta.live/alertbox/${DB[0].alert_key}/renew`
+            change: `http://scaletta.live/alertbox/${alertKey.key}/renew`
         }
         res.render("main/boxes/alertBoxRoute.ejs", obj)
     } catch (error) {

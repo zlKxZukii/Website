@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>OBS Bat Cave - Overlay Edition</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="batGame">
+        <div id="leaderboard">
+            <h3>Top 5 All-Time</h3>
+            <div id="scores">Warte auf !bat...</div>
+        </div>
+        <canvas id="world"></canvas>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        const targetUsername = "<%= targetUser %>";
+
+        const canvas = document.getElementById('world');
+        const ctx = canvas.getContext('2d');
+        const scoresDiv = document.getElementById('scores');
+        const gameContainer = document.getElementById('batGame');
+
+        let bats = [];
+        let highscores = {};
+        let cavePoints = [];
+        const segmentWidth = 30;
+        const caveGap = 270;
+
+        let isRunning = false;
+        let lastActivity = Date.now();
+        let loopId = null;
+
+        // Globale Einstellungen für das Design
+        let currentSettings = {
+            wallColor: '#ffffff',
+            pathColor: '#222222'
+        };
+
+        socket.on("connect", () => {
+            console.log("Verbunden als: " + targetUsername);
+            socket.emit("join-room", targetUsername);
+        });
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Initialisierung der Höhle
+        function initCave() {
+            cavePoints = [];
+            for (let i = 0; i < Math.ceil(canvas.width / segmentWidth) + 10; i++) {
+                cavePoints.push({ y: canvas.height / 2, gap: caveGap });
+            }
+        }
+        initCave();
+
+        function spawnBat(data) {
+            lastActivity = Date.now();
+
+            // Farben global aktualisieren, falls mitgeschickt
+            if (data.wallColor) currentSettings.wallColor = data.wallColor;
+            if (data.pathColor) currentSettings.pathColor = data.pathColor;
+
+            // Bestehende Fledermaus des Users entfernen (Reset bei neuem !bat)
+            bats = bats.filter(b => b.name !== data.viewerName);
+
+            // NEU: Bild aus der URL erstellen, falls vorhanden
+            let img = null;
+            if (data.emoteUrl) {
+                img = new Image();
+                img.src = data.emoteUrl;
+                img.crossOrigin = "anonymous";
+            }
+
+            const spawnY = cavePoints[Math.floor(150 / segmentWidth)].y;
+            const newColor = data.userColor || `hsl(${Math.random() * 360}, 80%, 60%)`;
+
+            if (!highscores[data.viewerName]) {
+                highscores[data.viewerName] = { dist: 0, color: newColor };
+            }
+
+            bats.push({
+                name: data.viewerName, baseX: 150, x: 150, y: spawnY, v: 0, color: newColor,
+                emote: img, // Hier wird das Bild-Objekt gespeichert
+                dist: 0, alive: true, phase: Math.random() * 10,
+                offsetY: (Math.random() - 0.5) * 80, reaction: 0.20 + Math.random() * 0.25,
+                lag: Math.floor(Math.random() * 8), wobble: 1.8 + Math.random() * 3.8,
+                jitterPhase: Math.random() * 10, horizontalPhase: Math.random() * 10
+            });
+
+            if (!isRunning) startLoop();
+        }
+
+        async function update() {
+            const now = Date.now();
+            const anyAlive = bats.some(b => b.alive);
+
+            // AUTO-SLEEP (30 Sek Inaktivität + keine lebenden Fledermäuse)
+            if (now - lastActivity > 3000 && !anyAlive) {
+                await stopLoop();
+                return false;
+            }
+
+            const last = cavePoints[cavePoints.length - 1];
+            let nextY = last.y + (Math.random() - 0.5) * 85 + (canvas.height / 2 - last.y) * 0.05;
+            nextY = Math.max(210, Math.min(canvas.height - 210, nextY));
+
+            cavePoints.shift();
+            cavePoints.push({ y: nextY, gap: caveGap });
+
+            bats.forEach(b => {
+                if (!b.alive) return;
+                b.horizontalPhase += 0.05;
+                b.x = b.baseX + Math.sin(b.horizontalPhase) * 28;
+                b.offsetY += (Math.random() - 0.5) * b.wobble;
+
+                let lookAhead = Math.floor((b.x + 45) / segmentWidth) + (b.lag - 4);
+                let target = cavePoints[Math.min(Math.max(0, lookAhead), cavePoints.length - 1)];
+
+                if (b.y > (target.y + b.offsetY) + 8 && b.v > 0) b.v -= (1.9 + Math.random() * 1.0);
+                b.v += b.reaction;
+                b.y += b.v;
+                b.dist += 0.6;
+                b.phase += 0.4;
+                b.jitterPhase += 0.6;
+
+                if (b.dist > highscores[b.name].dist) {
+                    highscores[b.name].dist = b.dist;
+                    highscores[b.name].color = b.color;
+                }
+
+                // Kollisionsprüfung
+                if (Math.abs(b.y - target.y) > (target.gap / 2) - 8) b.alive = false;
+            });
+
+            updateLeaderboard();
+            return true;
+        }
+
+        function updateLeaderboard() {
+            const sorted = Object.keys(highscores)
+                .map(n => ({ name: n, ...highscores[n] }))
+                .sort((a, b) => b.dist - a.dist)
+                .slice(0, 5);
+
+            scoresDiv.innerHTML = sorted.map((b, i) => {
+                const active = bats.some(a => a.name === b.name && a.alive);
+                return `<div class="score-row" style="color: ${b.color}">
+                        <span>${i + 1}. ${active ? '▶' : '💀'} ${b.name}</span>
+                        <span style="color:#fff">${Math.floor(b.dist)}m</span>
+                    </div>`;
+            }).join('');
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Höhlen-Hintergrund
+            ctx.fillStyle = currentSettings.pathColor;
+            ctx.beginPath();
+            cavePoints.forEach((p, i) => {
+                const x = i * segmentWidth;
+                const y = p.y - p.gap / 2;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            for (let i = cavePoints.length - 1; i >= 0; i--) {
+                ctx.lineTo(i * segmentWidth, cavePoints[i].y + cavePoints[i].gap / 2);
+            }
+            ctx.fill();
+
+            // 2. Höhlen-Wände
+            ctx.strokeStyle = currentSettings.wallColor;
+            ctx.lineWidth = 4;
+            [1, -1].forEach(side => {
+                ctx.beginPath();
+                cavePoints.forEach((p, i) => {
+                    const y = p.y + (side * p.gap / 2);
+                    if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * segmentWidth, y);
+                });
+                ctx.stroke();
+            });
+
+            // 3. Fledermäuse / Emotes zeichnen
+            bats.forEach(b => {
+                ctx.save();
+                ctx.translate(b.x, b.y + (b.alive ? Math.sin(b.jitterPhase) * 6 : 0));
+                ctx.globalAlpha = b.alive ? 1 : 0.3;
+
+                // Logik für Emote vs. Klassische Fledermaus
+                if (b.emote && b.emote.complete && b.emote.naturalWidth !== 0) {
+                    // Emote zeichnen (Größe 56x56, zentriert)
+                    ctx.drawImage(b.emote, -28, -28, 56, 56);
+                } else {
+                    // Klassisches Fledermaus-Design
+                    ctx.fillStyle = b.color;
+                    let w = b.alive ? Math.sin(b.phase) * 20 : 10;
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-30, w); ctx.lineTo(-8, 8); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(30, w); ctx.lineTo(8, 8); ctx.fill();
+                    ctx.beginPath(); ctx.arc(0, 4, 5, 0, 7); ctx.fill();
+                }
+
+                // 4. Name
+                ctx.font = "bold 20px Arial";
+                ctx.textAlign = "center";
+                ctx.shadowColor = "rgba(0,0,0,0.8)";
+                ctx.shadowBlur = 4;
+                ctx.fillStyle = b.alive ? "#fff" : "rgba(200,200,200,0.5)";
+                ctx.fillText(b.name, 0, -35);
+
+                ctx.restore();
+            });
+        }
+
+        async function startLoop() {
+            if (!isRunning) {
+                initCave()
+                gameContainer.style.opacity = "1";
+                isRunning = true;
+                loop();
+            }
+        }
+
+        async function stopLoop() {
+            isRunning = false;
+            cancelAnimationFrame(loopId);
+            gameContainer.style.opacity = "0";
+            let scores = highscores
+
+            setTimeout(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                bats = [];
+                highscores = {};
+                initCave();
+
+                scoresDiv.innerHTML = "..Warte.."
+                if (!isRunning) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 500);
+            await fetch('/games/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Action-Type': 'Save-Follower-Settings'
+                },
+                body: JSON.stringify({
+                    Bat: highscores,
+                    key: targetUsername
+                })
+            })
+        }
+
+
+        async function loop() {
+            if (!isRunning) return;
+            const continueLoop = await update();
+            if (continueLoop) {
+                draw();
+                loopId = requestAnimationFrame(loop);
+            }
+        }
+
+        // Socket Events
+        socket.on('spawnBat', (data) => {
+            spawnBat(data);
+        });
+
+    </script>
+</body>
+
+</html>

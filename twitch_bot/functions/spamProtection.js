@@ -1,35 +1,39 @@
 import chalk from "chalk"
 
 const blackList = [
-        "bigfollows",
-        "cloutboost", 
-        "buyviewers", 
-        "getviewers",
-        "follower-shop", 
-        "v5shop", 
-        "twitch-viewers", 
-        "social-boost",
-        "streamboo",
+    "bigfollows",
+    "cloutboost",
+    "buyviewers",
+    "getviewers",
+    "follower-shop",
+    "v5shop",
+    "twitch-viewers",
+    "social-boost",
+    "streamboo",
+    "nezhna",
 
-        // --- Typische Bot-Sprüche (Deutsch/Englisch) ---
-        "wanna become famous", 
-        "want to become famous", 
-        "best viewers and followers",
-        "become famous", 
-        "get followers", 
-        "top viewers", 
-        "cheap viewers",
-        "werde berühmt", 
-        "zuschauer kaufen",
-        "günstige follower",
+    // --- Typische Bot-Sprüche (Deutsch/Englisch) ---
+    "wanna become famous",
+    "want to become famous",
+    "best viewers and followers",
+    "become famous",
+    "get followers",
+    "top viewers",
+    "cheap viewers",
+    "werde berühmt",
+    "zuschauer kaufen",
+    "günstige follower",
+    "We specialize in promoting Twitch channels",
+    "check out our website",
 
-        // --- Krypto / Scam / Casino ---
-        "free gift cards", 
-        "win a prize", 
-        "free nitro", 
-        "crypto exploit",
-        "casino bonus", 
-        "stake code"];
+    // --- Krypto / Scam / Casino ---
+    "free gift cards",
+    "win a prize",
+    "free nitro",
+    "crypto exploit",
+    "casino bonus",
+    "stake code",
+    "promoting"];
 
 export async function messageProtection(client, user, apiClient, message) {
     if (!client.spamBotProtection[user.userId]) {

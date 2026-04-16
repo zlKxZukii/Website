@@ -19,34 +19,69 @@ RaidBoxRoute.get("/", async (req, res) => {
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const DB = await Select.AlertBox([sessionData.userId]);
+        const user = await ClientManager.getClient(sessionData.userId)
+
+        const AlertBox = await Select.AlertBox([sessionData.userId]);
+        const alertKey = await Select.AlertBoxKey([sessionData.userId])
         const obj = {
-            link: `https://scaletta.live/alertbox/${DB[0].alert_key}`,
+            link: `https://scaletta.live/alertbox/${alertKey.key}`,
             css: "../../css/boxes/box.css",
             username: sessionData.username,
             img: sessionData.profilePicture,
-            boxes: "Raid Box",
-            title: "Raid Box",
+            boxes: "Raids",
+            title: "Raids Box",
             showBody: true,
             helpLink: `https://scaletta.live/alertbox`,
-            change: `https://scaletta.live/subs/${DB[0].alert_key}/renew`,
-            color: "",
-            volume: "",
-            responseText: "",
-            key: DB[0].alert_key
+            change: `https://scaletta.live/follows/${alertKey.key}/renew`,
+            key: alertKey.key,
         };
-
-        for (const element of DB) {
-            if (element.type === "Raid") {
-                obj.color = element.settings.color;
-                obj.volume = element.settings.volume;
-                obj.responseText = element.settings.response_text;
+        if (!user) {
+            for (const element of AlertBox) {
+                if (element.type === "Raids") {
+                    Object.assign(obj, {
+                        [obj.boxes]: {
+                            color: element.settings.color,
+                            state: element.settings.state,
+                            selectedLayout: element.settings.layout,
+                            viewer: element.settings.viewer,
+                            amount: element.settings.amount,
+                            volume: element.settings.volume,
+                            duration: element.settings.duration,
+                            streamer: element.settings.streamer,
+                            text: element.settings.responseText,
+                            family: element.settings.family,
+                            size: element.settings.size,
+                            decoration: element.settings.decoration,
+                            weight: element.settings.weight
+                        }
+                    })
+                };
             };
-        };
+        }
+        else {
+            const element = user.alertBox.Raids
+            Object.assign(obj, {
+                [obj.boxes]: {
+                    color: element.settings.color,
+                    state: element.settings.state,
+                    selectedLayout: element.settings.layout,
+                    viewer: element.settings.viewer,
+                    amount: element.settings.amount,
+                    volume: element.settings.volume,
+                    duration: element.settings.duration,
+                    streamer: element.settings.streamer,
+                    text: element.settings.responseText,
+                    family: element.settings.family,
+                    size: element.settings.size,
+                    decoration: element.settings.decoration,
+                    weight: element.settings.weight
+                }
+            })
+        }
         res.render("main/boxes/raidBox.ejs", obj);
     } catch (error) {
         console.log(error);
-        res.redirect("/raid");
+        res.redirect("/raids");
     };
 })
 
@@ -56,13 +91,17 @@ RaidBoxRoute.get("/:key/renew", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
-        const newKey = crypto.randomBytes(64).toString("hex");
-        await Insert.AlertBoxKey([sessionData.userId, newKey])
-        await ClientManager.restartBot(sessionData.username, sessionData.userId, key)
+        const sessionData = JSON.parse(await client.get(`sess:${key}`));
+        const user = await ClientManager.getClient(sessionData.userId)
+        const newAlertKey = crypto.randomBytes(64).toString("hex");
+
+        user.wsKeys.alertBoxKey = newAlertKey
+        await Insert.AlertBoxKey([sessionData.userId, newAlertKey])
+
     } catch (error) {
         console.log("Neuer Key kann nicht generiert werden " + error)
     }
-    res.redirect("/raid")
+    res.redirect("/raids")
 })
 
 RaidBoxRoute.post('/save', async (req, res) => {
@@ -74,18 +113,31 @@ RaidBoxRoute.post('/save', async (req, res) => {
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-        const { volume, color, response_text } = req.body
 
-        user.alertBox.Raid.color = color
-        user.alertBox.Raid.volume = volume
-        user.alertBox.Raid.text = response_text
+        const { state, volume, duration, responseText, color, selectedLayout, viewer, streamer, amount, family, size, decoration, weight } = req.body;
 
-        await Insert.AlertBoxKey([sessionData.userId, user.wsKeys.alertBoxKey, "Raid", JSON.stringify({ color, volume, response_text })]);
+        if (user) {
+            const alertBox = user.alertBox.Raids.settings;
+            alertBox.state = state
+            alertBox.volume = volume
+            alertBox.duration = duration
+            alertBox.responseText = responseText
+            alertBox.color = color
+            alertBox.layout = selectedLayout
+            alertBox.viewer = viewer
+            alertBox.streamer = streamer
+            alertBox.amount = amount
+            alertBox.family = family
+            alertBox.size = size
+            alertBox.decoration = decoration
+            alertBox.weight = weight
+        }
 
+        await Insert.UpdateAlertBoxSettings([sessionData.userId, "Raids", JSON.stringify({ state, volume, duration, responseText, color, layout: selectedLayout, viewer, streamer, amount, family, size, decoration, weight })]);
     } catch (error) {
-        console.log("Fehler beim Speichern des Subscribers: " + error)
+        console.log("Fehler beim Speichern der Bits: " + error)
     }
-    res.redirect('/raid');
+    res.redirect('/raids');
 });
 
 RaidBoxRoute.post('/upload/raid',
@@ -103,7 +155,7 @@ RaidBoxRoute.post('/upload/raid',
             const sessionData = JSON.parse(sessionDataRaw);
             const userId = sessionData.userId;
             const user = ClientManager.getClient(userId);
-            const userFolder = path.join("uploads", "raid", String(userId));
+            const userFolder = path.join("uploads", "raids", String(userId));
 
             if (!fs.existsSync(userFolder)) {
                 fs.mkdirSync(userFolder, { recursive: true });
@@ -136,9 +188,9 @@ RaidBoxRoute.post('/upload/raid',
                     '-vf', 'fps=30,scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=yuva420p',
                     '-vcodec', 'libwebp',
                     '-lossless', '0',
-                    '-q:v', '75',                
-                    '-compression_level', '6',   
-                    '-preset', 'picture',        
+                    '-q:v', '75',
+                    '-compression_level', '6',
+                    '-preset', 'picture',
                     '-loop', '0',
                     '-an',
                     '-y',
@@ -153,8 +205,10 @@ RaidBoxRoute.post('/upload/raid',
                     }
                 }
                 const imagePathEnd = `../../${imagePath}`;
-                user.alertBox.Raid.img = imagePathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Raid", { imagePath: imagePathEnd }]);
+                if (user) {
+                    user.alertBox.Bits.img = imagePathEnd;
+                }
+                await Insert.UpdateAlertBoxImage([userId, "Raids", imagePathEnd]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -175,12 +229,12 @@ RaidBoxRoute.post('/upload/raid',
                     }
                 }
                 const soundPathEnd = `../../${soundPath}`;
-                user.alertBox.Raid.sound = soundPathEnd;
-                await Insert.AlertBoxKey([userId, user.wsKeys.alertBoxKey, "Raid", { soundPath: soundPathEnd }]);
+                if (user) {
+                    user.alertBox.Bits.sound = soundPathEnd;
+                }
+                await Insert.UpdateAlertBoxSound([userId, "Raids", soundPathEnd]);
             }
-
-            res.redirect("/raid");
-
+            res.redirect("/raids");
         } catch (error) {
             console.error("Upload Error:", error);
             // Temp-Dateien aufräumen im Fehlerfall
@@ -201,5 +255,6 @@ RaidBoxRoute.post('/test', async (req, res) => {
     };
 
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-    Alerts.testAlert(sessionData.userId, "Raid", sessionData.username)
+    Alerts.testAlert(sessionData.userId, "Raids", sessionData.username)
+    res.redirect("/raids")
 })

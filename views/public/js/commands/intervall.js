@@ -2,90 +2,100 @@ let counter = 0
 
 const saveIntervallNames = []
 
-window.addEventListener("load", () => {
-    renderIntervall()
-})
-
-function renderIntervall() {
-    const keys = Object.keys(data)
-    keys.sort()
-    const headline = document.getElementById("headline")
-    for (let index = 0; index < keys.length; index++) {
-        headline.innerHTML += renderTemplate(data[keys[index]].intervallName, data[keys[index]].text, data[keys[index]].intervall, data[keys[index]].state)
-    }
-}
-function renderTemplate(category, respone_text, intervall, state) {
-    return `<div style="border-radius: 0;" class="box-line" id="${category}">
-                <div class="img-tag">
-                    <button onclick="deleteIntervall('${category}')">x</button>
-                    <img src="./img/intervall/pencil.png" alt="" onclick="editIntervall('${category}')">
-                </div>
-                <div style="width: 10%;">
-                    ${category}
-                </div>
-                <div style="width: 60%;" id="${category}Text">
-                    <p style="width: 80%;" id="${category}ShowText">${respone_text}</p>
-                </div>
-                <div style="width: 10%;" id="${category}Intervall">
-                    <p style="width: 100%;" id="${category}ShowIntervall">${intervall}</p>
-                </div>
-                <label>
-                    <input id="${category}IntervallState" onclick="stateCheck('${category}')" type="checkbox" ${renderGetState(state)} >
-                    <div class="toggle"><span></span></div>
-                </label>
-            </div>`
-}
-function renderGetState(state) {
-    if (state) {
-        return "checked"
-    }
-}
-
 // abreifen des namens für speichern des intervalls
 function stateCheck(intervallName) {
     saveIntervallNames.push(intervallName)
 }
 
-function saveIntervall() {
-    for (let index = 0; index < saveIntervallNames.length; index++) {
-
-        if (!document.getElementById(`${saveIntervallNames[index]}InputText`)) {
-            const obj = {
-                text: document.getElementById(`${saveIntervallNames[index]}ShowText`).innerText,
-                intervall: document.getElementById(`${saveIntervallNames[index]}ShowIntervall`).innerText,
-                state: document.getElementById(`${saveIntervallNames[index]}IntervallState`).checked,
-                intervallName: saveIntervallNames[index]
-            }
-            document.cookie = `${saveIntervallNames[index].split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
+async function saveIntervall(button) {
+    const btnText = button.innerText;
+    const obj = {}
+    for (const key of saveIntervallNames) {
+        if (!document.getElementById(`${key}InputText`)) {
+            Object.assign(obj, {
+                [key]: {
+                    text: document.getElementById(`${key}ShowText`).innerText,
+                    intervall: document.getElementById(`${key}ShowIntervall`).innerText,
+                    state: document.getElementById(`${key}IntervallState`).checked,
+                    intervallName: key
+                }
+            })
         }
         else {
-            const obj = {
-                text: document.getElementById(`${saveIntervallNames[index]}InputText`).value,
-                intervall: document.getElementById(`${saveIntervallNames[index]}InputIntervall`).value,
-                state: document.getElementById(`${saveIntervallNames[index]}IntervallState`).checked,
-                intervallName: saveIntervallNames[index]
-            }
-            document.cookie = `${saveIntervallNames[index].split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
+            Object.assign(obj, {
+                [key]: {
+                    text: document.getElementById(`${key}InputText`).value,
+                    intervall: document.getElementById(`${key}InputIntervall`).value,
+                    state: document.getElementById(`${key}IntervallState`).checked,
+                    intervallName: key
+                }
+            })
         }
     }
+
     for (let index = 0; index < counter; index++) {
-        const intervallName = document.getElementById(`newName${index}`).value
+        const intervallName = document.getElementById(`newName${index}`)
         // falls die nummer nicht gegeben wurde
+        const intervallText= document.getElementById(`newText${index}`).value
         let intervallNumber = document.getElementById(`newIntervall${index}`).value
         if (intervallNumber == "") {
             intervallNumber = 300
         }
-
-        const obj = {
-            text: document.getElementById(`newText${index}`).value,
-            intervall: intervallNumber,
-            state: true,
-            intervallName: intervallName
+        if (intervallName.value === '') {
+            alert("Der Name darf nicht leer sein!")
+            intervallName.addEventListener('click', () => {
+                intervallName.style.borderColor = '#2bdffe'
+            })
+            intervallName.style.borderColor = "red";
+            return
         }
-        document.cookie = `${intervallName.split(" ").join("")}=${JSON.stringify(obj)};max-age=1000`
+        document.getElementById(`new${index}`).innerHTML = renderTemplate(intervallName.value, intervallText, intervallNumber, true )
+        Object.assign(
+            obj, {
+            [intervallName.value]: {
+                text: intervallText,
+                intervall: intervallNumber,
+                state: true,
+                intervallName: intervallName.value
+            }
+        })
     }
+    await fetchIntervall(obj, button, btnText)
+    // window.location.href = "/intervall/save"
+}
 
-    window.location.href = "/intervall/save"
+async function fetchIntervall(data, saveBtn, btnText) {
+    try {
+        const response = await fetch('/intervall/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Action-Type': 'Save-Follower-Settings'
+            },
+            body: JSON.stringify(data)
+        })
+        if (response.ok) {
+
+            saveBtn.innerText = "Erfolgreich gespeichert.";
+            saveBtn.style.animation = "rainbow 5s"
+            setTimeout(() => {
+                saveBtn.disabled = false;
+                saveBtn.style.color = "white"
+                saveBtn.innerText = btnText;
+                saveBtn.style.animation = null;
+            }, 5000);
+        }
+        else {
+            saveBtn.disabled = true;
+            saveBtn.style.color = "red",
+                saveBtn.innerText = "FEHLER "
+        }
+    } catch (error) {
+        saveBtn.disabled = true;
+        saveBtn.color = "red",
+            saveBtn.innerText = "FEHLER " + error
+    }
 }
 
 function editIntervall(intervallName) {
@@ -99,9 +109,19 @@ function editIntervall(intervallName) {
     document.getElementById(`${intervallName}Intervall`).innerHTML += `<input min="0" id="${intervallName}InputIntervall" style="width: 100%;" type="number" placeholder="Dauer des Intervalls" value="${showIntervall.innerText}">`
 }
 
-function deleteIntervall(intervallName) {
-    document.getElementById(intervallName).remove()
-    window.location.href = `/intervall/delete/${intervallName}`
+async function deleteIntervall(intervallName) {
+    const response = await fetch('/intervall/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-Action-Type': 'Save-Follower-Settings'
+        },
+        body: JSON.stringify({intervallName})
+    })
+    if (response.ok) {
+        document.getElementById(intervallName).remove()
+    }
 }
 
 function createIntervall() {

@@ -9,7 +9,13 @@ header {
     align-items: center;
 }
 
+:root {
+    color-scheme: dark;
+}
+
 .logo img {
+    filter: none !important;
+    forced-color-adjust: none;
     height: 80px;
 }
 
@@ -129,7 +135,6 @@ S .connection-buttons p {
     background-color: rgb(169, 112, 255);
 }
 
-
 .hamburger {
     width: 40px;
     height: 30px;
@@ -142,10 +147,12 @@ S .connection-buttons p {
 .hamburger span {
     display: block;
     height: 4px;
-    background: white;
+background: #fefefe; 
     border-radius: 2px;
     transition: transform 0.25s ease;
     will-change: transform;
+    color-scheme: only dark;
+    forced-color-adjust: none;
 }
 
 .hamburger:hover span:nth-child(1) {
@@ -171,6 +178,7 @@ S .connection-buttons p {
     transform: translateX(-100%);
     transition: transform 0.5s ease;
 }
+
 .hamburger-menu div {
     padding: 25px 40px;
 }

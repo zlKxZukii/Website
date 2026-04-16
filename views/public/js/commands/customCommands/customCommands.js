@@ -12,9 +12,12 @@ async function initSave() {
 }
 
 async function saveVals(saveBtn, btnText) {
-    const keys = Object.keys(customCommands)
+    const keys = []
+    const divs = document.querySelectorAll('.default-commands');
+    divs.forEach(element => {
+        keys.push(element.id)
+    });
     const fetchData = {};
-
     for (let index = 0; index < keys.length; index++) {
         Object.assign(fetchData, {
             [keys[index]]: {
@@ -33,12 +36,13 @@ async function saveVals(saveBtn, btnText) {
                 }
             }
         })
+        
         document.getElementById([keys[index]] + "LinkId").innerText = document.getElementById([keys[index]] + "Link").value
         if (document.getElementById(`${keys[index] + 'Link'}`).value === "") {
             Object.assign(fetchData[keys[index]], { response_text: document.getElementById([keys[index]] + "LinkId").innerText })
         }
     };
-
+console.log(keys)
     try {
         const response = await fetch('/customcommands/save', {
             method: 'POST',
@@ -57,6 +61,7 @@ async function saveVals(saveBtn, btnText) {
                 saveBtn.disabled = false;
                 saveBtn.style.color = "white"
                 saveBtn.innerText = btnText;
+                saveBtn.style.animation = null;
             }, 5000);
         }
         else {

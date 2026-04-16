@@ -54,8 +54,8 @@ customCommandsRoute.post("/save", async (req, res) => {
         const keys = Object.keys(req.body)
         for (let index = 0; index < keys.length; index++) {
             const { category, response_text, state, stateTitle } = req.body[keys[index]]
+            console.log(category)
             let { cooldown, delay } = req.body[keys[index]]
-            console.log(cooldown)
             if (cooldown < 0) {
                 cooldown = 0
             }
@@ -77,6 +77,9 @@ customCommandsRoute.post("/save", async (req, res) => {
                 stateTitle.vip])
             // Update user
             for (const key in keys) {
+                if (key === undefined) {
+
+                }
                 if (user.customCommands[key].category) {
                     user.customCommands[key].response_text = response_text
                     user.customCommands[key].cooldown = cooldown
@@ -105,7 +108,19 @@ customCommandsRoute.post("/create", async (req, res) => {
         const { category, responseText, trigger } = req.body
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-
+        Object.assign(user.customCommands, {
+            category: category,
+            response_text: responseText,
+            cooldown: 0,
+            trigger: trigger,
+            delay: 0,
+            state: false,
+            anybody: false,
+            broadcaster: false,
+            moderator: false,
+            subscriber: false,
+            vip: false
+        })
         await Insert.CreateCustomCommands([sessionData.userId, category, responseText, trigger])
 
     } catch (error) {
@@ -121,8 +136,12 @@ customCommandsRoute.post("/delete", async (req, res) => {
     };
     const { category } = req.body;
     const sessionData = JSON.parse(await client.get(`sess:${key}`));
-
+    const user = ClientManager.getClient(sessionData.userId)
+    for (const obj in user.customCommands) {
+        if (category === user.customCommands[obj].category) {
+            delete user.customCommands[obj]
+        }
+    }
     await Delete.CustomCommands([sessionData.userId, category]);
-
     res.redirect("/customcommands");
 })

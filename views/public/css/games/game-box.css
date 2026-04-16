@@ -1,0 +1,47 @@
+body {
+            margin: 0;
+            overflow: hidden;
+            background-color: transparent;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            background-color: transparent;
+        }
+
+        #batGame {
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Startet unsichtbar */
+        }
+
+        #leaderboard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ffffff;
+            min-width: 180px;
+            pointer-events: none;
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #00f2ff;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px #000;
+        }
