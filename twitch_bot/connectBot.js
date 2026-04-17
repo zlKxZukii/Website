@@ -27,12 +27,10 @@ class BotManager {
             const clipBoxColors = await this.boxSettings(userId)
             const games = await this.games(userId)
             const alertBox = await this.getAlertBox(userId)
-            const alertQuery = {}
             const jokeState = await Select.JokeDataForUser([userId]) || {};
             const defaultCommands = await Select.Commands([userId]) || {};
             const accessShieldState = await Select.AccessShield([userId]) || {};
             const customCommands = await Select.CustomCommand([userId]) || {};
-            const spamBotProtection = {};
             const intervallList = await this.initTimer(chatClient, username, userId);
             this.client.set(userId, {
                 userId,
@@ -44,9 +42,10 @@ class BotManager {
                 defaultCommands,
                 accessShieldState,
                 customCommands,
-                spamBotProtection,
+                spamBotProtection: {},
+                spamBotIntervall: {},
                 intervallList,
-                alertQuery,
+                alertQuery: {},
                 alertBox,
                 alertIsActive: false,
                 browserKeys,
@@ -57,7 +56,6 @@ class BotManager {
                 gamePlayer: [],
                 games
             });
-            console.log(username)
             await Insert.BotState([userId, true, username]);
 
             // zeigt die komplette User Lise
@@ -232,9 +230,11 @@ class BotManager {
         const DB = await Select.Intervall([userId]);
         for (const entry of DB) {
             if (entry.state) {
-                Object.assign(tasks,{[entry.category]: setInterval(() => {
-                    client.say(username, entry.response_text)
-                }, entry.intervall * 1000)})
+                Object.assign(tasks, {
+                    [entry.category]: setInterval(() => {
+                        client.say(username, entry.response_text)
+                    }, entry.intervall * 1000)
+                })
             };
         };
         return tasks

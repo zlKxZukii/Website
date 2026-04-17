@@ -1,6 +1,7 @@
 import express from "express"
 import client from "../../src/redisClient.js";
 import { Insert, Select } from "../../sql/sqlHandler.js";
+import { ClientManager } from "../../twitch_bot/connectBot.js";
 export const batGameRoute = express.Router()
 
 batGameRoute.get("/", async (req, res) => {
@@ -18,7 +19,7 @@ batGameRoute.get("/", async (req, res) => {
             link: `https://scaletta.live/games/${DB[0].key}`,
             title: "Flattermann",
             type: "Spiele",
-                        helpLink: 'https://scaletta.live/games',
+            helpLink: 'https://scaletta.live/games',
             showBody: true,
             pathColor: null,
             wallColor: null
@@ -27,6 +28,10 @@ batGameRoute.get("/", async (req, res) => {
             if (game.game === 'Bat') {
                 obj.pathColor = game.settings.pathColor
                 obj.wallColor = game.settings.wallColor
+                Object.assign(obj, {
+                    state: game.state,
+                    duration: game.settings.duration
+                })
             };
         }
         res.render("main/games/batGame/batGame.ejs", obj)
@@ -44,11 +49,14 @@ batGameRoute.post("/save", async (req, res) => {
     };
     try {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
-        const data = req.body;
-        await Insert.UpdateGame([sessionData.userId, "Bat", {
-            wallColor: data.wallColor,
-            pathColor: data.pathColor
-        }])
+        const user = ClientManager.getClient(sessionData.userId);
+        const { wallColor, pathColor, duration, state } = req.body;
+        const settings = {
+            wallColor, pathColor, duration
+        }
+        await Insert.UpdateGame([sessionData.userId, "Bat", settings, state])
+        user.games.Bat.state = state
+        user.games.Bat.settings = state
     } catch (error) {
         console.log("Fehler beim Speichern von BatGame: ", error)
     }

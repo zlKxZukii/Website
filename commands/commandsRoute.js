@@ -5,13 +5,13 @@ import { Select, Insert } from "../sql/sqlHandler.js";
 import { ClientManager } from "../twitch_bot/connectBot.js";
 
 const defaultCommandsObj = [
-        { category: 'Discord', triggers: ['!dc', '!discord'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'Facebook', triggers: ['!fb', '!facebook'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'YouTube', triggers: ['!yt', '!youtube'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'TikTok', triggers: ['!tt', '!tiktok'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'Instagram', triggers: ['!insta', '!instagram'], settings: { cooldown: 0, delay: 0 } },
-        { category: 'Clip', triggers: ['!clip'], settings: { clipLength: 30 } },
-        { category: 'Shoutout', triggers: ['!so', '!sh', '!shoutout'], settings: { color: '#ffffff', sound: '../uploads/default/sound.mp3', font: '', positioning: '', extra: '' } }]
+    { category: 'Discord', triggers: ['!dc', '!discord'], settings: { cooldown: 0, delay: 0 } },
+    { category: 'Facebook', triggers: ['!fb', '!facebook'], settings: { cooldown: 0, delay: 0 } },
+    { category: 'YouTube', triggers: ['!yt', '!youtube'], settings: { cooldown: 0, delay: 0 } },
+    { category: 'TikTok', triggers: ['!tt', '!tiktok'], settings: { cooldown: 0, delay: 0 } },
+    { category: 'Instagram', triggers: ['!insta', '!instagram'], settings: { cooldown: 0, delay: 0 } },
+    { category: 'Clip', triggers: ['!clip'], settings: { clipLength: 30 } },
+    { category: 'Shoutout', triggers: ['!so', '!sh', '!shoutout'], settings: { color: '#ffffff', sound: '../uploads/default/sound.mp3', font: '', positioning: '', extra: '' } }]
 
 
 commandsRoute.get("", async (req, res) => {
@@ -85,14 +85,13 @@ commandsRoute.post("/save", async (req, res) => {
     for (let index = 0; index < keys.length; index++) {
         const userParams = user.defaultCommands[index]
 
-
         const { value, state, stateTitle } = req.body[keys[index]]
         const settings = {}
         const fields = ['cooldown', 'delay', 'clipLength', 'color', 'sound'];
         fields.forEach(field => {
             if (field in req.body[keys[index]]) settings[field] = req.body[keys[index]][field];
         });
-        if ( userParams=== undefined) {
+        if (userParams === undefined) {
             Object.assign(user.defaultCommands, {
                 category: keys[index],
                 response_text: value,

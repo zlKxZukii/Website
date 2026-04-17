@@ -60,8 +60,62 @@
                                     <input type="range" id="headlineShadowy" min="-50" max="50"
                                         value="<%= locals.head?.y.replace('px','') || '0' %>">
                                 </div>
+                                <div class="options-head">
+                                    <label for="font-family">Schrifttyp</label>
+                                    <select class="selecter" id="headFamily">
+                                        <option value="'Inter', sans-serif"
+                                            <%=locals.head?.family==="'Inter', sans-serif" ? 'selected' : '' %>
+                                            >Inter</option>
+                                        <option value="'Roboto Flex', sans-serif"
+                                            <%=locals.head?.family==="'Roboto Flex', sans-serif" ? 'selected' : '' %>
+                                            >Roboto Flex</option>
+                                        <option value="'Montserrat', sans-serif"
+                                            <%=locals.head?.family==="'Montserrat', sans-serif" ? 'selected' : '' %>
+                                            >Montserrat</option>
+                                        <option value="'Poppins', sans-serif"
+                                            <%=locals.head?.family==="'Poppins', sans-serif" ? 'selected' : '' %>
+                                            >Poppins</option>
+                                        <option value="'Open Sans', sans-serif"
+                                            <%=locals.head?.family==="'Open Sans', sans-serif" ? 'selected' : '' %>
+                                            >Open Sans</option>
+                                        <option value="'Oswald', sans-serif"
+                                            <%=locals.head?.family==="'Oswald', sans-serif" ? 'selected' : '' %>>Oswald
+                                        </option>
+                                        <option value="'Playfair Display', serif"
+                                            <%=locals.head?.family==="'Playfair Display', serif" ? 'selected' : '' %>
+                                            >Playfair Display</option>
+                                        <option value="'Lora', serif" <%=locals.head?.family==="'Lora', serif"
+                                            ? 'selected' : '' %>>Lora</option>
+                                        <option value="'Fira Code', monospace"
+                                            <%=locals.head?.family==="'Fira Code', monospace" ? 'selected' : '' %>>Fira
+                                            Code</option>
+                                        <option value="'Ubuntu', sans-serif"
+                                            <%=locals.head?.family==="'Ubuntu', sans-serif" ? 'selected' : '' %>>Ubuntu
+                                        </option>
+                                        <option value="'Bebas Neue', sans-serif"
+                                            <%=locals.head?.family==="'Bebas Neue', sans-serif" ? 'selected' : '' %>
+                                            >Bebas Neue</option>
+                                        <option value="'Space Grotesk', sans-serif"
+                                            <%=locals.head?.family==="'Space Grotesk', sans-serif" ? 'selected' : '' %>
+                                            >Space Grotesk</option>
+                                        <option value="'Josefin Sans', sans-serif"
+                                            <%=locals.head?.family==="'Josefin Sans', sans-serif" ? 'selected' : '' %>
+                                            >Josefin Sans</option>
+                                        <option value="'Fraunces', serif" <%=locals.head?.family==="'Fraunces', serif"
+                                            ? 'selected' : '' %>
+                                            >Fraunces</option>
+                                        <option value="'Caveat', cursive" <%=locals.head?.family==="'Caveat', cursive"
+                                            ? 'selected' : '' %>
+                                            >Caveat</option>
+                                    </select>
+                                </div>
+                                <div class="options-head">
+                                    <label for="font-size">Schriftgröße:</label>
+                                    <input type="range" class="selecter" id="headSize" min="8" max="100"
+                                        value="<%= locals.head?.size %>" style="width: 100%;">
+                                </div>
                                 <p id="testHead"
-                                    style=" color:<%= locals.head?.color || '#ffffff' %>; text-shadow:<%= locals.head?.rgba || 'rgba(0,0,0,1)' %> <%= locals.head?.x || '0px' %> <%= locals.head?.y || '0px' %> <%= locals.head?.blur || '15px' %>; font-size: 36px; margin: 80px; display: flex; justify-content: center;">
+                                    style=" text-align: center; align-items: center; height: 150px; font-size: <%= locals.head?.size + 'px' || '24px' %>; font-family:<%= locals.head?.family || 'null' %> ; color:<%= locals.head?.color || '#ffffff' %>; text-shadow:<%= locals.head?.rgba || 'rgba(0,0,0,1)' %> <%= locals.head?.x || '0px' %> <%= locals.head?.y || '0px' %> <%= locals.head?.blur || '15px' %>; margin: 80px; display: flex; justify-content: center;">
                                     Test Text</p>
                             </div>
 
@@ -98,62 +152,62 @@
                                     <input type="range" id="clipShadowY" min="-50" max="50"
                                         value="<%= locals.clip?.y.replace('px','') || '0' %>">
                                 </div>
-                                <div class="option-clip">
+                                <div class="options-clip">
                                     <label for="font-family">Schrifttyp</label>
-                                    <select class="selecter" id="font-family">
+                                    <select class="selecter" id="clipFamily">
                                         <option value="'Inter', sans-serif"
-                                            <%=locals[boxes].family==="'Inter', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Inter', sans-serif" ? 'selected' : '' %>
                                             >Inter</option>
                                         <option value="'Roboto Flex', sans-serif"
-                                            <%=locals[boxes].family==="'Roboto Flex', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Roboto Flex', sans-serif" ? 'selected' : '' %>
                                             >Roboto Flex</option>
                                         <option value="'Montserrat', sans-serif"
-                                            <%=locals[boxes].family==="'Montserrat', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Montserrat', sans-serif" ? 'selected' : '' %>
                                             >Montserrat</option>
                                         <option value="'Poppins', sans-serif"
-                                            <%=locals[boxes].family==="'Poppins', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Poppins', sans-serif" ? 'selected' : '' %>
                                             >Poppins</option>
                                         <option value="'Open Sans', sans-serif"
-                                            <%=locals[boxes].family==="'Open Sans', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Open Sans', sans-serif" ? 'selected' : '' %>
                                             >Open Sans</option>
                                         <option value="'Oswald', sans-serif"
-                                            <%=locals[boxes].family==="'Oswald', sans-serif" ? 'selected' : '' %>>Oswald
+                                            <%=locals.clip?.family==="'Oswald', sans-serif" ? 'selected' : '' %>>Oswald
                                         </option>
                                         <option value="'Playfair Display', serif"
-                                            <%=locals[boxes].family==="'Playfair Display', serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Playfair Display', serif" ? 'selected' : '' %>
                                             >Playfair Display</option>
-                                        <option value="'Lora', serif" <%=locals[boxes].family==="'Lora', serif"
+                                        <option value="'Lora', serif" <%=locals.clip?.family==="'Lora', serif"
                                             ? 'selected' : '' %>>Lora</option>
                                         <option value="'Fira Code', monospace"
-                                            <%=locals[boxes].family==="'Fira Code', monospace" ? 'selected' : '' %>>Fira
+                                            <%=locals.clip?.family==="'Fira Code', monospace" ? 'selected' : '' %>>Fira
                                             Code</option>
                                         <option value="'Ubuntu', sans-serif"
-                                            <%=locals[boxes].family==="'Ubuntu', sans-serif" ? 'selected' : '' %>>Ubuntu
+                                            <%=locals.clip?.family==="'Ubuntu', sans-serif" ? 'selected' : '' %>>Ubuntu
                                         </option>
                                         <option value="'Bebas Neue', sans-serif"
-                                            <%=locals[boxes].family==="'Bebas Neue', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Bebas Neue', sans-serif" ? 'selected' : '' %>
                                             >Bebas Neue</option>
                                         <option value="'Space Grotesk', sans-serif"
-                                            <%=locals[boxes].family==="'Space Grotesk', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Space Grotesk', sans-serif" ? 'selected' : '' %>
                                             >Space Grotesk</option>
                                         <option value="'Josefin Sans', sans-serif"
-                                            <%=locals[boxes].family==="'Josefin Sans', sans-serif" ? 'selected' : '' %>
+                                            <%=locals.clip?.family==="'Josefin Sans', sans-serif" ? 'selected' : '' %>
                                             >Josefin Sans</option>
-                                        <option value="'Fraunces', serif" <%=locals[boxes].family==="'Fraunces', serif"
+                                        <option value="'Fraunces', serif" <%=locals.clip?.family==="'Fraunces', serif"
                                             ? 'selected' : '' %>
                                             >Fraunces</option>
-                                        <option value="'Caveat', cursive" <%=locals[boxes].family==="'Caveat', cursive"
+                                        <option value="'Caveat', cursive" <%=locals.clip?.family==="'Caveat', cursive"
                                             ? 'selected' : '' %>
                                             >Caveat</option>
                                     </select>
                                 </div>
-                                <div class="option-clip">
+                                <div class="options-clip">
                                     <label for="font-size">Schriftgröße:</label>
-                                    <input type="range" class="selecter" id="font-size" min="8" max="100"
-                                        value="<%= locals[boxes].size %>" style="width: 100%;">
+                                    <input type="range" class="selecter" id="clipSize" min="8" max="100"
+                                        value="<%= locals.clip?.size %>" style="width: 100%;">
                                 </div>
                                 <p id="testClip"
-                                    style=" color:<%= locals.clip?.color || '#ffffff' %>; text-shadow: <%= locals.clip?.rgba || 'rgba(0,0,0,1)' %> <%= locals.clip?.x || '0px' %> <%= locals.clip?.y || '0px' %> <%= locals.clip?.blur || '15px' %>; font-size: 36px; margin: 80px; display: flex; justify-content: center;">
+                                    style=" text-align: center; align-items: center; height: 150px; font-size: <%= locals.clip?.size+'px' || '24px' %>; font-family:<%= locals.clip?.family || 'null' %> ; color:<%= locals.clip?.color || '#ffffff' %>; text-shadow: <%= locals.clip?.rgba || 'rgba(0,0,0,1)' %> <%= locals.clip?.x || '0px' %> <%= locals.clip?.y || '0px' %> <%= locals.clip?.blur || '15px' %>; margin: 80px; display: flex; justify-content: center;">
                                     Test Text</p>
                             </div>
                         </div>
@@ -252,6 +306,8 @@
                         const fullStyle = value.style.textShadow;
 
                         const key = value.id.replace("test", "")
+                        const family = document.getElementById(key.toLocaleLowerCase() + "Family").value
+                        const size = document.getElementById(key.toLocaleLowerCase() + "Size").value
                         const color = document.getElementById(key.toLocaleLowerCase() + "Color").value
                         const shadowColor = fullStyle.match(/rgba?\(.*?\)/);
                         const rgba = shadowColor[0]
@@ -271,7 +327,7 @@
                             const y = coords[1];
                             const blur = coords[2];
 
-                            Object.assign(data, { [key]: { color, x, y, blur, rgba, alpha } });
+                            Object.assign(data, { [key]: { color, x, y, blur, rgba, alpha, family, size } });
                         } else {
                             console.log("Kein gültiger Schatten gefunden.");
                         }
@@ -318,6 +374,26 @@
                         saveBtn.animation = null;
                     }
                 }
+            </script>
+            <script>
+                const clipFamily = document.getElementById('clipFamily')
+                const clipSize = document.getElementById('clipSize')
+                function updateFontClip() {
+                    testClip.style.fontFamily = clipFamily.value
+                    testClip.style.fontSize = clipSize.value + 'px'
+                }
+                clipFamily.addEventListener('change', updateFontClip)
+                clipSize.addEventListener('input', updateFontClip)
+            </script>
+            <script>
+                const headFamily = document.getElementById('headFamily')
+                const headSize = document.getElementById('headSize')
+                function updateFontHead() {
+                    testHead.style.fontFamily = headFamily.value
+                    testHead.style.fontSize = headSize.value + 'px'
+                }
+                headFamily.addEventListener('change', updateFontHead)
+                headSize.addEventListener('input', updateFontHead)
             </script>
             <script>
                 const clipPlayer = document.getElementById('clipsPlayer')

@@ -69,6 +69,10 @@
     height: 60px;
 }
 
+.options-clip label {
+    text-align: right;
+}
+
 .options-clip:nth-child(odd) {
     background-color: black;
 }

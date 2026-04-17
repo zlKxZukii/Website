@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 
-<head>
-    <meta charset="UTF-8">
-    <title>OBS Bat Cave - Overlay Edition</title>
-    <style>
-
-    </style>
-</head>
-
 <body>
     <div id="batGame">
         <div id="leaderboard">
@@ -32,6 +24,7 @@
         let bats = [];
         let highscores = {};
         let cavePoints = [];
+        let duration = 30000; // Standardwert 30 Sek
         const segmentWidth = 30;
         const caveGap = 270;
 
@@ -39,7 +32,6 @@
         let lastActivity = Date.now();
         let loopId = null;
 
-        // Globale Einstellungen für das Design
         let currentSettings = {
             wallColor: '#ffffff',
             pathColor: '#222222'
@@ -57,7 +49,6 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Initialisierung der Höhle
         function initCave() {
             cavePoints = [];
             for (let i = 0; i < Math.ceil(canvas.width / segmentWidth) + 10; i++) {
@@ -68,15 +59,13 @@
 
         function spawnBat(data) {
             lastActivity = Date.now();
-
-            // Farben global aktualisieren, falls mitgeschickt
+            if (data.duration) duration = data.duration * 1000;
+            
             if (data.wallColor) currentSettings.wallColor = data.wallColor;
             if (data.pathColor) currentSettings.pathColor = data.pathColor;
 
-            // Bestehende Fledermaus des Users entfernen (Reset bei neuem !bat)
             bats = bats.filter(b => b.name !== data.viewerName);
 
-            // NEU: Bild aus der URL erstellen, falls vorhanden
             let img = null;
             if (data.emoteUrl) {
                 img = new Image();
@@ -93,7 +82,7 @@
 
             bats.push({
                 name: data.viewerName, baseX: 150, x: 150, y: spawnY, v: 0, color: newColor,
-                emote: img, // Hier wird das Bild-Objekt gespeichert
+                emote: img,
                 dist: 0, alive: true, phase: Math.random() * 10,
                 offsetY: (Math.random() - 0.5) * 80, reaction: 0.20 + Math.random() * 0.25,
                 lag: Math.floor(Math.random() * 8), wobble: 1.8 + Math.random() * 3.8,
@@ -107,8 +96,13 @@
             const now = Date.now();
             const anyAlive = bats.some(b => b.alive);
 
-            // AUTO-SLEEP (30 Sek Inaktivität + keine lebenden Fledermäuse)
-            if (now - lastActivity > 3000 && !anyAlive) {
+            // Wenn noch Fledermäuse leben, Timer zurücksetzen
+            if (anyAlive) {
+                lastActivity = now;
+            }
+
+            // AUTO-SLEEP: Nur wenn keiner lebt UND die Zeit abgelaufen ist
+            if (!anyAlive && (now - lastActivity > duration)) {
                 await stopLoop();
                 return false;
             }
@@ -141,7 +135,6 @@
                     highscores[b.name].color = b.color;
                 }
 
-                // Kollisionsprüfung
                 if (Math.abs(b.y - target.y) > (target.gap / 2) - 8) b.alive = false;
             });
 
@@ -167,7 +160,6 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Höhlen-Hintergrund
             ctx.fillStyle = currentSettings.pathColor;
             ctx.beginPath();
             cavePoints.forEach((p, i) => {
@@ -180,7 +172,6 @@
             }
             ctx.fill();
 
-            // 2. Höhlen-Wände
             ctx.strokeStyle = currentSettings.wallColor;
             ctx.lineWidth = 4;
             [1, -1].forEach(side => {
@@ -192,18 +183,14 @@
                 ctx.stroke();
             });
 
-            // 3. Fledermäuse / Emotes zeichnen
             bats.forEach(b => {
                 ctx.save();
                 ctx.translate(b.x, b.y + (b.alive ? Math.sin(b.jitterPhase) * 6 : 0));
                 ctx.globalAlpha = b.alive ? 1 : 0.3;
 
-                // Logik für Emote vs. Klassische Fledermaus
                 if (b.emote && b.emote.complete && b.emote.naturalWidth !== 0) {
-                    // Emote zeichnen (Größe 56x56, zentriert)
                     ctx.drawImage(b.emote, -28, -28, 56, 56);
                 } else {
-                    // Klassisches Fledermaus-Design
                     ctx.fillStyle = b.color;
                     let w = b.alive ? Math.sin(b.phase) * 20 : 10;
                     ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-30, w); ctx.lineTo(-8, 8); ctx.fill();
@@ -211,7 +198,6 @@
                     ctx.beginPath(); ctx.arc(0, 4, 5, 0, 7); ctx.fill();
                 }
 
-                // 4. Name
                 ctx.font = "bold 20px Arial";
                 ctx.textAlign = "center";
                 ctx.shadowColor = "rgba(0,0,0,0.8)";
@@ -236,17 +222,8 @@
             isRunning = false;
             cancelAnimationFrame(loopId);
             gameContainer.style.opacity = "0";
-            let scores = highscores
 
-            setTimeout(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                bats = [];
-                highscores = {};
-                initCave();
-
-                scoresDiv.innerHTML = "..Warte.."
-                if (!isRunning) ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }, 500);
+            // Zuerst speichern, solange highscores noch gefüllt ist
             await fetch('/games/save', {
                 method: 'POST',
                 headers: {
@@ -258,9 +235,16 @@
                     Bat: highscores,
                     key: targetUsername
                 })
-            })
-        }
+            });
 
+            setTimeout(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                bats = [];
+                highscores = {};
+                initCave();
+                scoresDiv.innerHTML = "..Warte..";
+            }, 500);
+        }
 
         async function loop() {
             if (!isRunning) return;
@@ -271,7 +255,6 @@
             }
         }
 
-        // Socket Events
         socket.on('spawnBat', (data) => {
             spawnBat(data);
         });

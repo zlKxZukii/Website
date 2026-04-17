@@ -1,9 +1,16 @@
 async function saveBatGame(btn, settings) {
+    const data = {
+        pathColor: settings.pathColor,
+        wallColor: settings.wallColor,
+        state: document.getElementById('batGameStateCheck').checked,
+        duration: document.getElementById('duration').value
+    }
+
     const btnText = btn.innerText;
     btn.innerText = 'Speichert...';
     btn.style.color = 'gray';
     btn.disabled = true;
-    await fetchBatData(btn, btnText, settings);
+    await fetchBatData(btn, btnText, data);
 };
 
 async function fetchBatData(btn, btnText, fetchData) {

@@ -440,12 +440,14 @@ class InsertSQL {
             INSERT INTO games (
                 twitch_id, 
                 game,
-                settings
+                settings,
+                state
             )
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (twitch_id, game) 
             DO UPDATE SET 
                 settings = games.settings || EXCLUDED.settings,
+                state = EXCLUDED.state,
                 updated_at = NOW()
             RETURNING *;`;
             const res = await query(sql, valuesArray);

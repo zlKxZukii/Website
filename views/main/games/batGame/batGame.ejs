@@ -16,25 +16,44 @@
             </div>
             <div style="display: flex;flex-direction: column;">
                 <h3>Einstellungen</h3>
-                <div>
+                <div class="manager">
                     <div class="option">
-                        <p>Beschreibung</p>
-                        <p>Farbe</p>
-                        <p>Deckkraft</p>
-                    </div>
-                    <div class="option">
-                        <label style="color:<%= wallColor %>" for="wallColor" id="wallLabel">Wandfarbe</label>
-
-                        <input type="color" id="wallColor" value="<%= wallColor?.substring(0,7) || '#000000' %>">
-                        <input type="range" id="wallOpacity" min="0" max="255" value="255">
+                        <h2>Wände</h2>
+                        <div class="align-config">
+                            <label style="color:<%= wallColor %>" for="wallColor" id="wallLabel">Farbe</label>
+                            <input type="color" id="wallColor" value="<%= wallColor?.substring(0,7) || '#000000' %>">
+                        </div>
+                        <div class="align-config">
+                            <label for="wallOpacity">Deckkraft</label>
+                            <input type="range" id="wallOpacity" min="0" max="255" value="255">
+                        </div>
                         <input type="hidden" name="wallColor" id="finalWallColor"
                             value="<%= wallColor || '#000000ff' %>">
                     </div>
                     <div class="option">
-                        <label for="pathColor" id="pathLabel">Pfadfarbe</label>
-
-                        <input type="color" id="pathColor" value="<%= pathColor?.substring(0,7) || '#000000' %>">
-                        <input type="range" id="pathOpacity" min="0" max="255" value="255">
+                        <h2>Status</h2>
+                        <label class="align-config">
+                            <p id="batGameStateText"></p>
+                            <input id="batGameStateCheck" type="checkbox" onclick="checkStateOfBox()"
+                                <%=locals.state===true ? 'checked' :'' %>>
+                            <div class="toggle"><span></span></div>
+                        </label>
+                        <div class="align-config">
+                            <label for="duration"> Dauer in Sekunden
+                            </label>
+                            <input type="number" id="duration" value="<%=locals.duration || 0 %>">
+                        </div>
+                    </div>
+                    <div class="option">
+                        <h2>Pfad</h2>
+                        <div class="align-config">
+                            <label for="pathColor" id="pathLabel">Farbe</label>
+                            <input type="color" id="pathColor" value="<%= pathColor?.substring(0,7) || '#000000' %>">
+                        </div>
+                        <div class="align-config">
+                            <label for="pathOpacity">Deckkraft</label><input type="range" id="pathOpacity" min="0"
+                                max="255" value="255">
+                        </div>
                         <input type="hidden" name="pathColor" id="finalPathColor"
                             value="<%= pathColor || '#000000ff' %>">
                     </div>
@@ -42,7 +61,7 @@
                 <button class="button-class" onclick="saveBatGame(this, currentSettings)">Speichern</button>
             </div>
     </div>
-
+<!-- game -->
     <script>
         const container = document.getElementById('flattermann-frame');
         const canvas = document.getElementById('world');
@@ -223,6 +242,7 @@
         resize();
         loop();
     </script>
+        <!-- update Colors -->
     <script>
         const wallColorInput = document.getElementById('wallColor');
         const wallOpacityInput = document.getElementById('wallOpacity');
@@ -274,4 +294,19 @@
         updatePathColor()
     </script>
 
-    <script src="../../../js/games/batGame.js"></script>
+    <script>
+        function checkStateOfBox() {
+            const batText = document.getElementById('batGameStateText')
+            if (document.getElementById('batGameStateCheck').checked) {
+                batText.innerText = 'Aktiv'
+                batText.style.color = 'green'
+            }
+            else {
+                batText.innerText = 'Inaktiv'
+                batText.style.color = 'red'
+            }
+        }
+        checkStateOfBox()
+    </script>
+
+    <script src="/js/games/batGame.js"></script>

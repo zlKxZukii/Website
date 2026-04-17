@@ -65,7 +65,7 @@ clipPlayerRoute.post('/getclip/:key', async (req, res) => {
     const { key } = req.body;
 
     if (!key) {
-        return res.json({ send: "netter Versuch" })
+        return res.json({ send: "Dieser Key existiert nicht!" })
     };
 
     const { twitch_id, username } = await Select.GetUserIdFromTools([key]);
@@ -78,7 +78,9 @@ clipPlayerRoute.post('/getclip/:key', async (req, res) => {
         duration: duration,
         game: game,
         cover: cover,
-        cliper: cliper || username
+        cliper: cliper || username,
+        clip: user.clipBoxColors.Clip,
+        head: user.clipBoxColors.Head
     });
     res.redirect(`/clipsplayer/${key}`);
 });
@@ -93,16 +95,18 @@ clipPlayerRoute.post('/save', async (req, res) => {
     const user = ClientManager.getClient(sessionData.userId);
     const settings = {}
     const valArr = ['Head', 'Clip']
+    
     for (const val of valArr) {
-        const { color, x, y, blur, rgba, alpha } = req.body[val]
-        Object.assign(settings, { [val]: { color, x, y, blur, rgba, alpha } })
+        const { color, x, y, blur, rgba, alpha, family, size } = req.body[val]
+        console.log(req.body[val])
+        Object.assign(settings, { [val]: { color, x, y, blur, rgba, alpha, family, size } })
         if (user.clipBoxColors === null) {
             user.clipBoxColors = {
                 Head: "",
                 Clip: ""
             }
         }
-        user.clipBoxColors[val] = { x, y, blur, rgba, alpha, color }
+        user.clipBoxColors[val] = { x, y, blur, rgba, alpha, color, family, size }
     }
     await Insert.UpdateBrowserJSON([sessionData.userId, 'ClipBox', settings, req.body.key])
     res.redirect("/clipsplayer")

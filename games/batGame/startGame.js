@@ -5,10 +5,10 @@ export async function sendGame(viewer, emoteId, client, key, color) {
     const obj = {
         wallColor: gameClient.settings.wallColor,
         pathColor: gameClient.settings.pathColor,
-        duaration: gameClient.settings.duration,
+        duration: Number(gameClient.settings.duration),
         viewerName: viewer,
-        emoteUrl: `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0`,
-        userColor: color
+                userColor: color,
+        emoteUrl: `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0`
     }
 
     if (!client.gamePlayer.includes(viewer)) {

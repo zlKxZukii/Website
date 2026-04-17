@@ -30,5 +30,6 @@ export const scopes = [
     // User / Bot
     "user:read:email",
     "user:read:chat",
-    "user:bot"
+    "user:bot",
+    "user:manage:blocked_users"
 ];

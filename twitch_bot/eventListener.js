@@ -59,7 +59,9 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
         // Follow Alert
         try {
             eventSubListener.onChannelFollow(userId, userId, async (event) => {
-                Alerts.saveAlert(userId, event, "Follower")
+                if (followProtection(user, userId, event.userId, event.userDisplayName)) {
+                    Alerts.saveAlert(userId, event, "Follower")
+                }
             })
         } catch (error) {
             console.log(chalk.red("Fehler beim abfangen der Follower: " + error))

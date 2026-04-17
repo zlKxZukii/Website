@@ -39,8 +39,6 @@ export async function messageProtection(client, user, apiClient, message) {
     if (!client.spamBotProtection[user.userId]) {
         const time = await getDays(user.userId, apiClient);
         Object.assign(client.spamBotProtection, { [user.userId]: { exists: time } });
-        console.log(containsText(message))
-        console.log(client.spamBotProtection[user.userId].exists)
         if (client.spamBotProtection[user.userId].exists <= 7 && containsText(message)) {
 
             await apiClient.moderation.banUser(client.userId, {
@@ -65,26 +63,36 @@ function containsText(message) {
     return false;
 }
 
-export async function followProtection(client, user, userID) {
-    if (!client.spamBotProtection[user.userId]) {
+export async function followProtection(client, userID, viewerId, viewerName) {
+    // wenn der user nicht in der liste ist
+    const list = client.spamBotProtection;
+    const intervall = client.spamBotIntervall;
+    if (!list[viewerId]) {
+        const time = await getDays(viewerId, client.apiClient)
+        Object.assign(list, { [viewerId]: { exists: time } })
+        const amount = Object.keys(list).length
 
-        const time = await getDays(user.userId, client.apiClient)
+        if (intervall.timer) {
+            clearTimeout(intervall.timer)
+        }
+        intervall.timer = setTimeout(() => {
+            for (const key in list) {
+                delete list[key]
+            }
+            delete intervall.timer;
+        }, 60000);
 
-        Object.assign(client.spamBotProtection, { [user.userId]: { exists: time } })
 
-        if (client.spamBotProtection[user.userId].exists <= 7 && containsText(message)) {
-
+        if (list[viewerId].exists <= 7 || amount >= 7 || list[viewerId].exists <= 7 && amount <= 7) {
             await client.apiClient.moderation.banUser(userID, {
-
                 reason: "SpamBotFollow",
-
-                user: user.userId
-
+                user: viewerId
             })
-
-            await client.apiClient.users.createBlock(userID, user.userId, "SpamBot")
-
-            console.log(`${user.userDisplayName} geblockt`)
+            await client.apiClient.users.createBlock(userID, viewerId, "SpamBot")
+            console.log(`${viewerName} geblockt`)
+        }
+        else {
+            return true;
         }
     }
 }

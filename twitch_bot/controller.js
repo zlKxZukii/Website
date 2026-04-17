@@ -148,13 +148,3 @@ async function games(client, message, msg) {
         }
     }
 }
-
-// {
-//   'Bat': {
-//     game: 'Bat',
-//     triggers: [ '!bat', '!bats' ],
-//     key: 'c93573f5771d407470594045f75f61907a4c998f4a1223f4dd4012d85abb425cca1ea5e0de5fb5f7f5e92e586ab70e88e21ed3d8440614572777f3e55626fdf7',
-//     settings: { wallColor: '#fff', pathColor: '#333' },
-//     leaderboard: {}
-//   }
-// }

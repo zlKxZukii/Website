@@ -1,13 +1,23 @@
-.option {
-    padding: 10px;
-    height: 50px;
+.manager {
     display: flex;
-    justify-content: space-between;
+}
+
+.option {
+    width: 33%;
+    padding: 10px;
+    height: 200px;
+    display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 .option:nth-child(odd) {
     background-color: black;
+}
+
+.option h2 {
+    margin-top: 20px;
+    font-size: 20px;
 }
 
 .option p,
@@ -15,15 +25,32 @@ input,
 label {
     display: flex;
     justify-content: center;
-    width: 33%;
 }
 
 .option:first-child {
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 0px 0px 0px 10px;
 }
 
 .option:last-child {
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 0px 0px 10px 0px;
+}
+
+.align-config {
+    padding: 20px;
+    width: 90%;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+#duration {
+    width: 30%;
+    border: solid 2px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: rgba(34, 34, 34, 1);
+    height: 20px;
+    padding: 5px;
 }
 
 .button-class {
@@ -37,4 +64,59 @@ label {
     margin: auto;
     margin-top: 10px;
     padding: 9px 18px;
+}
+
+.toggle {
+    position: relative;
+    margin: 0 10px;
+    width: 40px;
+    /* neue Breite */
+    height: 20px;
+    /* Höhe 20px */
+    background: red;
+    border-radius: 10px;
+    /* Hälfte der Höhe */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Der kleine Kreis */
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    /* Padding für 16px Kreis */
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Checkbox ausblenden */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* Wenn aktiviert: Hintergrund grün + Kreis nach rechts */
+input[type="checkbox"]:checked+.toggle {
+    background: #4caf50;
+}
+
+input[type="checkbox"]:checked+.toggle::after {
+    transform: translateX(20px);
+
+}
+
+/* Optional: Beschriftung AN/AUS */
+.toggle span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
+    user-select: none;
 }

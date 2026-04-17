@@ -295,14 +295,6 @@ class AlertHandler {
         };
     };
 
-    saveShoutout(client, response) {
-        client.isShoutout = false;
-        io.to(client.wsKeys.alertBoxKey).emit('new-alert', response)
-        setTimeout(() => {
-            client.isShoutout = true
-        }, response.duration * 1000 + 10000);
-    }
-
     saveAlert(userId, event, type) {
         try {
             const user = ClientManager.getClient(userId);
@@ -318,7 +310,7 @@ class AlertHandler {
                         decoration = settings.decoration
                     }
                     Object.assign(user.alertQuery, {
-                        [viewerName]: {
+                        [viewerName + "Follow"]: {
                             img,
                             sound,
                             layout: settings.layout,
@@ -349,7 +341,7 @@ class AlertHandler {
                         decoration = settings.decoration
                     }
                     Object.assign(user.alertQuery, {
-                        [viewerName]: {
+                        [viewerName + "Raid"]: {
                             img,
                             sound,
                             layout: settings.layout,
@@ -410,7 +402,7 @@ class AlertHandler {
                         decoration = settings.decoration
                     }
                     Object.assign(user.alertQuery, {
-                        [viewerName]: {
+                        [viewerName + "Sub"]: {
                             img,
                             sound,
                             layout: settings.layout,
@@ -505,53 +497,57 @@ class AlertHandler {
         };
     };
 
+    saveShoutout(client, response) {
+        Object.assign(client.alertQuery, { response })
+        if (client.alertIsActive === false) {
+            client.alertIsActive = true;
+            this.sendAlert(client);
+        };
+    }
+
     async sendAlert(user) {
         let keys = Object.keys(user.alertQuery);
         const delay = (ms) => new Promise(res => setTimeout(res, ms));
         try {
             while (keys.length !== 0) {
+                if (user.alertQuery[keys[0]].type === 'Shoutout') {
+                    io.to(user.wsKeys.alertBoxKey).emit('new-alert', user.alertQuery[keys[0]])
+                } else {
+                    // kommt direkt aus dem chatClient
+                    const { color, img, sound, layout, volume, duration, text, id, family, size, decoration, weight } = user.alertQuery[keys[0]];
+                    let align = 'inner';
 
-                if (user.isShoutout === false) {
-                    while (true) {
-                        await delay(3000)
-                        if (user.isShoutout) { break }
+                    if (layout === 'left') {
+                        align = "left"
                     }
-                }
-                // kommt direkt aus dem chatClient
-                const { color, img, sound, layout, volume, duration, text, id, family, size, decoration, weight } = user.alertQuery[keys[0]];
+                    else if (layout === 'right') {
+                        align = "right"
+                    }
+                    else if (layout === 'top') {
+                        align = "top"
+                    }
+                    else if (layout === 'bottom') {
+                        align = "bottom"
+                    }
 
-                let align = 'inner';
+                    const obj = {
+                        color,
+                        img,
+                        sound,
+                        align,
+                        volume,
+                        duration,
+                        text,
+                        id,
+                        family,
+                        size: size + 'px',
+                        decoration,
+                        weight
+                    };
 
-                if (layout === 'left') {
-                    align = "left"
+                    io.to(user.wsKeys.alertBoxKey).emit("new-alert", obj);
                 }
-                else if (layout === 'right') {
-                    align = "right"
-                }
-                else if (layout === 'top') {
-                    align = "top"
-                }
-                else if (layout === 'bottom') {
-                    align = "bottom"
-                }
-
-                const obj = {
-                    color,
-                    img,
-                    sound,
-                    align,
-                    volume,
-                    duration,
-                    text,
-                    id,
-                    family,
-                    size: size + 'px',
-                    decoration,
-                    weight
-                };
-
-                io.to(user.wsKeys.alertBoxKey).emit("new-alert", obj);
-                await delay(user.alertQuery[keys[0]].duration * 1000 + 1000);
+                await delay(user.alertQuery[keys[0]].duration * 1000 + 4000);
                 delete user.alertQuery[keys[0]];
                 keys = Object.keys(user.alertQuery);
             };

@@ -49,7 +49,7 @@ class Manager {
             setTimeout(() => {
                 user.clipRun = true
             }, clipId.duration * 1000 - 5000);
-
+            
             return {
                 video: video,
                 duration: clipId.duration,

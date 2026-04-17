@@ -19,13 +19,13 @@
     socket.on("newClip", (data) => {
 
         clipContainer.innerHTML = ` <div style='width:100%; display:flex; justify-content:start'>
-                                        <h2 style='width:90%; text-align:center;'>${data.game}</h2>
+                                        <h2 style="font-size:${data.head?.size}px; font-family:${data.head?.family}; color:${data.head?.color}; text-shadow:${data.head?.rgba} ${data.head?.x} ${data.head?.y} ${data.head?.blur}; width:90%; text-align:center;">${data.game}</h2>
                                     </div>
                                     <div>
                                         <video id="clipPlayer" src="${data.video}" autoplay></video> 
                                     </div>
                                     <div class="cliper">
-                                        <p>Clipped by: ${data.cliper}</p>
+                                        <p style="font-size:${data.clip?.size}px; font-family:${data.clip?.family}; color:${data.clip?.color}; text-shadow:${data.clip?.rgba} ${data.clip?.x} ${data.clip?.y} ${data.clip?.blur};" >Clipped by: ${data.cliper}</p>
                                         <img src="${data.cover}" alt="">
                                     </div>`;
         setTimeout(async () => {

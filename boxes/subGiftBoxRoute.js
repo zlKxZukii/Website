@@ -18,6 +18,7 @@ SubGiftBoxRoute.get("/", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
+        console.log("Start");
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = await ClientManager.getClient(sessionData.userId)
 
@@ -62,7 +63,6 @@ SubGiftBoxRoute.get("/", async (req, res) => {
         }
         else {
             const element = user.alertBox['Subscriber Geschenke']
-            console.log({ cumulativ: element.settings.cumulativ })
             Object.assign(obj, {
                 [obj.boxes]: {
                     color: element.settings.color,
