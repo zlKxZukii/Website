@@ -19,10 +19,15 @@ async function saveVals(saveBtn, btnText) {
     });
     const fetchData = {};
     for (let index = 0; index < keys.length; index++) {
+        console.log(keys)
+        let text = document.getElementById([keys[index]] + "Link").value
+        if (text.trim() === "") {
+            text = document.getElementById([keys[index]] + "LinkId").innerText
+        }
         Object.assign(fetchData, {
             [keys[index]]: {
                 category: keys[index],
-                response_text: document.getElementById([keys[index]] + "Link").value,
+                response_text: text,
                 cooldown: Number(document.getElementById([keys[index]] + "Cooldown").value),
                 delay: Number(document.getElementById([keys[index]] + "Delay").value),
                 state: document.getElementById([keys[index]] + "LinkState").checked,
@@ -37,12 +42,8 @@ async function saveVals(saveBtn, btnText) {
             }
         })
         
-        document.getElementById([keys[index]] + "LinkId").innerText = document.getElementById([keys[index]] + "Link").value
-        if (document.getElementById(`${keys[index] + 'Link'}`).value === "") {
-            Object.assign(fetchData[keys[index]], { response_text: document.getElementById([keys[index]] + "LinkId").innerText })
-        }
+        document.getElementById([keys[index]] + "LinkId").innerText = text
     };
-console.log(keys)
     try {
         const response = await fetch('/customcommands/save', {
             method: 'POST',
@@ -54,7 +55,6 @@ console.log(keys)
             body: JSON.stringify(fetchData)
         })
         if (response.ok) {
-
             saveBtn.innerText = "Erfolgreich gespeichert.";
             saveBtn.style.animation = "rainbow 5s"
             setTimeout(() => {
@@ -136,7 +136,7 @@ async function createCommand(key, button) {
     const fetchData = {
         category: category.value,
         responseText: responseText.value,
-        trigger: triggerArr
+        triggers: triggerArr
     };
     button.disabled = true;
     button.innerText = "Speichert...";
@@ -151,14 +151,14 @@ async function pushDB(fetchData, key, saveBtn) {
             response_text: fetchData.responseText,
             cooldown: 0,
             delay: 0,
-            state: false,
-            triggers: fetchData.trigger,
+            state: true,
+            triggers: fetchData.triggers,
             stateTitle: {
-                anybody: false,
-                broadcaster: false,
-                vip: false,
-                subscriber: false,
-                moderator: false
+                anybody: true,
+                broadcaster: true,
+                vip: true,
+                subscriber: true,
+                moderator: true
             }
         }
     }

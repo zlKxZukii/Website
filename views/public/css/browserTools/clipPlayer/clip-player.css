@@ -1,5 +1,30 @@
-.link-box{
+.link-box {
     align-items: center
+}
+
+ul {
+    width: 60%;
+}
+
+ul li {
+    text-align: center;
+    font-size: 20px;
+}
+
+ul li:nth-child(even) {
+    margin-bottom: 20px;
+}
+
+ul strong {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    font-size: 22px;
+}
+
+ul strong p {
+    color: #2bdffe;
+    margin: 0 15px;
 }
 
 #clipsPlayer {

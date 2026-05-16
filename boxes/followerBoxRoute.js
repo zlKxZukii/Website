@@ -173,32 +173,48 @@ FollowBoxRoute.post('/upload/follow',
             // 1. BILD VERARBEITUNG
             if (req.files && req.files['image']) {
                 const file = req.files['image'][0];
-                const imageName = `image-${Date.now()}.webp`;
+                let fileType = path.extname(file.originalname).toLowerCase();
+
+                // Variablen oben definieren, damit sie überall im Scope bekannt sind
+                let imageName = `image-${Date.now()}${fileType === '.webm' ? '.webm' : '.webp'}`;
                 const imagePath = path.join(userFolder, imageName);
 
-                await processFile([
-                    '-t', '10',
-                    '-i', file.path,
-                    '-vf', 'fps=30,scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=yuva420p',
-                    '-vcodec', 'libwebp',
-                    '-lossless', '0',
-                    '-q:v', '75',
-                    '-compression_level', '6',
-                    '-preset', 'picture',
-                    '-loop', '0',
-                    '-an',
-                    '-y',
-                    imagePath
-                ], file.path);
+                if (fileType === '.webm' || fileType === '.webp') {
+                    // Fall 1: Direktes Kopieren
+                    await processFile([
+                        '-i', file.path,
+                        '-c:v', 'copy',
+                        '-an',
+                        '-y',
+                        imagePath
+                    ], file.path);
+                } else {
+                    // Fall 2: Konvertieren zu WebP
+                    await processFile([
+                        '-t', '10',
+                        '-i', file.path,
+                        '-vf', 'fps=30,format=yuva420p',
+                        '-vcodec', 'libwebp',
+                        '-lossless', '0',
+                        '-q:v', '75',
+                        '-compression_level', '6',
+                        '-preset', 'picture',
+                        '-loop', '0',
+                        '-an',
+                        '-y',
+                        imagePath
+                    ], file.path);
+                }
 
-                // Alte Bilder löschen
+                // Alte Bilder löschen (imageName ist hier nun bekannt!)
                 const files = await fs.promises.readdir(userFolder);
                 for (const f of files) {
                     if (f.startsWith('image-') && f !== imageName) {
                         await fs.promises.unlink(path.join(userFolder, f)).catch(() => { });
                     }
                 }
-                const imagePathEnd = `../../${imagePath}`;
+
+                const imagePathEnd = `../../${imagePath}`; // Jetzt sicher zugreifbar
                 if (user) {
                     user.alertBox.Follower.img = imagePathEnd;
                 }

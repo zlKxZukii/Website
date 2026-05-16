@@ -3,15 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="color-scheme" content="dark">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Scaletta – der interaktive Twitch-Chat-Bot für Streamer: Mehr Witz, mehr Interaktion und weniger Stress im Stream-Chat. Automatische Commands, lustige Antworten und Community-Spaß für dein Live-Streaming.">
+    <meta name="color-scheme" content="dark">
     <title><%- locals.title %></title>
+    <meta name="description"
+        content="Scaletta: Die All-in-One Lösung für Twitch-Streamer. Interaktive Commands, automatischer Spamschutz & anpassbare Alerts – ganz ohne Code. Jetzt Stream upgraden!">
     <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+
+    <meta property="og:title" content="Scaletta – Technik für deinen Stream">
+    <meta property="og:description"
+        content="Interaktive Commands, Alerts und Bot-Schutz mit nur wenigen Klicks. Hol dir die Eule in deinen Chat!">
+    <meta property="og:image" content="DEIN_BILD_PFAD/social_owl.png">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Josefin+Sans:wght@100..700&family=Space+Grotesk:wght@300..700&display=swap"
         rel="stylesheet">
+
     <link rel="stylesheet" href="/css/assets.css">
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -24,10 +34,24 @@
 
         <%- include("../layouts/nav") %>
             <%- include("../layouts/cookie") %>
-
-                <%- include("../layouts/footer") %>
+                <%- include("../layouts/footer.ejs") %>
+                                            <a href="#nav" class="scroll-arrow" id="navArrow">
+                                &#8593;
+                            </a>
                     <% } %>
                         <%- body %>
 </body>
+<% if (showBody==true) { %>
+<script>
+    const scrollBtn = document.querySelector('.scroll-arrow');
 
+    // Auf das Scroll-Event hören
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollBtn.classList.add('show');
+        } else {
+            scrollBtn.classList.remove('show');
+        }
+    });</script>
+<% } %>
 </html>

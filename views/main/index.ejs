@@ -1,73 +1,376 @@
-<div>
+<div id="align">
+    <canvas id="moveCanvas"></canvas>
+    <h1>Erwecke deinen <br> Chat zum Leben
+        <span>
+            <%= trusted %> Streamer<br> vertrauen Scaletta!
+        </span>
+    </h1>
+
     <div class="head">
-        <h1>Mehr Witz. <br>
-            Mehr Interaktion.<br>
-            Weniger Stress. <br>
-            Für dich.
-        </h1>
-        <div class="video-div">
-            <h2>Partner von Scaletta</h2>
-            <video autoplay muted loop playsinline>
-                <source src="../VID/index/clip.webm" type="video/mp4">
-            </video>
-            <div class="video-socials">
-                <div>
-                    <a href="https://www.twitch.tv/ozanityreal"><img style="height: 25px;"
-                            src="../img/index/twitch_logo.png" alt="">OzanityReal</a>
+        <div class="head-text">
+            <div class="head-box">
+                <div class="box-text">
+                    <h3>Streamen sollte Spaß machen, nicht in Arbeit ausarten!</h3>
+                    <p>
+                        Hier kommt <strong>Scaletta</strong>
+                        ins
+                        Spiel: Die intuitive All-in-One-Lösung, die <strong>dir</strong> den Rücken freihält.
+                    </p>
+
+                    <p style="height: 20px;"></p>
+                    <p>
+                        Das Wichtigste dabei: <strong>Absolute Einfachheit.</strong><br>
+                        <span style="height: 20px;"></span>
+                        Genau wie unsere Eule im Hintergrund deiner Maus folgt,<br> begleitet dich Scaletta mühelos
+                        durch
+                        deinen Stream. Kein komplizierter Code alles ist mit nur <strong>wenigen Klicks</strong>
+                        sofort einsatzbereit.
+                    </p>
+                    <p style="height:20px;"></p>
+                    <p>
+                        Während Scaletta im Hintergrund wachsam die Fäden zieht, gehört die Bühne ganz allein dir und
+                        deinen Zuschauern.
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <p><strong style="font-size: 24px;">Scaletta – das Branding, dem du vertrauen kannst.</strong></p>
                 </div>
-
-                <div>
-                    <a href="https://www.tiktok.com/@ozanityreeal?_r=1&_t=ZN-92GiJ4FgeEo"> <img style="height: 25px;"
-                            src="../img/index/tiktok_logo.png" alt="">OzanityReal</a>
+                <div class="box-img">
+                    <img src="/img/logo.webp" alt="">
                 </div>
             </div>
-        </div>
+            <div class="head-box">
+                <div class="box-text">
+                    <h3>Was Scaletta für dich erledigt:</h3>
+                    <p>
+                        <strong>Interaktion auf Knopfdruck:</strong>
+                        Nutze den Clip-Player oder lockere die Stimmung mit Commands wie:
+                        !chuck, !flachwitzoder dem Minispiel !bat auf.
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <p>
+                        <strong>Liebe zurückgeben:</strong> Verwende den !shoutout-Command
+                        bei Raids, um deine Community zu vernetzen.
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <p><strong>Sicherheit ohne Stress:</strong>
+                        Ein Klick genügt und Scaletta blockiert Spam- und Followbots vollautomatisch für dich.</p>
+                    <p style="height: 20px;"></p>
+                    <p><strong>Anpassbare Alerts:</strong> Eine voll
+                        anpassbare Alert-Box, die ohne komplizierte Anmeldung
+                        oder Programmierung funktioniert.</p>
+                    <p style="height: 20px;"></p>
+                    <p><strong style="font-size: 24px;">Scaletta übernimmt die Technik – du machst die Show.</strong>
+                    </p>
+                </div>
+                <div class="box-img">
+                    <img src="/img/index/shoutout_owl.webp" alt="">
+                </div>
+            </div>
 
-        
-    </div>
-    <div class="hero-align">
-        <div class="hero-section">
-            <h2>Ein Twitch-Bot für Streamer,
-                die ihren Chat mit einfachen Commands<br>
-                und kleinen Witzen lebendig halten wollen
-                ohne Aufwand, ohne Ablenkung.</h2>
-        </div>
+            <div class="head-box">
+                <div class="box-text">
+                    <h3>Deine Meinung zählt. Werde Teil der Entwicklung!</h3>
+                    <p>
+                        Scaletta wächst mit <strong>dir</strong> und deiner Community.
+                        Während die Eule im Hintergrund wachsam die Fäden zieht, grübeln wir
+                        ständig darüber nach, wie wir dein Streaming-Erlebnis noch besser
+                        machen können.
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <p>
+                        <strong>Hast du eine Vision?</strong> Ganz egal, ob es ein neuer Command, ein innovatives
+                        Widget oder eine kleine Komfort-Funktion ist deine Ideen fließen direkt in die Entwicklung
+                        ein. Scaletta existiert nur für dich!
+                    </p>
 
-        <div id="example">
-            <div class="command-align">
-                <p>
-                    Timinator
-                </p>
-                <p>
-                    : <%= locals.jokeTrigger %>
-                </p>
-            </div>
-            <div class="command-align">
-                <p>
-                    <%= locals.username || "Scaletta" %>
-                </p>
-                <p>
-                    : <%= locals.jokePrompt %>
-                </p>
-            </div>
-            <div class="command-align">
-                <p>
-                    Timinator
-                </p>
-                <p>
-                    : <%= locals.socialMediaTrigger %>
-                </p>
-            </div>
-            <div class="command-align">
-                <p>
-                    <%= locals.username || "Scaletta" %>
-                </p>
-                <p>
-                    : Kontaktiere mich über Social Media: <a href="<%= locals.socialMediaPrompt %>">
-                        <%= locals.socialMediaPrompt %>
-                    </a>
-                </p>
+                    <p style="height: 20px;"></p>
+                    <p>
+                        Wenn du Wünsche, Vorschläge oder vielleicht sogar einen Bug entdeckt hast.
+                        Melde dich gerne direkt hier:
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <div id="endButtons">
+                        <button onclick="window.open('<%= whatsappLink %>', '_blank')"> <img
+                                src="/img/footer/whatsapp_logo.png" alt="">
+                            <p>WhatsApp</p>
+                        </button>
+                        <button onclick="window.open('<%= discordLink %>', '_blank')">
+                            <p>Discord</p><img src="/img/footer/discord_logo.png" alt="">
+                        </button>
+                    </div>
+                    <p style="height: 20px;"></p>
+                    <p style="text-align: center; font-size: 24px;"><strong>Scaletta freut sich auf deine Meinung!</strong></p>
+                </div>
+                <div class="box-img">
+                    <img src="/img/index/socials_owl.webp" alt="">
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+    const canvas = document.getElementById('moveCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    const mouse = { x: -200, y: -200 };
+
+    // --- STERNE KONFIGURATION ---
+    const stars = [];
+    const numStars = 150;
+
+    // --- KONFIGURATION DER EULE (BRAUN) ---
+    const move = {
+        color: '#8B4513',
+        colorDark: '#65330F',
+        eyeColor: '#FFD700',
+        pupilColor: '#000000',
+        beakColor: '#FF8C00',
+        wingColor: '#703A11',
+        numSegments: 12,
+        segmentLength: 15,
+        baseSize: 21,
+        segments: []
+    };
+
+    // --- SPRECHBLASEN KONFIGURATION (NEU) ---
+    const bubble = {
+        text: "🦉 Willkommen bei Scaletta! 🦉",
+        visible: true,
+        padding: 12,
+        fontSize: 16,
+        fontFamily: "Arial, sans-serif",
+        bgColor: "rgba(0, 0, 0, 1)",
+        textColor: "#FFF",
+        borderRadius: 12
+    };
+
+    // Initialisierung der Eule
+    for (let i = 0; i < move.numSegments; i++) {
+        move.segments.push({ x: mouse.x, y: mouse.y, angle: 0 });
+    }
+
+    // Initialisierung der Sterne
+    function initStars() {
+        stars.length = 0;
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 2,
+                opacity: 0.5 + Math.random() * 0.2,
+                speed: 0.001 + Math.random() * 0.002
+            });
+        }
+    }
+
+    window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        initStars();
+    }
+
+    function update() {
+        move.segments[0].x = mouse.x + 40;
+        move.segments[0].y = mouse.y + 40;
+
+        for (let i = 1; i < move.numSegments; i++) {
+            const dx = move.segments[i - 1].x - move.segments[i].x;
+            const dy = move.segments[i - 1].y - move.segments[i].y;
+            move.segments[i].angle = Math.atan2(dy, dx);
+            move.segments[i].x = move.segments[i - 1].x - Math.cos(move.segments[i].angle) * move.segmentLength;
+            move.segments[i].y = move.segments[i - 1].y - Math.sin(move.segments[i].angle) * move.segmentLength;
+        }
+
+        stars.forEach(star => {
+            star.opacity += star.speed;
+            if (star.opacity > 0.8 || star.opacity < 0.4) {
+                star.speed *= -1;
+            }
+        });
+    }
+
+    // --- ZEICHENFUNKTIONEN ---
+
+    function drawStars() {
+        ctx.fillStyle = "white";
+        stars.forEach(star => {
+            ctx.globalAlpha = star.opacity;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1.0;
+    }
+
+    function drawSingleFeather(x, y, angle, length, width, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.ellipse(length * 0.5, 0, length * 0.5, width, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawWingReal(x, y, angle, size, isRightWing) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        const sideMultiplier = isRightWing ? 1 : -1;
+        const baseAngle = (Math.PI / 2.1) * sideMultiplier;
+
+        for (let f = 0; f < 5; f++) {
+            const featherAngle = baseAngle + (f - 2.5) * (Math.PI / 50);
+            drawSingleFeather(0, 0, featherAngle, size * (1.1 - f * 0.05), size * 0.15, move.colorDark);
+        }
+        for (let f = 0; f < 4; f++) {
+            drawSingleFeather((f + 1) * (size * 0.15), 0, baseAngle + (Math.PI / 3) * sideMultiplier, size * 0.7, size * 0.18, move.wingColor);
+        }
+        ctx.restore();
+    }
+
+    // Funktion für die Sprechblase (Neu)
+    function drawSpeechBubble(x, y, text) {
+        if (!text || text === "") return;
+
+        ctx.font = `bold ${bubble.fontSize}px ${bubble.fontFamily}`;
+        const textMetrics = ctx.measureText(text);
+        const bubbleWidth = textMetrics.width + bubble.padding * 2;
+        const bubbleHeight = bubble.fontSize + bubble.padding * 2;
+
+        // Position oberhalb des Kopfes
+        const bx = x - bubbleWidth / 2;
+        const by = y - 85;
+
+        // Schatten für die Blase
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+
+        // Blase zeichnen
+        ctx.fillStyle = bubble.bgColor;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(bx, by, bubbleWidth, bubbleHeight, bubble.borderRadius);
+        } else {
+            ctx.rect(bx, by, bubbleWidth, bubbleHeight); // Fallback
+        }
+        ctx.fill();
+
+        // Schatten ausschalten für den Rest
+        ctx.shadowBlur = 0;
+
+        // Kleiner Pfeil nach unten
+        ctx.beginPath();
+        ctx.moveTo(x, by + bubbleHeight + 10);
+        ctx.lineTo(x - 10, by + bubbleHeight);
+        ctx.lineTo(x + 10, by + bubbleHeight);
+        ctx.fill();
+
+        // Text zeichnen
+        ctx.fillStyle = bubble.textColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, bx + bubbleWidth / 2, by + bubbleHeight / 2 + 1);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        drawStars();
+        update();
+
+        for (let i = move.numSegments - 1; i >= 0; i--) {
+            const seg = move.segments[i];
+            const currentSize = move.baseSize * ((move.numSegments - i) / move.numSegments);
+            ctx.save();
+            ctx.translate(seg.x, seg.y);
+            ctx.rotate(seg.angle);
+
+            if (i === 0) {
+                drawSingleFeather(-8, -currentSize / 2, -Math.PI / 4, 15, 6, move.color);
+                drawSingleFeather(8, -currentSize / 2, Math.PI / 4, 15, 6, move.color);
+                ctx.fillStyle = move.color;
+                ctx.beginPath(); ctx.arc(0, 0, currentSize, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = move.eyeColor;
+                ctx.beginPath();
+                ctx.arc(-currentSize * 0.5, -2, currentSize * 0.4, 0, Math.PI * 2);
+                ctx.arc(currentSize * 0.5, -2, currentSize * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = move.pupilColor;
+                ctx.beginPath();
+                ctx.arc(-currentSize * 0.5 + 1, -2, currentSize * 0.2, 0, Math.PI * 2);
+                ctx.arc(currentSize * 0.5 - 1, -2, currentSize * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = move.beakColor;
+                ctx.beginPath();
+                ctx.moveTo(0, 2);
+                ctx.lineTo(-4, currentSize * 0.6);
+                ctx.lineTo(4, currentSize * 0.6);
+                ctx.fill();
+
+            } else if (i < 4) {
+                drawWingReal(0, 0, 0, 35 + i * 8, true);
+                drawWingReal(0, 0, 0, 35 + i * 8, false);
+                ctx.fillStyle = move.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, currentSize, 0, Math.PI * 2);
+                ctx.fill();
+
+            } else if (i === move.numSegments - 2) {
+                ctx.save();
+                ctx.rotate(Math.PI);
+                for (let f = 0; f < 5; f++) {
+                    drawSingleFeather(0, 0, (f - 2) * 0.1, currentSize * 1.5, currentSize * 0.4, move.colorDark);
+                }
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        // Sprechblase am Kopf zeichnen (Segment 0)
+        if (bubble.visible) {
+            drawSpeechBubble(move.segments[0].x, move.segments[0].y, bubble.text);
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+
+
+</script>
+
+<script>
+
+    function updateOwlText(text) {
+        bubble.text = text
+    }
+
+    function updateOwlLeaveText(text) {
+        setTimeout(() => {
+            bubble.text = text
+        }, 4000);
+    }
+
+    setInterval(() => {
+        bubble.text = '🦉 Schau oben links was ich kann! 🦉'
+        setTimeout(() => {
+            bubble.text = '🦉 Dein wachsamer Begleiter. 🦉'
+        }, 4000);
+    }, 10000);
+
+</script>

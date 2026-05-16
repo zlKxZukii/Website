@@ -10,6 +10,7 @@ import { getAds } from "../obs_docks/ads/ads.js";
 import { apiClient } from "../src/server.js";
 import { ClientManager } from "./connectBot.js";
 import { Alerts } from "../boxes/alert/alerts.js";
+import { discordWebhookPreperation, userLive } from "../discord/functions/discordWebhook.js";
 
 // for schleife hinzufügen für spätere eventuelle erweiterungen der Subscriptions
 
@@ -31,13 +32,26 @@ export async function subscribeUser(eventSubListener, userId, io, client) {
 
         try {
             await eventSubListener.onStreamOnline(userId, async (event) => {
+                discordWebhookPreperation(event)
+                setTimeout(() => {
+                    userLive(event)
+                }, 5000);
                 console.log(chalk.cyan(`[LIVE] ${event.broadcasterDisplayName}`));
-                console.log(ad.ads.nextAdDate)
-                io.to(userId).emit("stream-status", { online: true });
             });
         } catch (error) {
             console.log(chalk.red("Fehler beim Online gehen: " + error))
         }
+        try {
+            await eventSubListener.onStreamOffline(userId, async (event) => {
+                setTimeout(() => {
+                    const user = ClientManager.getClient(event.broadcasterId);
+                    user.live = false;
+                }, 5000);
+            })
+        } catch (error) {
+            console.log(chalk.red("Fehler beim Offline gehen: " + error))
+        }
+
         try {
             await eventSubListener.onChannelAdBreakBegin(userId, async (event) => {
                 io.to(user.wsKeys.obsDocksKeys.ads).emit("new-add", {

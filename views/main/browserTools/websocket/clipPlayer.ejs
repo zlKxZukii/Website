@@ -8,44 +8,67 @@
 <script>
     const socket = io();
     const key = "<%= targetUser %>";
-    const clipContainer = document.getElementById('clipContainer')
+    const clipContainer = document.getElementById('clipContainer');
 
-    socket.on("connect", async () => {
-        console.log("Verbunden für Raum: " + key);
-        socket.emit("join-room", key);
-        await getClip();
-    });
+    // Hauptfunktion, die durch das Web Lock geschützt wird
+    async function runSingleInstancePlayer() {
+        // Fordert ein Schloss an, das für diesen spezifischen User eindeutig ist
+        await navigator.locks.request(`clip_player_lock_${key}`, async (lock) => {
+            console.log(lock)
+            console.log("Dieses Fenster ist nun der aktive Clip-Player.");
 
+            // Erst wenn wir das Lock haben, treten wir dem Room bei
+            socket.emit("join-room", key);
+
+            // Und starten den ersten Clip-Abruf
+            await getClip();
+
+            // Wir halten das Lock "ewig" offen, solange der Tab existiert
+            await new Promise(resolve => {
+                // Falls der Socket trennt oder das Fenster schließt, 
+                // könnte man hier auflösen, aber meist lässt man es einfach offen.
+            });
+        });
+    }
+
+    // Event-Listener für neue Clips (nur der Master-Tab wird diesen Trigger auslösen)
     socket.on("newClip", (data) => {
-
-        clipContainer.innerHTML = ` <div style='width:100%; display:flex; justify-content:start'>
-                                        <h2 style="font-size:${data.head?.size}px; font-family:${data.head?.family}; color:${data.head?.color}; text-shadow:${data.head?.rgba} ${data.head?.x} ${data.head?.y} ${data.head?.blur}; width:90%; text-align:center;">${data.game}</h2>
-                                    </div>
-                                    <div>
-                                        <video id="clipPlayer" src="${data.video}" autoplay></video> 
-                                    </div>
-                                    <div class="cliper">
-                                        <p style="font-size:${data.clip?.size}px; font-family:${data.clip?.family}; color:${data.clip?.color}; text-shadow:${data.clip?.rgba} ${data.clip?.x} ${data.clip?.y} ${data.clip?.blur};" >Clipped by: ${data.cliper}</p>
-                                        <img src="${data.cover}" alt="">
-                                    </div>`;
+        clipContainer.innerHTML = `
+            <div style='width:100%; display:flex; justify-content:start'>
+                <h2 style="font-size:${data.head?.size}px; font-family:${data.head?.family}; color:${data.head?.color}; text-shadow:${data.head?.rgba} ${data.head?.x} ${data.head?.y} ${data.head?.blur}; width:90%; text-align:center;">${data.game}</h2>
+            </div>
+            <div>
+                <video id="clipPlayer" src="${data.video}" autoplay></video> 
+            </div>
+            <div class="cliper">
+                <p style="font-size:${data.clip?.size}px; font-family:${data.clip?.family}; color:${data.clip?.color}; text-shadow:${data.clip?.rgba} ${data.clip?.x} ${data.clip?.y} ${data.clip?.blur};" >Clipped by: ${data.cliper}</p>
+                <img src="${data.cover}" alt="">
+            </div>`;
+            
+        // Timer für den nächsten Clip
         setTimeout(async () => {
-            await getClip()
-        }, data.duration * 1000 - 5000);
+            await getClip();
+        }, (data.duration * 1000) - 5000);
     });
 
     async function getClip() {
         try {
-
-            await fetch(`/clipsplayer/getclip/${key}`, {
+            const response = await fetch(`/clipsplayer/getclip/${key}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: key })
             });
-
+            if (response.status !== 200) {
+                console.log("Versuche neuen Clip zu laden.")
+                setTimeout(getClip, 3000) 
+            }
         } catch (error) {
             console.error("Fehler beim Clip-Abruf:", error);
-            setTimeout(getClip, 3000);
+            setTimeout(getClip, 4000);
         }
     }
+
+    // Startet die Logik
+    runSingleInstancePlayer();
 
 </script>

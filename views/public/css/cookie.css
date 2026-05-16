@@ -75,8 +75,7 @@
     cursor: pointer;
     position: fixed;
     bottom: 70px;
-    right: 30px;
-    transform: rotateY(180deg);
+    left: 20px;
     height: 70px;
     z-index: 100;
 }

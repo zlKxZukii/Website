@@ -13,6 +13,7 @@ import pkg from 'pg';
 import chalk from "chalk";
 import SpotifyWebApi from "spotify-web-api-node";
 const { Pool } = pkg;
+import axios from "axios";
 
 export const app = express();
 export const PORT = 3000;
@@ -86,5 +87,5 @@ export const query = (text, params) => pool.query(text, params);
 export const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: process.env.SPOTIFY_REDIRECT_URI // Hier die IP statt localhost
+    redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });

@@ -1,0 +1,77 @@
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+}
+
+#player{
+    align-items: center;
+    display: flex;
+
+    width: 100%;
+    height: 100%;
+}
+
+#player img{
+    padding: 20px;
+    border-radius: 200px;
+    height: 90%;
+    max-width: 270px;
+}
+
+#info{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+p{
+    margin: 10px;
+}
+#viz-wrapper {
+    width: 330px;
+    height: 80px; 
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-bottom: 5px;
+}
+
+#bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px; /* Abstand zwischen den Balken */
+    width: 100%;
+    height: 100%;
+}
+
+/* Die Animation */
+.playing .bar {
+    animation: wave var(--duration) infinite alternate ease-in-out;
+}
+
+@keyframes wave {
+    from { height: 15%; filter: brightness(0.8); }
+    to { height: var(--height); filter: brightness(1.2); }
+}
+
+@keyframes rotation-loop {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,113 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#player {
+    border-radius: 200px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+#player img {
+    padding-left: 20px;
+    width: 35%;
+    border-radius: 200px;
+}
+
+.info {
+    padding-left: 2%;
+    height: 100%;
+    width: 63%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.song-interpret {
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+h2,
+h3, h4 {
+    text-align: start;
+    color: #00d2ff;
+}
+
+h2 {
+    max-height: 92px;
+    overflow: hidden;
+    font-size: 40px;
+    width: 68%;
+}
+
+h3 {    max-height: 30px;
+    overflow: hidden;
+    font-size: 30px;
+}
+
+h4{
+        max-height: 24px;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+#time {
+    display: flex;
+    justify-content: space-between;
+    width: 58%;
+}
+#time p{
+    font-size: 30px;
+    color: #00d2ff
+}
+
+#viz-wrapper {
+    width: 330px;
+    height: 80px; 
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-bottom: 5px;
+}
+
+#bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px; /* Abstand zwischen den Balken */
+    width: 100%;
+    height: 100%;
+}
+
+.bar {
+    flex: 1;
+    height: 15%;
+    /* Farbenfroher Gradient: Lila -> Blau -> Türkis */
+    background: linear-gradient(to top,#8e2de2, #4a00e0, #00d2ff);
+    border-radius: 3px 3px 1px 1px;
+    box-shadow: 0 0 8px rgba(0, 210, 255, 0.4); /* Glow-Effekt */
+    transition: height 0.3s ease;
+}
+
+/* Die Animation */
+.playing .bar {
+    animation: wave var(--duration) infinite alternate ease-in-out;
+}
+
+@keyframes wave {
+    from { height: 15%; filter: brightness(0.8); }
+    to { height: var(--height); filter: brightness(1.2); }
+}

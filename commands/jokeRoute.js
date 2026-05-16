@@ -57,13 +57,13 @@ jokesRoute.post("/save", async (req, res) => {
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const bodyKeys = Object.keys(req.body)
         const user = ClientManager.getClient(sessionData.userId)
-        // insert Statements
+        // insert Statement
         for (const key of bodyKeys) {
             await Insert.jokeState([sessionData.userId, key, req.body[key]])
-            for (const keyIndex in bodyKeys) {
-                if(user.jokeState[keyIndex].category === key){
-                    user.jokeState[keyIndex].state = req.body[key]
-                }
+        }
+        if (user) {
+            for(const key in bodyKeys){
+                user.jokeState[key].state = req.body[bodyKeys[key]]
             }
         }
         res.redirect("/jokes")

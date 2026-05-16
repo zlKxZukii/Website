@@ -1,0 +1,91 @@
+<div class="align">
+    <h2>Teile mit wann du online bist!</h2>
+
+    <label for="webhook">Füge deine <a href="#webhookExp"> Webhook </a> URL hinzu!
+    </label>
+    <input id="webhook" type="text">
+
+    <button id="createHook" onclick="createHook(this)">Speichere den Hook.</button>
+        <h2 style="margin-top: 40px;">Deine Webhooks.</h2>
+        <div id="webhookDiv">
+            <div id="defaultHook" style="text-align: center; display: flex; justify-content: center;"><p style="color: red;">Keine Webhooks vorhanden.</p></div>
+        </div>
+        <button id="settingBtn" onclick="saveSettings(this)">Speichere deine Einstellungen.</button>
+            <div id="faq">
+                <h2>FAQ</h2>
+                <div class="question">
+                    <h3>Was ist ein Webhook?</h3>
+                    <p>Eine URL die Discord sofort Bescheid gibt, wann du online gehst.</p>
+                </div>
+                <h3>Woher bekommst du deinen Webhook?</h3>
+                <div id="webhookExp" class="question">
+
+                    <ul>
+                        <h4>Desktop</h4>
+                        <li>1. Gehe auf deinen Server.</li>
+                        <li>2. Rechtsklicke auf den Kanal.</li>
+                        <li>3. Kanal bearbeiten.</li>
+                        <li>4. Integrationen.</li>
+                        <li>5. WebHook erstellen.</li>
+                        <li>6. Vergib einen Namen und ein Bild.</li>
+                        <li>7. Prüfe nochmal den Kanal.</li>
+                        <li>8. Drücke auf Webhook-URL kopieren.</li>
+                    </ul>
+                    <div id="hold">
+                        <img class="placeholder" src="/img/logo.webp" alt="">
+                    </div>
+                    <ul>
+                        <h4>Mobil</h4>
+                        <li>1. Gehe auf deinen Discord Server.</li>
+                        <li>2. Halte den Kanal.</li>
+                        <li>3. Kanal bearbeiten.</li>
+                        <li>4. Integrationen.</li>
+                        <li>5. WebHook erstellen.</li>
+                        <li>6. Vergib einen Namen und ein Bild.</li>
+                        <li>7. Prüfe nochmal den Kanal.</li>
+                        <li>8. Drücke auf Webhook-URL kopieren.</li>
+                    </ul>
+                </div>
+            </div>
+</div>
+
+<script>
+    const data = <%- JSON.stringify(webhookList) %>;
+</script>
+
+<script>
+    const keys = Object.keys(data)
+    const webhookDiv = document.getElementById('webhookDiv')
+    window.onload = function () {
+        if (keys.length > 0) {
+            const def = document.getElementById('defaultHook')
+            if (def) {
+               def.remove() 
+            }
+            for (const url of keys) {
+                
+                webhookDiv.innerHTML += `<div id="${url}" class="hook">
+                                            <p>${url}</p><button id="${url}Btn" onclick="deleteHook(this)">x</button>
+                                        </div>
+                                        <div id="${url}settings" class="settings-box">
+                                            <div class="settings">
+                                                <label for="${url}messageOut">Außerhalb der Box.</label>
+                                                <textarea name="${url}messageOut" id="${url}messageOut" >${data[url].messageOut}</textarea>
+                                            </div>
+                                            <div class="settings">
+                                                <label for="${url}messageIn">Innerhalb der Box.</label>
+                                                <textarea name="${url}messageIn" id="${url}messageIn" >${data[url].messageIn}</textarea>
+                                            </div>
+                                            <div class="settings">
+                                                <label for="${url}colorPicker">Farbe der Seitenleiste.</label>
+                                                <input
+                                                    style=" border: none; background: none; cursor: pointer;"
+                                                    type="color" name="${url}colorPicker" id="${url}colorPicker" value="${data[url].color}"">
+                                            </div>
+                                        </div>`
+            }
+        }
+    }
+</script>
+
+<script src="/js/discord/data.js"></script>

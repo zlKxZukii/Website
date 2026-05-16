@@ -6,6 +6,7 @@ window.addEventListener("load", () => {
     const renderSocialMedia = document.getElementById("socialMedia")
     renderDefaultCommands(renderSocialMedia)
     renderFunctions(functionDiv)
+    updateColor()
 })
 
 function renderDefaultCommands(renderDiv) {
@@ -115,6 +116,7 @@ function clipTemplate(title, socialMedia) {
             <div class="closed" id="clipSlide">
                 <div class="fade-box">
                 <div class=align-slide>
+                    <p>Alles nach <strong>!clip</strong> wird zum Namen des Clips.</p>
                 </div>
                 <div style="width:30%;">
                 </div>
@@ -160,7 +162,7 @@ function clipTemplate(title, socialMedia) {
 }
 
 function shououtTemplate(title, socialMedia) {
-    return `<div class="default-commands-checkbox">
+    return `<div class="default-commands-checkbox" onclick=fadeShoutout()>
                 <div style="cursor: pointer;" class="default-commands" onclick="fadeIt('shoutout')">
                     <p>!so, !sh, !shoutout</p>
                     <p>Shoutout</p>
@@ -174,59 +176,66 @@ function shououtTemplate(title, socialMedia) {
                 </div>
             </div>
             <div class="closed" id="shoutoutSlide">
-                <div class="fade-box">
-                <div class="align-slide">
-                    <p style="color:${socialMedia.settings.color || '#ffffff'}" id="${title}Safe">${socialMedia.response_text}</p>
-                </div>
-                <div class='text-section'>
-                    <input id="${title}Text" type="text" name="textSender"
-                        placeholder="Hier ${title} Text einfügen" autocomplete="off">
-                    <ul>
-                        <li>Platzhalter</li>
-                        <li>-</li>
-                        <li>Ehrengast</li>
-                        <li>[viewer]</li>
-                        <li>-</li>
-                                                <li>Letztes Spiel</li>
-                        <li>[game]</li>
-                    </ul>
-                </div>
-                    <ul class="allow-level">
-                    <li>
-                        <label>
-                            <input type="checkbox" name="" id="${title}Anybody"  onclick="highlightAll('${title}')" ${getState(socialMedia.stateTitle.anybody)}>
-                            <div class="toggle"><span></span></div>
-                         </label>Jeder
-                     </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" name="" id="${title}Subscriber" ${getState(socialMedia.stateTitle.subscriber)}>
-                            <div class="toggle"><span></span></div>
-                         </label>Abonnenten
-                     </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" name="" id="${title}Vip" ${getState(socialMedia.stateTitle.vip)}>
-                            <div class="toggle"><span></span></div>
-                         </label>VIP
-                     </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" name="" id="${title}Moderator" ${getState(socialMedia.stateTitle.moderator)}>
-                            <div class="toggle"><span></span></div>
-                         </label>Moderatoren
-                     </li>
-                    <li>
-                        <label>
-                            <input type="checkbox" name="" id="${title}Broadcaster" ${getState(socialMedia.stateTitle.broadcaster)}>
-                            <div class="toggle"><span></span></div>
-                         </label>Streamer
-                     </li>
-                    </ul>
+                <div class="fade-box" style="flex-direction: column;">
+                    <div style="width:100%; display: flex; justify-contenst: space-between;">
+                        <div class="align-slide">
+                            <p style="color:${socialMedia.settings.color || '#ffffff'}" id="${title}Safe">${socialMedia.response_text}</p>
+                        </div>
+                        <div class='text-section'>
+                            <input id="${title}Text" type="text" name="textSender"
+                                placeholder="Hier ${title} Text einfügen" autocomplete="off">
+                        </div>
+                        <ul class="allow-level">
+                        <li>
+                            <label>
+                                <input type="checkbox" name="" id="${title}Anybody"  onclick="highlightAll('${title}')" ${getState(socialMedia.stateTitle.anybody)}>
+                                <div class="toggle"><span></span></div>
+                            </label>Jeder
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" name="" id="${title}Subscriber" ${getState(socialMedia.stateTitle.subscriber)}>
+                                <div class="toggle"><span></span></div>
+                            </label>Abonnenten
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" name="" id="${title}Vip" ${getState(socialMedia.stateTitle.vip)}>
+                                <div class="toggle"><span></span></div>
+                            </label>VIP
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" name="" id="${title}Moderator" ${getState(socialMedia.stateTitle.moderator)}>
+                                <div class="toggle"><span></span></div>
+                            </label>Moderatoren
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" name="" id="${title}Broadcaster" ${getState(socialMedia.stateTitle.broadcaster)}>
+                                <div class="toggle"><span></span></div>
+                            </label>Streamer
+                        </li>
+                        </ul>
 
-                    <div class="cooldown">
-                        <label for="colorPicker"> Die Farbe der Schrift</label>
-                        <input type="color" name="colorPicker" id="colorPicker" value="${socialMedia.settings.color || '#ffffff'}">
+                        <div class="cooldown">
+                            <label for="colorPicker"> Die Farbe der Schrift</label>
+                            <input type="color" name="colorPicker" id="colorPicker" value="${socialMedia.settings.color || '#ffffff'}">
+                        </div>
+                    </div>
+                    <div class='fade-box'>
+                        <div style='width:30%'>
+                            <h3 style="text-align: center; margin-bottom: 20px;">Bei Raids</h3>
+                            <p>Nutze<strong>!so</strong>, um demjenigen, der dich gerade geraidet hat, einen Shoutout zu geben.</p>
+                        </div>
+                        <div style="width:30%">
+                            <h3 style="text-align: center; margin-bottom: 20px;">Command-Info</h3>
+                            <p>Dieser Command verteilt Liebe an deine Raider oder jemanden aus deiner Community, indem der Name und ein Clip des Streamers gezeigt werden.</p>
+                        </div>
+                        <div style="width:30%">
+                            <h3 style="text-align: center; margin-bottom: 20px;">Per Hand</h3>
+                            <p>Nutze <strong>!so Streamer</strong> (ersetze Streamer durch den Namen des Streamers, dem du einen Shoutout geben möchtest), um einen Shoutout zu geben.</p>
+                        </div>
                     </div>
                 </div>
             </div>`}
@@ -236,4 +245,13 @@ function getState(state) {
         return "checked"
     }
     else { return false }
+}
+
+function updateColor() {
+    const colorPicker = document.getElementById('colorPicker');
+    const text = document.getElementById('ShoutoutSafe')
+    colorPicker.addEventListener('input', (event) => {
+        const selectedColor = event.target.value;
+        text.style.color = selectedColor
+    })
 }

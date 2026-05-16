@@ -1,13 +1,17 @@
-export async function clip(channel, userID, apiClient, chatClient, duration) {
+export async function clip(channel, userID, apiClient, chatClient, duration, title) {
     let message = "";
 
     try {
-        
-        const clip = await apiClient.clips.createClip({
+        const clipObj = {
             channel: userID,
             createAfterDelay: true,
-            duration: Number(duration)
-        })
+            duration: Number(duration),
+        }
+        if (title !== null) {
+            Object.assign(clipObj, {title: title})
+        }
+        const clip = await apiClient.clips.createClip(clipObj)
+
 
         async function waitForClip() {
 

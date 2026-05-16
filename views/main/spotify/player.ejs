@@ -1,0 +1,127 @@
+<div id="player">
+    <img id="albumCover" src="/img/logo.png" alt="">
+    <div class="info">
+        <div class="song-interpret">
+            <h2 id="title">Scaletta</h2>
+            <h3 id="album">Synchronisiert</h3>
+            <h4 id="interpret">Gerade</h3>
+        </div>
+        <div id="time">
+            <p id="timeLeft">dein Spotify</p>
+            <p id="completeTime"></p>
+        </div>
+        <div>
+            <div id="viz-wrapper">
+                <div id="bars"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const img = document.getElementById('albumCover')
+    const title = document.getElementById('title')
+    const album = document.getElementById('album')
+    const interpret = document.getElementById('interpret')
+    const container = document.getElementById('bars');
+    const timeLeft = document.getElementById('timeLeft')
+    const completeTime = document.getElementById('completeTime')
+
+    const totalBars = 30;
+    for (let i = 0; i < totalBars; i++) {
+        const bar = document.createElement('div');
+        bar.classList.add('bar');
+
+        // Wir erstellen eine Sinus-ähnliche Verteilung für die Höhen
+        // Damit die Mitte tendenziell höher springt als die Ränder
+        const multiplier = Math.sin((i / totalBars) * Math.PI);
+        const randomHeight = Math.floor(multiplier * 60 + Math.random() * 30 + 20) + "%";
+        const randomDuration = (Math.random() * 0.3 + 0.4) + "s";
+
+        bar.style.setProperty('--height', randomHeight);
+        bar.style.setProperty('--duration', randomDuration);
+        bar.style.animationDelay = (i * 0.05) + "s"; // Erzeugt einen Wellen-Effekt
+
+        container.appendChild(bar);
+    }
+
+    const playerDiv = document.getElementById('player')
+    const socket = io()
+    const key = "<%= targetUser %>";
+    async function getSong() {
+        const response = await fetch(`/spotify/song/${key}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: key })
+        })
+    }
+    socket.on("connect", async () => {
+        console.log("Verbunden für Raum: " + key);
+        socket.emit("join-room", key);
+    });
+
+    let actualizeTimer;
+
+    async function startIntervall(params) {
+        clearInterval(actualizeTimer);
+        actualizeTimer = setInterval(async () => {
+            await getSong();
+        }, 5000);
+    }
+    startIntervall();
+
+    let prodTime;
+    function progressTimeGetter(data) {
+        clearInterval(prodTime)
+
+        const progressTime = Math.round(data.progress / 1000)
+        let secondDigit = progressTime % 60
+        prodTime = setInterval(() => {
+            const firstDigit = String(Math.floor(progressTime / 60)).padStart(2, 0)
+            const progressTimeProd = firstDigit + ":" + String(secondDigit).padStart(2, 0)
+            console.log(secondDigit)
+            if (data.isPlaying) {
+                if (secondDigit === 60) {
+                    secondDigit = 0
+                }
+                else {
+                    secondDigit = secondDigit + 1
+                }
+            }
+            timeLeft.innerText = progressTimeProd
+        }, 1000);
+
+        return { progressTime }
+    }
+
+    socket.on('song', async (data) => {
+        img.src = data.album.albumCover
+        title.innerText = data.song.name
+        album.innerText = data.album.albumName
+        interpret.innerText = data.song.artist
+        const { progressTime } = progressTimeGetter(data)
+        const timeComplete = Math.round(data.duration / 1000)
+        const remainingTime = completeTime - progressTime
+        const completeTimeProd = String(Math.floor(timeComplete / 60)).padStart(2, 0) + ":" + String(timeComplete % 60).padStart(2, 0)
+        completeTime.innerText = completeTimeProd
+        if (remainingTime < 5 && remainingTime > 0) {
+            clearInterval(actualizeTimer)
+            console.log("ist kleiner")
+            setTimeout(async () => {
+                await getSong()
+                await startIntervall()
+            }, remainingTime * 1000 + 2000);
+        }
+
+        const viz = document.getElementById('viz');
+        if (data.isPlaying) {
+            container.classList.add('playing'); // Balken fangen an zu hüpfen
+        } else {
+            container.classList.remove('playing'); // Balken bleiben stehen
+        }
+    });
+
+
+</script>

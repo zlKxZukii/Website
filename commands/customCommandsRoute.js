@@ -19,7 +19,6 @@ customCommandsRoute.get((""), async (req, res) => {
         showBody: true,
         customCommandData: {}
     };
-
     const DB = await Select.CustomCommand([sessionData.userId])
     //Sende ans frontend
     for (let index = 0; index < DB.length; index++) {
@@ -54,7 +53,6 @@ customCommandsRoute.post("/save", async (req, res) => {
         const keys = Object.keys(req.body)
         for (let index = 0; index < keys.length; index++) {
             const { category, response_text, state, stateTitle } = req.body[keys[index]]
-            console.log(category)
             let { cooldown, delay } = req.body[keys[index]]
             if (cooldown < 0) {
                 cooldown = 0
@@ -63,35 +61,45 @@ customCommandsRoute.post("/save", async (req, res) => {
                 delay = 0
             }
             // Update DB
-            await Insert.UpdateCustomCommands([
-                sessionData.userId,
-                category,
-                response_text,
-                cooldown,
-                delay,
-                state,
-                stateTitle.anybody,
-                stateTitle.broadcaster,
-                stateTitle.moderator,
-                stateTitle.subscriber,
-                stateTitle.vip])
-            // Update user
-            for (const key in keys) {
-                if (key === undefined) {
+            try {
+                await Insert.UpdateCustomCommands([
+                    sessionData.userId,
+                    category,
+                    response_text,
+                    cooldown,
+                    delay,
+                    state,
+                    stateTitle.anybody,
+                    stateTitle.broadcaster,
+                    stateTitle.moderator,
+                    stateTitle.subscriber,
+                    stateTitle.vip])
 
-                }
-                if (user.customCommands[key].category) {
-                    user.customCommands[key].response_text = response_text
-                    user.customCommands[key].cooldown = cooldown
-                    user.customCommands[key].delay = delay
-                    user.customCommands[key].state = state
-                    user.customCommands[key].anybody = stateTitle.anybody
-                    user.customCommands[key].broadcaster = stateTitle.broadcaster
-                    user.customCommands[key].moderator = stateTitle.moderator
-                    user.customCommands[key].subscriber = stateTitle.subscriber
-                    user.customCommands[key].vip = stateTitle.vip
+            } catch (error) {
+                console.log(error)
+            }
+
+            // Update user
+            if (user) {
+                try {
+                    for (const key in keys) {
+                        if (user.customCommands[index].category === keys[key]) {
+                            user.customCommands[index].response_text = response_text
+                            user.customCommands[index].cooldown = cooldown
+                            user.customCommands[index].delay = delay
+                            user.customCommands[index].state = state
+                            user.customCommands[index].anybody = stateTitle.anybody
+                            user.customCommands[index].broadcaster = stateTitle.broadcaster
+                            user.customCommands[index].moderator = stateTitle.moderator
+                            user.customCommands[index].subscriber = stateTitle.subscriber
+                            user.customCommands[index].vip = stateTitle.vip
+                        }
+                    }
+                } catch (error) {
+                    console.log('User ', error)
                 }
             }
+
         }
         res.redirect("/customcommands");
     } catch (error) {
@@ -105,23 +113,25 @@ customCommandsRoute.post("/create", async (req, res) => {
         return res.redirect("/?index=true");
     };
     try {
-        const { category, responseText, trigger } = req.body
+
+        const { category, responseText, triggers } = req.body
         const sessionData = JSON.parse(await client.get(`sess:${key}`));
         const user = ClientManager.getClient(sessionData.userId);
-        Object.assign(user.customCommands, {
+        user.customCommands.push({
             category: category,
             response_text: responseText,
             cooldown: 0,
-            trigger: trigger,
+            triggers: triggers,
             delay: 0,
-            state: false,
-            anybody: false,
-            broadcaster: false,
-            moderator: false,
-            subscriber: false,
-            vip: false
+            state: true,
+            anybody: true,
+            broadcaster: true,
+            moderator: true,
+            subscriber: true,
+            vip: true
         })
-        await Insert.CreateCustomCommands([sessionData.userId, category, responseText, trigger])
+        console.log(triggers)
+        await Insert.CreateCustomCommands([sessionData.userId, category, responseText, triggers])
 
     } catch (error) {
         console.log("Fehler beim erstellen des CustomCommands: " + error)

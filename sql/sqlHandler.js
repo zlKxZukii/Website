@@ -74,7 +74,7 @@ class InsertSQL {
         }
     }
 
-        async UpdateAlertBoxImage(valuesArray) {
+    async UpdateAlertBoxImage(valuesArray) {
         try {
             const sql = `INSERT INTO alert_box (
                             twitch_id,
@@ -251,7 +251,7 @@ class InsertSQL {
             await this.setCustomPermissions(valuesArray[0], valuesArray[1]);
             return res;
         } catch (error) {
-            console.log(chalk.red("Default Commands konnten nicht erstellt werden ", error.message));
+            console.log(chalk.red("Custom Command konnten nicht erstellt werden ", error.message));
         };
     };
     async setCustomPermissions(twitch_id, category) {
@@ -379,11 +379,13 @@ class InsertSQL {
             const sql = `INSERT INTO browser_tools (
                             twitch_id,
                             type,
-                            key
+                            key,
+                            settings
                         )
-                        VALUES($1, $2, $3)
+                        VALUES($1, $2, $3, $4)
                         ON CONFLICT (twitch_id, "type", "key")
                         DO UPDATE SET
+                        settings = EXCLUDED.settings,
                         updated_at = NOW()
                         RETURNING *;`;
             const res = await query(sql, valuesArray);
@@ -455,7 +457,6 @@ class InsertSQL {
         } catch (error) {
             console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
         };
-
     }
     async UpdateLeaderboard(valuesArray) {
         try {
@@ -478,6 +479,57 @@ class InsertSQL {
             console.error(chalk.red("Tool konnte nicht gespeichert werden.", error));
         };
     }
+
+    async UpdateSpotifyUser(valuesArray) {
+        try {
+            const sql = `INSERT INTO spotify(
+                        twitch_id, 
+                        spotify_access_token)
+                        VALUES ($1, $2)
+                        ON CONFLICT (twitch_id) 
+                        DO UPDATE SET 
+                            spotify_access_token = EXCLUDED.spotify_access_token,
+                            updated_at = NOW();`
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log('Fehler beim Updaten des Spotify Users: ', error)
+        }
+    }
+
+    async UpdateDiscordWebhook(valuesArray) {
+        try {
+            const sql = `UPDATE
+                            discord_webhook 
+                        SET
+                            message_in = $1, 
+                            message_out = $2,
+                            color = $3,
+                            updated_at = NOW()
+                        WHERE
+                            webhook = $4;`
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log('Fehler beim Updaten des Discord Webhooks: ', error)
+        }
+    }
+
+    async UpdateLastFmSettings(valuesArray) {
+        try {
+            const sql = `UPDATE
+                            last_fm
+                        SET
+                            settings = $2
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log('Fehler beim Updaten der LastFM settings: ', error)
+        }
+    }
+
 };
 
 class SelectSQL {
@@ -774,6 +826,124 @@ class SelectSQL {
             console.log(error)
         }
     }
+
+    async GetSpotifyUser(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            spotify
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    async GetSpotifyKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            key
+                        FROM
+                            spotify_key
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    async SpotifyKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            spotify_key
+                        WHERE
+                            key = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async GetUserByKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            twitch_id,
+                            username
+                        FROM
+                            users
+                        WHERE
+                            login_key = $1`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async GetUserByName(valuesArray) {
+        try {
+            const sql = `SELECT
+                            twitch_id
+                        FROM
+                            users
+                        WHERE
+                            username = $1`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async LastFmUserById(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            last_fm
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    async LastFmUserByWsKey(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            last_fm
+                        WHERE
+                            websocket_key = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows[0];
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async DiscordWebhooks(valuesArray) {
+        try {
+            const sql = `SELECT
+                            *
+                        FROM
+                            discord_webhook
+                        WHERE
+                            twitch_id = $1;`
+            const res = await query(sql, valuesArray)
+            return res.rows;
+        } catch (error) {
+            console.log(error)
+        }
+    }
 };
 
 class AuthSQL {
@@ -848,6 +1018,79 @@ class AuthSQL {
             console.error(chalk.red("Fehler beim Login des Users:" + err.message));
         }
     }
+
+    async CreateSpotifyUser(valuesArray) {
+        const sql = `INSERT INTO spotify(
+                        twitch_id, 
+                        spotify_access_token, 
+                        spotify_refresh_token, 
+                        spotify_expires_at)
+                        VALUES ($1, $2, $3, $4)
+                        ON CONFLICT (twitch_id) 
+                        DO UPDATE SET 
+                            spotify_access_token = EXCLUDED.spotify_access_token,
+                            spotify_expires_at = EXCLUDED.spotify_expires_at,
+                            spotify_refresh_token = COALESCE(EXCLUDED.spotify_refresh_token, spotify.spotify_refresh_token),
+                            updated_at = NOW();`
+
+        const res = await query(sql, valuesArray);
+        return res;
+    }
+    async CreateSpotifyKey(valuesArray) {
+        const sql = `INSERT INTO spotify_key(
+                        twitch_id, 
+                        key)
+                        VALUES ($1, $2)
+                        ON CONFLICT (twitch_id) 
+                        DO UPDATE SET 
+                            updated_at = NOW();`
+        const res = await query(sql, valuesArray);
+        return res;
+    }
+
+    async CreateLastFmUser(valuesArray) {
+        try {
+            const sql = `INSERT INTO last_fm(
+                        twitch_id, 
+                        username,
+                        session_key,
+                        websocket_key)
+                        VALUES ($1, $2, $3, $4)
+                        ON CONFLICT (twitch_id)
+                        DO UPDATE SET 
+                            session_key = EXCLUDED.session_key,
+                            websocket_key = EXCLUDED.websocket_key,
+                            updated_at = NOW();`
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log("LastFM user konnte nicht erstellt werden: ", error)
+        }
+    }
+
+    async CreateDiscordWebhook(valuesArray) {
+        try {
+            const sql = `INSERT INTO discord_webhook(
+                        twitch_id, 
+                        webhook,
+                        message_in,
+                        message_out,
+                        color)
+                        VALUES ($1, $2, $3, $4, $5)
+                        ON CONFLICT (webhook)
+                        DO UPDATE SET 
+                            twitch_id = EXCLUDED.twitch_id,
+                            message_in = EXCLUDED.message_in,
+                            message_out = EXCLUDED.message_out,
+                            color = EXCLUDED.color,
+                            updated_at = NOW();
+                        `
+            const res = await query(sql, valuesArray);
+            return res;
+        } catch (error) {
+            console.log("Discord Webhook konnte nicht erstellt werden: ", error)
+        }
+    }
 }
 
 class DeleteSQL {
@@ -874,6 +1117,19 @@ class DeleteSQL {
             return res.rows;
         } catch (error) {
             console.log(chalk.red("Custom Command wurde nicht gelöscht " + error.message))
+        };
+    }
+
+    async DiscordWebhook(valuesArray) {
+        try {
+            const sql = `DELETE FROM 
+                            discord_webhook 
+                         WHERE
+                            webhook = $1`;
+            const res = await query(sql, valuesArray);
+            return res.rows;
+        } catch (error) {
+            console.log(chalk.red("Discord Webhook wurde nicht gelöscht " + error.message))
         };
     }
 }

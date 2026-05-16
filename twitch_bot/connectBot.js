@@ -12,6 +12,7 @@ import chalk from "chalk";
 import crypto from "crypto";
 import { eventSubListener, io } from "../src/server.js";
 import { subscribeUser } from "./eventListener.js";
+import { settings } from "cluster";
 
 class BotManager {
     constructor() {
@@ -32,6 +33,9 @@ class BotManager {
             const accessShieldState = await Select.AccessShield([userId]) || {};
             const customCommands = await Select.CustomCommand([userId]) || {};
             const intervallList = await this.initTimer(chatClient, username, userId);
+            const spotify = await this.readSpotify(userId)
+            const lastFM = await this.readLastFM(userId)
+            const discordWebhook = await this.readDiscordWebhook(userId)
             this.client.set(userId, {
                 userId,
                 chatClient,
@@ -45,6 +49,7 @@ class BotManager {
                 spamBotProtection: {},
                 spamBotIntervall: {},
                 intervallList,
+                lastRaider: "",
                 alertQuery: {},
                 alertBox,
                 alertIsActive: false,
@@ -54,7 +59,11 @@ class BotManager {
                 isShoutout: true,
                 gameRuns: false,
                 gamePlayer: [],
-                games
+                games,
+                lastFM,
+                spotify,
+                discordWebhook,
+                live: false
             });
             await Insert.BotState([userId, true, username]);
 
@@ -244,16 +253,43 @@ class BotManager {
         const retObj = {}
         const DB = await Select.GetBrowserToolsKey([userId])
         if (!DB || DB.length <= 0) {
+
+            const createObj = {
+                Head: {
+                    x: '0px',
+                    y: '0px',
+                    blur: '15px',
+                    rgba: 'rgba(255, 255, 255, 0.5)',
+                    size: '45',
+                    alpha: '0.5',
+                    color: '#ffffff',
+                    family: "'Roboto Flex', sans-serif"
+                },
+                Clip:
+                {
+                    x: '0px',
+                    y: '0px',
+                    blur: '15px',
+                    rgba: 'rgba(255, 255, 255, 0.5)',
+                    size: '45',
+                    alpha: '0.5',
+                    color: '#ffffff',
+                    family: "'Roboto Flex', sans-serif"
+                }
+            }
             const creationArr = [{ type: 'ClipBox' }];
             for (const tool of creationArr) {
                 const key = crypto.randomBytes(64).toString("hex");
                 Object.assign(retObj, { [tool.type]: key })
-                await Insert.CreateBrowserTool([userId, tool.type, key])
+                await Insert.CreateBrowserTool([userId, tool.type, key, createObj])
             }
         }
         else {
             for (const tool in DB) {
-                Object.assign(retObj, { [DB[tool].type]: DB[tool].key })
+                Object.assign(retObj, {
+                    [DB[tool].type]: DB[tool].key,
+
+                })
             }
         }
         return retObj
@@ -348,6 +384,73 @@ class BotManager {
             }
         }
     }
+
+    async readSpotify(userId) {
+        try {
+            const DB = await Select.GetSpotifyUser([userId])
+            const key = await Select.GetSpotifyKey([userId])
+
+            if (DB === undefined) {
+                return { state: 'not connected' }
+            }
+
+            return {
+                accessToken: DB.spotify_access_token,
+                refreshToken: DB.spotify_refresh_token,
+                state: DB.state,
+                settings: DB.player,
+                key: key.key
+            }
+        } catch (error) {
+            return { state: 'not connected' }
+        }
+    }
+
+    async readLastFM(userId) {
+        try {
+            const { username, session_key, websocket_key, settings } = await Select.LastFmUserById([userId])
+
+            if (username === undefined) {
+                return { state: 'not connected' }
+            }
+
+            return {
+                sessionKey: session_key,
+                username,
+                key: websocket_key,
+                state: true,
+                settings
+            }
+        } catch (error) {
+            return { state: 'not connected' }
+        }
+    }
+
+    async readDiscordWebhook(userId) {
+        const obj = {};
+        try {
+            const data = await Select.DiscordWebhooks([userId])
+            if (data.length === 0) {
+                return obj;
+            }
+            else {
+                for (const index in data) {
+                    const { webhook, message_in, message_out, color } = data[index]
+                    Object.assign(obj, {[webhook]: {
+                        messageIn: message_in,
+                        messageOut: message_out,
+                        color
+                    }})
+                }
+            }
+            return obj
+        } catch (error) {
+            console.log(error)
+            return obj;
+
+        }
+    }
 }
+
 
 export const ClientManager = new BotManager()

@@ -33,10 +33,3 @@ body {
 .align a:hover {
     color: #2BD6F1;
 }
-
-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}

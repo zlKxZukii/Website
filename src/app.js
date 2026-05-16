@@ -35,6 +35,9 @@ import { RaidBoxRoute } from "../boxes/raidBoxRoute.js";
 import { SubGiftBoxRoute } from "../boxes/subGiftBoxRoute.js";
 import { BitBoxRoute } from "../boxes/bitBoxRoute.js";
 import { SubscriberOngoingRoute } from "../boxes/subOngoingRoute.js";
+import { listRoute } from "../list/listRoute.js";
+import { LastFmRoute } from "../lastFm/lastFmRoute.js";
+import { DiscordRoute } from "../discord/discordRoute.js";
 
 // --- INITIALISIERUNGS-LOGIK ---
 
@@ -60,6 +63,7 @@ async function startServer() {
 
         // 4. Routen einbinden
         app.use("/", indexRoute);
+        app.use("/list", listRoute)
         app.use("/uploads", express.static('uploads'))
         app.use("/dashboard", dashboardRoute);
         app.use("/alertbox", alertBoxRoute);
@@ -87,6 +91,8 @@ async function startServer() {
         app.use("/clipsplayer", clipPlayerRoute)
         app.use("/games", gamesRoute)
         app.use("/bat", batGameRoute)
+        app.use("/lastfm", LastFmRoute)
+        app.use("/discord", DiscordRoute)
 
         // 404 Handler
         app.use((req, res) => {
@@ -95,6 +101,9 @@ async function startServer() {
                 img: "../img/dead_end_owl.png", text: "Etwas ist schief gelaufen.", showBody: true
             });
         });
+        app.locals.discordLink = process.env.DISCORD_INV_LINK;
+        app.locals.whatsappLink = process.env.WHATSAPP_DIRECT_LINK;
+        app.locals.instagramLink = process.env.INSTAGRAM_DIRECT_LINK;
 
         // 5. HTTP Server starten
         httpServer.listen(PORT, async () => {

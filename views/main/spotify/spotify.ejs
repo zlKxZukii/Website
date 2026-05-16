@@ -1,0 +1,107 @@
+<h2 style="font-size: 50px; text-align: center; margin-top: 60px;">
+    <%= title %>
+</h2>
+
+<%- include("../../layouts/browserToolsBar") %>
+    <% if(showSettings){ %>
+        <div class="link-box">
+            <%- include("../../layouts/linkBox") %>
+                <div style="display: flex; justify-content: center;
+                align-items: center; flex-direction: column;">
+                    <h2>Vorschau</h2>
+                    <div id="player">
+                        <img id="albumCover" src="/img/logo.png" alt="">
+                        <div class="info">
+                            <div class="song-interpret">
+                                <h2 id="title">Scalettas Lied</h2>
+                                <h3 id="album">Scalettas Album</h3>
+                                <h4 id="interpret">Scalettas Name</h3>
+                            </div>
+                            <div id="time">
+                                <p id="timeLeft">01:33</p>
+                                <p id="completeTime">03:29</p>
+                            </div>
+                            <div>
+                                <div id="viz-wrapper">
+                                    <div class="playing" id="bars"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings">
+                        <div class="trigger">
+                            <p style="text-align: start;">Trigger</p>
+                            <p style="text-align: start;">Beschreibung</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!nowplaying</p>
+                            <p>Der Song der gerade läuft.</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!nextsong</p>
+                            <p>Der Song der als nächstes läuft.</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!addsong</p>
+                            <p>Einen Song hinzufügen.</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!skipsong</p>
+                            <p>Den Song überspringen.</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!volume</p>
+                            <p>Die Lautstärke der Musik einstellen.</p>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <% } else{%>
+
+            <div class="spotify-box">
+                <h2>Spotify verbinden!</h2>
+                <button><img src="/img/spotify/spotify_logo.webp" alt=""
+                        onclick="window.location.href='https://scaletta.live/authspotify'">Spotify</button>
+                <h2>Vorschau</h2>
+                <div id="player">
+                    <img id="albumCover" src="/img/logo.png" alt="">
+                    <div class="info">
+                        <div class="song-interpret">
+                            <h2 id="title">Scalettas Lied</h2>
+                            <h3 id="album">Scalettas Album</h3>
+                            <h4 id="interpret">Scalettas Name</h3>
+                        </div>
+                        <div id="time">
+                            <p id="timeLeft">01:33</p>
+                            <p id="completeTime">03:29</p>
+                        </div>
+                        <div>
+                            <div id="viz-wrapper">
+                                <div class="playing" id="bars"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% }%>
+
+                <script>
+                    const container = document.getElementById('bars');
+                    const totalBars = 25;
+                    for (let i = 0; i < totalBars; i++) {
+                        const bar = document.createElement('div');
+                        bar.classList.add('bar');
+
+                        // Wir erstellen eine Sinus-ähnliche Verteilung für die Höhen
+                        // Damit die Mitte tendenziell höher springt als die Ränder
+                        const multiplier = Math.sin((i / totalBars) * Math.PI);
+                        const randomHeight = Math.floor(multiplier * 60 + Math.random() * 30 + 20) + "%";
+                        const randomDuration = (Math.random() * 0.3 + 0.4) + "s";
+
+                        bar.style.setProperty('--height', randomHeight);
+                        bar.style.setProperty('--duration', randomDuration);
+                        bar.style.animationDelay = (i * 0.05) + "s"; // Erzeugt einen Wellen-Effekt
+
+                        container.appendChild(bar);
+                    }</script>

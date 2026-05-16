@@ -1,0 +1,378 @@
+.spotify-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 60px 0;
+    background-color: rgba(34, 34, 34, 0.7);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    padding-bottom: 20px;
+}
+
+.spotify-box h2 {
+    font-size: 28px;
+    margin: 20px 0;
+}
+
+.spotify-box img {
+    margin-right: 10px;
+    height: 40px;
+}
+
+.spotify-box button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: transparent;
+    color: white;
+    height: 80px;
+    width: 80%;
+    max-width: 300px;
+}
+
+#player {
+    margin: 20px;
+    border-radius: 200px;
+    border: solid black;
+    width: 300px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+#player img {
+    transition: transform 2s linear;
+    width: 30%;
+}
+
+#player h2 {
+    text-align: start;
+    margin: 5px 0;
+    max-height: 23px;
+    overflow: hidden;
+    font-size: 13px;
+    width: 68%;
+}
+
+#player h3 {
+    align-items: start;
+    padding: 0;
+    text-align: start;
+    margin: 5px 0;
+    max-height: 10px;
+    overflow: hidden;
+    font-size: 10px;
+}
+
+#player h4 {
+    text-align: start;
+    max-height: 8px;
+    overflow: hidden;
+    font-size: 8px;
+}
+
+#time {
+    display: flex;
+    justify-content: space-between;
+    width: 58%;
+}
+
+#time p {
+    font-size: 10px;
+    color: #00d2ff
+}
+
+#viz-wrapper {
+    width: 155px;
+    height: 25px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+#bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    /* Abstand zwischen den Balken */
+    width: 100%;
+    height: 100%;
+}
+
+/* Die Animation */
+.playing .bar {
+    animation: wave var(--duration) infinite alternate ease-in-out;
+}
+
+.color {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.color label {
+    margin-bottom: 5px;
+}
+
+@keyframes wave {
+    from {
+        height: 15%;
+        filter: brightness(0.8);
+    }
+
+    to {
+        height: var(--height);
+        filter: brightness(1.2);
+    }
+}
+
+.info {
+    padding-left: 2%;
+    height: 100%;
+    width: 63%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.song-interpret {
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.commands {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 20px;
+    margin-bottom: 0;
+}
+
+.trigger {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+.trigger:nth-child(odd) {
+    background-color: black;
+}
+
+.trigger:first-child {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px 10px 0 0;
+}
+
+.trigger p {
+    width: 50%;
+}
+
+.settings {
+    margin: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#settingsAlign{
+    margin: auto;
+    width: 90%;
+}
+
+#btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 20px auto;
+    padding: 5px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: transparent;
+    color: white;
+    width: 80%;
+}
+
+#barDiv{
+    width: 100%;
+}
+
+@media screen and (min-width:700px) {
+    #barDiv .settings{
+        justify-content: space-around;
+    }
+}
+
+@media screen and (min-width:1000px) {
+    #settingsAlign{
+        display: flex;
+    }
+
+    .commands .settings{
+        justify-content: space-around;
+    } 
+
+    #btn{
+        font-size: 24px;
+        padding: 10px;
+    }
+}
+
+@media screen and (min-width:1300px) {
+    .spotify-box button {
+        max-width: 600px;
+    }
+
+    #player {
+        width: 600px;
+        height: 200px;
+    }
+
+    #player img {
+        width: 25%;
+    }
+
+    #player h2 {
+        font-size: 30px;
+        max-height: 40px;
+    }
+
+    #player h3 {
+        max-height: 20px;
+        font-size: 20px;
+    }
+
+    #player h4 {
+        max-height: 16px;
+        font-size: 16px;
+    }
+
+    #time p {
+        font-size: 16px;
+    }
+
+    #viz-wrapper {
+        height: 50px;
+        width: 315px;
+    }
+
+    .commands {
+        width: 80%;
+    }
+
+    .commands p {
+        font-size: 18px
+    }
+}
+
+.rotation {
+    transform: rotate(360deg);
+}
+
+.toggle {
+    position: relative;
+    width: 60px;
+    /* neue Breite */
+    height: 20px;
+    /* Höhe 20px */
+    background: red;
+    border-radius: 10px;
+    /* Hälfte der Höhe */
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Der kleine Kreis */
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    /* Padding für 16px Kreis */
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Checkbox ausblenden */
+input[type="checkbox"] {
+    display: none;
+}
+
+/* Wenn aktiviert: Hintergrund grün + Kreis nach rechts */
+input[type="checkbox"]:checked+.toggle {
+    background: #4caf50;
+}
+
+input[type="checkbox"]:checked+.toggle::after {
+    transform: translateX(42px);
+    /* 60 - 16 - 2*2 = 42px */
+}
+
+/* Optional: Beschriftung AN/AUS */
+.toggle span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}
+
+input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    background: none;
+    margin: 0;
+}
+
+/* Die Rundung für Chrome/Edge/Safari */
+input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+}
+
+/* Die Rundung für Firefox */
+input[type="color"]::-moz-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+}
+
+@keyframes rotation-loop {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

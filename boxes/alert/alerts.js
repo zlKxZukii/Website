@@ -98,7 +98,7 @@ class AlertHandler {
             if (type === "Follower") {
                 const { img, sound, settings } = user.alertBox[type]
                 if (settings.state) {
-                    const viewerName = 'zlScaletta';
+                    const viewerName = 'Scaletta';
                     const streamer = username;
                     const textRaw = settings.responseText
                     const { text, id } = this.initAlerts(settings, textRaw, { viewerName, streamer })
@@ -127,7 +127,7 @@ class AlertHandler {
 
             if (type === "Raids") {
                 const amount = '23';
-                const viewerName = 'zlScaletta';
+                const viewerName = 'Scaletta';
                 const streamer = username;
                 const { img, sound, settings } = user.alertBox[type];
                 if (settings.state) {
@@ -158,7 +158,7 @@ class AlertHandler {
 
             if (type === "Bits") {
                 const amount = '100'
-                const viewerName = 'zlScaletta';
+                const viewerName = 'Scaletta';
                 const streamer = username;
                 const { img, sound, settings } = user.alertBox[type]
                 if (settings.state) {
@@ -189,7 +189,7 @@ class AlertHandler {
 
             if (type === "Subscriber") {
                 const tier = "1"
-                const viewerName = 'zlScaletta';
+                const viewerName = 'Scaletta';
                 const streamer = username;
                 const { img, sound, settings } = user.alertBox[type]
                 if (settings.state) {
@@ -221,7 +221,7 @@ class AlertHandler {
             if (type === "Subscriber Geschenke") {
                 const tier = "1"
                 const amount = '20'
-                const viewerName = 'zlScaletta';
+                const viewerName = 'Scaletta';
                 const streamer = username;
                 const cumulativ = '30'
                 const { img, sound, settings } = user.alertBox[type]
@@ -252,7 +252,7 @@ class AlertHandler {
             };
 
             if (type === "Fortlaufende Subscriber") {
-                const viewerName = 'zlScaletta';
+                const viewerName = 'Scaletta';
                 const streamer = username;
                 const tier = "1"
                 const post = "Hier kommt mein Sub!"
@@ -332,7 +332,8 @@ class AlertHandler {
                 const amount = event.viewers;
                 const viewerName = event.raidingBroadcasterDisplayName;
                 const streamer = event.raidedBroadcasterDisplayName;
-                const { img, sound, settings } = user.alertBox[type]
+                const { img, sound, settings } = user.alertBox[type];
+                user.lastRaider = viewerName
                 if (settings.state) {
                     const textRaw = settings.responseText
                     const { text, id } = this.initAlerts(settings, textRaw, { viewerName, streamer, amount })
@@ -493,7 +494,7 @@ class AlertHandler {
                 this.sendAlert(user);
             };
         } catch (error) {
-            console.log(chalk.red("Fehler im speichern: " + error));
+            console.log(chalk.red("Fehler im speichern des Alerts: " + error));
         };
     };
 

@@ -1,11 +1,11 @@
 @font-face {
-  font-family: 'JetBrains Mono';
-  src: url('../font/JetBrainsMono-Regular.ttf') format('ttf');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'JetBrains Mono';
+    src: url('../font/JetBrainsMono-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
 }
 
-button{
+button {
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -55,4 +55,42 @@ input[type="color"]::-webkit-color-swatch {
 input[type="color"]::-moz-color-swatch {
     border-radius: 50%;
     border: 2px solid #e2e8f0;
+}
+
+.scroll-arrow {
+    position: fixed;
+    /* Fixiert das Element relativ zum Browserfenster */
+    bottom: 70px;
+    /* Abstand von unten */
+    right: 30px;
+    /* Abstand von rechts */
+
+    background-color: rgba(34, 34, 34, 0.4);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: solid #2BD6F1;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.scroll-arrow:hover {
+    background-color: #555;
+    transform: scale(1.1);
+    /* Wird beim Drüberfahren dezent größer */
+}
+
+.scroll-arrow.show {
+    opacity: 1;
+    visibility: visible;
 }

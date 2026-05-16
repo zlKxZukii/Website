@@ -23,7 +23,7 @@ browserToolsRoute.get('/', async (req, res) => {
             title: "Browser Tools",
             type: "Browser Tools",
             showBody: true,
-            link: `https://scaletta.live/clipsplayer/${clipKey}`
+            link: `https://scaletta.live/clipsplayer/player/${clipKey}`
         }
         res.render("main/browserTools/browserTools.ejs", obj)
     } catch (error) {

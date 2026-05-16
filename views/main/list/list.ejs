@@ -1,21 +1,47 @@
 <div class="headline">
-    <button onclick="window.location.href='https://www.twitch.tv/<%- locals.streamer%>'">👉 Hier kommst du zurück zu <%- locals.streamer%> 👈</button>
+    <div id="streamerBox">
+        <div id="head">
+            <img src="<%= streamerPb %>" alt="">
+            <h3>
+                <%= locals.streamer%>
+            </h3>
+        </div>
+        <div id="streamerText">
+            <p>
+                <%= description %>
+            </p>
+        </div>
+    </div>
+    <div>
+        <button onclick="window.location.href='https://www.twitch.tv/<%= locals.streamer.toLowerCase()%>'">
+            Hier kommst du zurück zu <br> <strong><%- locals.streamer%></strong>!
+        </button>
+    </div>
 </div>
+
+<h2 style="text-align: center; margin: 20px; font-size:28px;">Command Liste von<br>
+    <%= locals.streamer%>
+</h2>
 
 <div class="render-box" id="commandBox">
-
+    <div id="headCommands" class="command-list-element">
+        <p >Trigger</p>
+        <p>Bezeichnung</p>
+    </div>
 </div>
 
-<script>const data =<%- JSON.stringify(list) %></script>
+<script>const data = <%- JSON.stringify(list) %></script>
 
-<script>window.addEventListener("load", () => {
-                console.log(data)
-                const keys = Object.keys(data)
-                for (let index = 0; index < keys.length; index++) {
-                    document.getElementById("commandBox").innerHTML += `    
+<script>
+        window.addEventListener("load", () => {
+            console.log(data)
+            const keys = Object.keys(data)
+            for (let index = 0; index < keys.length; index++) {
+                document.getElementById("commandBox").innerHTML += `    
                     <div class="command-list-element">
-                        <p>${data[keys[index]].trigger}</p>
+                        <p>${data[keys[index]].triggers}</p>
                         <p>${data[keys[index]].title}</p>
                     </div>`
-                }
-            })</script>
+            }
+        })
+</script>

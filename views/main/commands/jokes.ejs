@@ -8,7 +8,7 @@
             <p>Status</p>
         </div>
         <div id="renderJokes"></div>
-
+        
         <div class="joke-buttons">
             <button id="button1" onclick="acDeButton(false, this)">Alle Deaktivieren</button>
             <button id="button2" onclick="acDeButton(true, this)">Alle
@@ -23,7 +23,6 @@
         window.onload = function () { render() }
         function render() {
             for (let index = 0; index < keys.length; index++) {
-                console.log(data[keys[index]].trigger)
                 const renderJokes = document.getElementById("renderJokes")
                 renderJokes.innerHTML += `<div class="joke-section">
                                     <p>${data[keys[index]].trigger}</p>

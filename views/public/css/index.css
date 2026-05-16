@@ -1,85 +1,134 @@
+#moveCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: block;
+    pointer-events: none;
+    z-index: -100;
+}
+
+#align {
+    margin: 60px 0;
+    padding: 40px;
+    max-width: 1920px;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(34, 34, 34, 0.4);
+    box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
+        15px -10px 10px rgba(34, 34, 34, 0.7),
+        -15px 10px 10px rgba(34, 34, 34, 0.7),
+        15px 10px 10px rgba(34, 34, 34, 0.7);
+    border-radius: 10px;
+}
+
+p {
+    font-size: 16px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+h1 span {
+    color: #2BD6F1;
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+h3 {
+    text-align: center;
+    font-size: 20px;
+}
+
+ul li {
+    font-size: 20px;
+}
+
 .head {
     display: flex;
     justify-content: space-between;
-    padding-top: 50px;
 }
 
-.video-div {
-    width: 45%;
+.head-text a {
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 1s ease;
 }
 
-.video-div h2 {
+.head-text a:hover {
+    color: #2BD6F1;
+}
+
+.head-box {
     display: flex;
-    justify-content: center;
-    font-size: 36px;
-    margin-bottom: 30px;
+    flex-direction: column;
 }
 
-.video-div video {
-    box-shadow: -5px 10px 10px #2addfc, -5px -10px 10px #2addfc, 10px 10px 10px #2addfc;
+.box-text span {
+    margin: 10px 0;
+}
+
+.box-text h3 {
+    margin: 20px 0;
+}
+
+.box-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
 }
 
-.video-socials {
+.box-img img {
     margin-top: 20px;
+    width: 80%;
+}
+
+.not-signed {
+    font-size: 32px;
+    animation: rainbow 4s infinite
+}
+
+#endButtons {
+    width: 100%;
     display: flex;
-    flex-direction: row;
+    align-items: center;
     justify-content: space-around;
+    flex-direction: column;
 }
 
-.video-socials img {
-    padding-right: 5px;
-}
-
-.video-socials a {
-    margin-top: 10px;
+#endButtons button {
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    border-color: #2bdffe;
+    background-color: transparent;
     color: white;
-    text-decoration: none;
-    transition: color 0.5s ease;
+    width: 210px;
 }
 
-.video-socials a:hover {
-    color: #2addfc;
+#endButtons p {
+    font-size: 24px;
+    width: 60%;
 }
 
-.head h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 70px;
-    width: 45%;
-    padding-left: 40px;
-    color: #2addfc;
+#endButtons img {
+    margin: 0 20px;
+    height: 40px;
 }
 
-.hero-align {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-.hero-section {
-    padding-left: 40px;
-    width: 45%;
-    align-items: center;
-}
-
-.hero-section h2 {
-    margin: 40px;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    font-size: 48px;
-    color: #2addfc;
-}
-
-
-#example {
+/* #example {
     max-height: 160px;
     display: flex;
     flex-direction: column;
@@ -94,21 +143,60 @@
         5px -10px 10px rgba(34, 34, 34, 0.7),
         -5px 10px 10px rgba(34, 34, 34, 0.7),
         5px 10px 10px rgba(34, 34, 34, 0.7);
+} */
+
+@media screen and (min-width:580px) {
+    .head-box {
+        margin: 40px 0;
+        flex-direction: row;
+    }
+
+    .head-box:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+    .box-img img {
+        max-height: 300px;
+        max-width: 300px;
+        margin: 0;
+    }
+
+    .box-text {
+        width: 60%;
+    }
+
+    .box-img {
+        width: 40%;
+    }
 }
 
-.command-align {
-    padding: 4px 0px;
-    display: flex;
-    flex-direction: row;
+@media screen and (min-width:830px) {
+
+    h1 {
+        font-size: 50px;
+    }
+
+    h1 span {
+        font-size: 34px;
+    }
+
+    p {
+        font-size: 20px;
+        text-align: start;
+    }
 }
 
-.command-align p:first-child {
-    min-width: 15%;
-    animation: rainbow 10s infinite;
-}
 
+@media screen and (min-width: 1000px) {
+    #align {
+        margin: 60px;
+    }
 
-.not-signed{
-    font-size: 32px;
-    animation: rainbow 4s infinite
+    #endButtons {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    #endButtons button {
+        width: 250px;
+    }
 }

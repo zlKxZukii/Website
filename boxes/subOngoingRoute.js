@@ -192,24 +192,38 @@ SubscriberOngoingRoute.post('/upload/subongoing',
             // 1. BILD VERARBEITUNG
             if (req.files && req.files['image']) {
                 const file = req.files['image'][0];
-                const imageName = `image-${Date.now()}.webp`;
+                const fileType = path.extname(file.originalname).toLowerCase()
+                console.log(fileType)
+                const isReady = fileType === '.webm' || fileType === '.webp'
+                let imageName = `image-${Date.now()}${fileType}`;
                 const imagePath = path.join(userFolder, imageName);
-
-                await processFile([
-                    '-t', '10',
-                    '-i', file.path,
-                    '-vf', 'fps=30,scale=256:256:force_original_aspect_ratio=increase,crop=256:256,format=yuva420p',
-                    '-vcodec', 'libwebp',
-                    '-lossless', '0',
-                    '-q:v', '75',
-                    '-compression_level', '6',
-                    '-preset', 'picture',
-                    '-loop', '0',
-                    '-an',
-                    '-y',
-                    imagePath
-                ], file.path);
-
+                if (isReady) {
+                    await processFile([
+                        '-i', file.path,
+                        '-c:v', 'copy',        // Kopiert den Stream 1:1 (egal ob Bild oder Video)
+                        '-an',                 // Entfernt Ton (wichtig bei Videos/GIFs)
+                        '-y',
+                        imagePath
+                    ], file.path);
+                }
+                else {
+                    // Fall 2: Konvertieren zu WebP (für JPG, PNG, GIF)
+                    await processFile([
+                        '-t', '10',
+                        '-i', file.path,
+                        // Nur FPS und Pixelformat beibehalten, keine scale-Logik mehr
+                        '-vf', 'fps=30,format=yuva420p',
+                        '-vcodec', 'libwebp',
+                        '-lossless', '0',
+                        '-q:v', '75',
+                        '-compression_level', '6',
+                        '-preset', 'picture',
+                        '-loop', '0',
+                        '-an',
+                        '-y',
+                        imagePath
+                    ], file.path);
+                }
                 // Alte Bilder löschen
                 const files = await fs.promises.readdir(userFolder);
                 for (const f of files) {
@@ -219,9 +233,11 @@ SubscriberOngoingRoute.post('/upload/subongoing',
                 }
                 const imagePathEnd = `../../${imagePath}`;
                 if (user) {
-                    user.alertBox.Bits.img = imagePathEnd;
+                
+                    user.alertBox['Fortlaufende Subscriber'].img = imagePathEnd;
+                    console.log(user.alertBox['Fortlaufende Subscriber'])
                 }
-                await Insert.UpdateAlertBoxImage([userId, "Fortlaufende Subscriber", imagePathEnd]);
+                await Insert.UpdateAlertBoxImage([userId, 'Fortlaufende Subscriber', imagePathEnd]);
             }
 
             // 2. SOUND VERARBEITUNG
@@ -243,7 +259,7 @@ SubscriberOngoingRoute.post('/upload/subongoing',
                 }
                 const soundPathEnd = `../../${soundPath}`;
                 if (user) {
-                    user.alertBox.Bits.sound = soundPathEnd;
+                    user.alertBox['Fortlaufende Subscriber'].sound = soundPathEnd;
                 }
                 await Insert.UpdateAlertBoxSound([userId, "Fortlaufende Subscriber", soundPathEnd]);
             }

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { getRandomInt } from "../randomizer/randomNumber.js";
+import { clip } from '../twitch_bot/functions/createClip.js';
 
 
 const execFilePromise = promisify(execFile);
@@ -17,7 +18,8 @@ if (!fs.existsSync(SHOUTOUT_DIR)) fs.mkdirSync(SHOUTOUT_DIR, { recursive: true }
 
 
 class Manager {
-    async shoutOut(viewerName, apiClient, text) {
+    async shoutOut(response) {
+        const { viewerName, apiClient, text } = response
         const viewer = await apiClient.users.getUserByName(viewerName)
         const clips = await apiClient.clips.getClipsForBroadcaster(viewer.id, { limit: 1 })
         const game = await this.getGame(apiClient, clips.data[0].gameId)
@@ -43,17 +45,17 @@ class Manager {
             user.clipRun = false;
 
             const { clipId } = await this.getClipsFromBroadcaster(userId, apiClient);
-
+            console.log(clipId)
             const game = await this.getGame(apiClient, clipId.gameId)
             const video = await this.getLocalClipUrl(clipId, userId, CLIPS_DIR, 'clips');
             setTimeout(() => {
                 user.clipRun = true
             }, clipId.duration * 1000 - 5000);
-            
+
             return {
                 video: video,
                 duration: clipId.duration,
-                game: game.name,
+                game: game.name || undefined,
                 cover: await game.getBoxArtUrl(130, 190),
                 cliper: clipId.creatorDisplayName
             }
@@ -64,12 +66,23 @@ class Manager {
     }
 
     async getClipsFromBroadcaster(userID, apiClient) {
-        const clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 100 })
+        try {
+            const date = new Date();
 
-        if (clips.data.length != 0) {
-            return { clipId: clips.data[getRandomInt(clips.data.length)] }
-        }
-        else {
+            date.setDate(date.getDate() - 90);
+            let clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 50, startDate: date.toISOString() })
+            console.log(clips.data)
+            if (clips.data.length <= 8) {
+                clips = await apiClient.clips.getClipsForBroadcaster(userID, { limit: 50 })
+                return { clipId: clips.data[getRandomInt(clips.data.length)] }
+            }
+            if (clips.data.length != 0) {
+                return { clipId: clips.data[getRandomInt(clips.data.length)] }
+            }
+            else {
+                return { clipId: "CloudySarcasticSashimiTwitchRPG" }
+            }
+        } catch (error) {
             return { clipId: "CloudySarcasticSashimiTwitchRPG" }
         }
     }

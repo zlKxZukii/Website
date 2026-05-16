@@ -36,7 +36,7 @@ export async function authTwitch(code, ipAddress, res) {
 
         const DB = await Select.AccessShield([info.userId])
         if (!DB || DB < 1) {
-            // await ClientManager.start(user.displayName.toLowerCase())
+            await ClientManager.start(user.displayName.toLowerCase(), user.id)
             const category = ["spamBot", "followBot"]
             for (let index = 0; index < category.length; index++) {
                 await Insert.AccessShield([info.userId, category[index], false])

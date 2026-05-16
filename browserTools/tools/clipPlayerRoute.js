@@ -34,7 +34,7 @@ clipPlayerRoute.get('/', async (req, res) => {
             showBody: true,
             boxes: 'Clip Player',
             helpLink: 'https://scaletta.live/browsertools',
-            link: `https://scaletta.live/clipsplayer/${clipKey}?autoplay=1&muted=1`,
+            link: `https://scaletta.live/clipsplayer/player/${clipKey}?autoplay=1&muted=1`,
             clipKey
         }
         if (user.clipBoxColors) {
@@ -50,7 +50,7 @@ clipPlayerRoute.get('/', async (req, res) => {
     }
 })
 
-clipPlayerRoute.get('/:key', async (req, res) => {
+clipPlayerRoute.get('/player/:key', async (req, res) => {
     const obj = {
         css: "../../css/browserTools/websocket/clip-player.css",
         title: "CLIP PLAYER",
@@ -69,10 +69,13 @@ clipPlayerRoute.post('/getclip/:key', async (req, res) => {
     };
 
     const { twitch_id, username } = await Select.GetUserIdFromTools([key]);
-
     const user = ClientManager.getClient(twitch_id);
-    const { video, duration, game, cover, cliper } = await ActionManager.initClipForBroadcaster(twitch_id, user.apiClient, user)
+    let clipData = await ActionManager.initClipForBroadcaster(twitch_id, user.apiClient, user)
 
+    if (!clipData) {
+        return res.status(204).send()
+    }
+    const { video, duration, game, cover, cliper } = clipData
     io.to(key).emit("newClip", {
         video: video,
         duration: duration,
@@ -82,7 +85,7 @@ clipPlayerRoute.post('/getclip/:key', async (req, res) => {
         clip: user.clipBoxColors.Clip,
         head: user.clipBoxColors.Head
     });
-    res.redirect(`/clipsplayer/${key}`);
+    res.status(200).json({ success: true });
 });
 
 clipPlayerRoute.post('/save', async (req, res) => {
@@ -95,7 +98,7 @@ clipPlayerRoute.post('/save', async (req, res) => {
     const user = ClientManager.getClient(sessionData.userId);
     const settings = {}
     const valArr = ['Head', 'Clip']
-    
+
     for (const val of valArr) {
         const { color, x, y, blur, rgba, alpha, family, size } = req.body[val]
         console.log(req.body[val])

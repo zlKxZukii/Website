@@ -30,6 +30,7 @@ dashboardRoute.get((""), async (req, res) => {
     if (req.headers.host.includes("www.")) {
         parent = "www."+parentRAW
     }
+    
     const obj = {
         title: "Dashboard",
         css: "../css/dashboard/dashboard.css",

@@ -1,0 +1,183 @@
+<style>
+    .bar {
+        flex: 1;
+        height: 15%;
+        /* Farbenfroher Gradient: Lila -> Blau -> Türkis */
+        background: linear-gradient(to top, var(--bottom, <%=locals.settings?.barBottom || '#00d2ff' %>), var(--middle, <%=locals.settings?.barMiddle || '#4a00e0' %>), var(--top, <%=locals.settings?.barTop || '#8e2de2' %>));
+        border-radius: 3px 3px 1px 1px;
+        box-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+        /* Glow-Effekt */
+        transition: height 0.3s ease;
+    }
+</style>
+
+<h2 style="font-size: 50px; text-align: center; margin-top: 60px;">
+    <%= title %>
+</h2>
+
+<%- include("../../layouts/browserToolsBar") %>
+    <% if(showSettings){ %>
+        <div class="link-box">
+            <%- include("../../layouts/linkBox") %>
+                <div style="display: flex; justify-content: center;
+                align-items: center; flex-direction: column;">
+                    <h2>Vorschau</h2>
+                    <div id="player">
+                        <img id="albumCover" src="/img/logo.webp" alt="">
+                        <div class="info">
+                            <div class="song-interpret">
+                                <h2 id="title">Scalettas Lied</h2>
+                                <h3 id="album">Scalettas Album</h3>
+                                <h4 id="interpret">Scalettas Name</h4>
+                            </div>
+                            <div>
+                                <div id="viz-wrapper">
+                                    <div class="playing" id="bars"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Commands</h2>
+                    <div class="commands">
+                        <div class="trigger">
+                            <p style="text-align: start;">Trigger</p>
+                            <p style="text-align: start;">Beschreibung</p>
+                        </div>
+                        <div class="trigger">
+                            <p>!nowplaying</p>
+                            <p>Der Song der gerade läuft.</p>
+                        </div>
+                    </div>
+                    <h2>Feintuning</h2>
+                    <div id="settingsAlign">
+                    <div class="commands">
+                        <div class="settings">
+                            <p>Drehung</p>
+                            <label id="rotation">
+                                <input onclick="addRotation(this)" id="roationState" type="checkbox"
+                                    <%=locals.settings.rotation===true ? 'checked' : '' %>>
+                                <div class="toggle"><span></span></div>
+                            </label>
+                        </div>
+                        <div class="settings">
+                            <label for="fontColor">Schriftfarbe</label>
+                            <input style=" border: none; background: none; cursor: pointer;" type="color"
+                                name="fontColor" id="fontColor" value="<%= locals.settings.fontColor || '#ffffff' %>">
+                        </div>
+                    </div>
+                    <div id="barDiv">
+                        <h3>Bars</h3>
+                        <div class="settings">
+                            <div class="color">
+                                <label for="upperColor">Oben</label>
+                                <input style=" border: none; background: none; cursor: pointer;" type="color"
+                                    name="upperColor" id="upperColor"
+                                    value="<%= locals.settings?.barTop || '#8e2de2' %>">
+                            </div>
+                            <div class="color">
+                                <label for="middleColor">Mitte</label>
+                                <input style=" border: none; background: none; cursor: pointer;" type="color"
+                                    name="middleColor" id="middleColor"
+                                    value="<%= locals.settings?.barMiddle || '#4a00e0' %>">
+                            </div>
+                            <div class="color">
+                                <label for="underColor">Unten</label>
+                                <input style=" border: none; background: none; cursor: pointer;" type="color"
+                                    name="underColor" id="underColor"
+                                    value="<%= locals.settings?.barBottom || '#00d2ff' %>">
+                            </div>
+                        </div>
+                    </div>
+                                            
+                    </div>
+                                            <button id="btn" onclick="saveSettings(this)">Speichern</button>
+                </div>
+        </div>
+        <% } else{%>
+
+            <div class=" spotify-box">
+                <h2>Mit last.fm verbinden!</h2>
+                <button onclick="window.location.href='https://scaletta.live/lastfm/auth'"><img height="40px"
+                        src="/img/lastfm/lastfm_logo.webp" alt="">Mit last.fm
+                    verbinden!</button>
+                <h2>Vorschau</h2>
+                <div id="player">
+                    <img style="height: unset;" id="albumCover" src="/img/logo.webp" alt="">
+                    <div class="info">
+                        <div class="song-interpret">
+                            <h2 id="title">Scalettas Lied</h2>
+                            <h3 id="album">Scalettas Album</h3>
+                            <h4 id="interpret">Scalettas Name</h3>
+                        </div>
+                        <div id="time">
+                            <p id="timeLeft">01:33</p>
+                            <p id="completeTime">03:29</p>
+                        </div>
+                        <div>
+                            <div id="viz-wrapper">
+                                <div class="playing" id="bars"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% }%>
+                <script>
+                    const container = document.getElementById('bars');
+                    const totalBars = 25;
+                    for (let i = 0; i < totalBars; i++) {
+                        const bar = document.createElement('div');
+                        bar.classList.add('bar');
+
+                        // Wir erstellen eine Sinus-ähnliche Verteilung für die Höhen
+                        // Damit die Mitte tendenziell höher springt als die Ränder
+                        const multiplier = Math.sin((i / totalBars) * Math.PI);
+                        const randomHeight = Math.floor(multiplier * 60 + Math.random() * 30 + 20) + "%";
+                        const randomDuration = (Math.random() * 0.3 + 0.4) + "s";
+
+                        bar.style.setProperty('--height', randomHeight);
+                        bar.style.setProperty('--duration', randomDuration);
+                        bar.style.animationDelay = (i * 0.05) + "s"; // Erzeugt einen Wellen-Effekt
+
+                        container.appendChild(bar);
+                    }
+                </script>
+                <script>
+                    function addRotation(state) {
+                        const cover = document.getElementById('albumCover')
+                        if (state === true || state?.checked) {
+                            return cover.style.animation = 'rotation-loop 12s linear infinite';
+                        }
+                        document.getElementById('albumCover').style.animation = null;
+                    }
+                    addRotation(<%= settings.rotation %>)
+                    const fontColor = document.getElementById('fontColor')
+                    function updateFontColor() {
+                        document.getElementById('title').style.color = fontColor.value
+                        document.getElementById('album').style.color = fontColor.value
+                        document.getElementById('interpret').style.color = fontColor.value
+                    }
+                    fontColor.addEventListener('input', () => {
+                        updateFontColor()
+                    })
+                    updateFontColor()
+                </script>
+                <script>
+                    const upperBar = document.getElementById('upperColor')
+                    const middleBar = document.getElementById('middleColor')
+                    const underBar = document.getElementById('underColor')
+                    function updateColor(color, variable) {
+                        container.style.setProperty(variable, color)
+                    }
+                    upperBar.addEventListener('input', () => {
+                        updateColor(upperBar.value, '--top')
+                    })
+                    middleBar.addEventListener('input', () => {
+                        updateColor(middleBar.value, '--middle')
+                    })
+                    underBar.addEventListener('input', () => {
+                        updateColor(underBar.value, '--bottom')
+                    })
+                </script>
+                <script src="/js/lastfm/data.js"></script>

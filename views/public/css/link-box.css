@@ -2,8 +2,7 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
-    margin: 60px;
-    margin-top: 60px;
+    margin: 60px 0;
     background-color: rgba(34, 34, 34, 1);
     box-shadow: -15px -10px 10px rgba(34, 34, 34, 0.7),
         15px -10px 10px rgba(34, 34, 34, 0.7),
@@ -18,7 +17,7 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    font-size: 26px;
+    font-size: 22px;
 }
 
 .input-field {
@@ -34,21 +33,38 @@
 .inner {
     display: flex;
     justify-content: center;
+    flex-direction: column;
     width: 80%;
-    border-style: solid ;border-radius: 10px 10px 10px 10px;
+    border-style: solid;
+    border-radius: 10px 10px 10px 10px;
     border-color: #2bdffe;
 }
 
-.input-field input {
-border: none;
-    background-color: rgba(34, 34, 34, 1);
-    height: 34px;
-    width: 90%;
-    border-radius:10px 0px 0px 10px
+#configBtn {
+    border-top: #2bdffe solid;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
 }
 
-.blur{
-    filter:blur(5px);
+#configBtn button {
+    width: 50%;
+}
+
+#configBtn button:last-child{
+    border-radius: 0 10px 10px 0;
+    border-left:#2bdffe solid;
+}
+
+.input-field input {
+    border: none;
+    background-color: rgba(34, 34, 34, 1);
+    height: 34px;
+    border-radius: 10px 0px 0px 10px
+}
+
+.blur {
+    filter: blur(5px);
 }
 
 .input-field button {
@@ -64,7 +80,7 @@ border: none;
     height: 25px;
 }
 
-.help{
+.help {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,11 +88,17 @@ border: none;
     margin: 20px;
 }
 
-.help button{
+.help button {
     padding: 20px 40px;
     font-size: 26px;
     font-weight: bold;
     border: solid #2bdffe;
     width: auto;
     height: auto;
+}
+
+@media screen and (min-width: 1000px){
+    .link-box{
+        margin: 60px;
+    }
 }

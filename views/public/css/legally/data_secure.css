@@ -1,19 +1,18 @@
 .data-secure-box {
-    margin: 40px 60px;
+    margin: 60px 0;
     padding: 40px 40px;
     background-color: rgba(34, 34, 34, 0.7);
     border-radius: 10px;
 }
 
 .data-secure-box h1 {
-    display: flex;
-    justify-content: center;
     padding-bottom: 40px;
+    font-size: 24px;
+    text-align: center;
 }
 
 .data-secure-box h2 {
-    display: flex;
-    justify-content: center;
+    text-align: center;
     padding: 20px 0px;
 }
 
@@ -28,4 +27,14 @@
 
 .data-secure-box a:hover {
     color: #2BD6F1;
+}
+
+@media screen and (min-width:1000px) {
+    .data-secure-box {
+        margin: 60px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
 }
